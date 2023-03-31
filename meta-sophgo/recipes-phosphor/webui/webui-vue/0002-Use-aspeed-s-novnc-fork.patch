@@ -1,0 +1,63 @@
+From 6eb5ccbcd1420359872374cd6d610b40b172c3a2 Mon Sep 17 00:00:00 2001
+From: Steven Lee <steven_lee@aspeedtech.com>
+Date: Mon, 6 Feb 2023 11:23:13 +0800
+Subject: [PATCH] Use aspeed's novnc fork
+
+aspeed's novnc fork supports aspeed proprietary jpg.
+Modify webpack's config for WebAssembly.
+
+Signed-off-by: Jammy Huang <jammy_huang@aspeedtech.com>
+---
+ package.json  | 3 ++-
+ vue.config.js | 7 +++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/package.json b/package.json
+index 9a7f942f..979031fa 100644
+--- a/package.json
++++ b/package.json
+@@ -16,7 +16,7 @@
+     },
+     "dependencies": {
+         "@carbon/icons-vue": "10.28.0",
+-        "@novnc/novnc": "1.2.0",
++        "@novnc/novnc": "git+https://github.com:AspeedTech-BMC/noVNC.git#c133fc8",
+         "axios": "0.21.4",
+         "bootstrap": "4.6.0",
+         "bootstrap-vue": "2.21.2",
+@@ -51,6 +51,7 @@
+         "eslint": "7.22.0",
+         "eslint-plugin-prettier": "3.3.1",
+         "eslint-plugin-vue": "7.8.0",
++        "path-browserify": "^1.0.1",
+         "lint-staged": "10.5.4",
+         "prettier": "2.2.1",
+         "sass": "1.32.8",
+diff --git a/vue.config.js b/vue.config.js
+index de0ad12a..01663c3a 100644
+--- a/vue.config.js
++++ b/vue.config.js
+@@ -84,6 +84,10 @@ module.exports = {
+         ] = `@/env/components/AppNavigation/${envName}.js`;
+       }
+     }
++    config.resolve.fallback = {
++      fs: false,
++      path: require.resolve('path-browserify'),
++    };
+ 
+     if (process.env.NODE_ENV === 'production') {
+       config.plugins.push(
+@@ -92,6 +96,9 @@ module.exports = {
+         })
+       );
+     }
++    config.experiments = {
++      asyncWebAssembly: true,
++    };
+   },
+   pluginOptions: {
+     i18n: {
+-- 
+2.25.1
+

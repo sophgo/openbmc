@@ -1,0 +1,40 @@
+diff --git a/arch/arm/mach-aspeed/ast2600/board_common.c b/arch/arm/mach-aspeed/ast2600/board_common.c
+index 99a9e1273a..fcc27683c1 100644
+--- a/arch/arm/mach-aspeed/ast2600/board_common.c
++++ b/arch/arm/mach-aspeed/ast2600/board_common.c
+@@ -51,6 +51,11 @@ void reset_eth_phy(void)
+ }
+ #endif
+ 
++static void __maybe_unused disable_wdt2(void)
++{
++	writeb(0x00, ASPEED_FMC_WDT2);
++}
++
+ __weak int board_init(void)
+ {
+ 	struct udevice *dev;
+@@ -91,6 +96,8 @@ __weak int board_init(void)
+ 			break;
+ 	}
+ 
++	disable_wdt2();
++
+ 	return 0;
+ }
+ 
+diff --git a/include/configs/evb_ast2600_spl.h b/include/configs/evb_ast2600_spl.h
+index 23dd7ecd7f..36be5e7dc3 100644
+--- a/include/configs/evb_ast2600_spl.h
++++ b/include/configs/evb_ast2600_spl.h
+@@ -32,7 +32,9 @@
+ #undef CONFIG_EXTRA_ENV_SETTINGS
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+ 	"loadaddr=" STR(CONFIG_SYS_LOAD_ADDR) "\0"	\
+-	"bootspi=fdt addr 20100000 && fdt header get fitsize totalsize && cp.b 20100000 ${loadaddr} ${fitsize} && bootm; echo Error loading kernel FIT image\0"	\
++	"bootspi=fdt addr 20100000 && fdt header get fitsize totalsize && cp.b 20100000 ${loadaddr} ${fitsize} && bootm; echo Error loading kernel FIT image, boot alternative firmware; run bootalt\0"	\
++	"wdt2bite=mw.l 0x1e620068 0x0a 1; mw.b 0x1e78500c 0x33 1; mw.b 0x1e620064 0x01\0" \
++        "bootalt=run wdt2bite\0" \
+ 	"verify=yes\0"	\
+ 	""
+ 

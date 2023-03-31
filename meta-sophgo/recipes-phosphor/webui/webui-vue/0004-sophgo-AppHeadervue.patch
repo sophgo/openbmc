@@ -1,0 +1,13 @@
+diff --git a/src/components/AppHeader/AppHeader.vue b/src/components/AppHeader/AppHeader.vue
+index 84e4588..cb01277 100644
+--- a/src/components/AppHeader/AppHeader.vue
++++ b/src/components/AppHeader/AppHeader.vue
+@@ -37,7 +37,7 @@
+           >
+             <img
+               class="header-logo"
+-              src="@/assets/images/logo-header.svg"
++              src="@/assets/images/sg2042.svg"
+               :alt="altLogo"
+             />
+           </b-navbar-brand>

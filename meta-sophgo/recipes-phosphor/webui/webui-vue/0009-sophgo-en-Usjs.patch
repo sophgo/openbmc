@@ -1,0 +1,18 @@
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index ffb6a2e..e619bbb 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -839,6 +839,13 @@
+         "rebootServer": "Reboot server",
+         "shutDown": "Shut down",
+         "shutdownServer": "Shutdown server",
++        "serverCpldInfo":"CPLD Info",
++        "serverCpuaPwState":"CPU A Power State:",
++        "serverCpubPwState":"CPU B Power State:",
++        "serverOcpuPwState":"CPU Other Power State:",
++        "serverOtherPwState":"Other Power State:",
++        "serverPsuState":"PSU State:",
++        "serverEfuseState":"Efuse State:",
+         "bootSettings": {
+             "bootSettingsOverride": "Boot settings override",
+             "enableOneTimeBoot": "Enable one time boot",

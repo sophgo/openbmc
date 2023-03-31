@@ -1,0 +1,30 @@
+diff --git a/obmc-flash-bmc b/obmc-flash-bmc
+index 4b29bb3..bf8326f 100644
+--- a/obmc-flash-bmc
++++ b/obmc-flash-bmc
+@@ -69,6 +69,15 @@ findname() {
+ 
+ # Set the u-boot envs that perform a side switch on failure to boot
+ set_wdt2bite() {
++  # AST2600
++  if ! fw_printenv wdt2bite 2>/dev/null; then
++    # Pause 1 second and trigger WD2 RESET, alternate boot flash kicks in.
++    fw_setenv wdt2bite "mw.l 0x1e620068 0x0a 1; mw.b 0x1e78500c 0x33 1; mw.b 0x1e620064 0x01"
++    fw_setenv bootalt "run wdt2bite"
++    fw_setenv obmc_bootcmd "boot || run bootalt"
++  fi
++
++  # AST2500
+   if ! fw_printenv wdt2bite 2>/dev/null; then
+     fw_setenv wdt2bite "mw.l 0x1e785024 0xa 1; mw.b 0x1e78502c 0xb3 1"
+     fw_setenv bootalt "run wdt2bite"
+@@ -440,9 +449,6 @@ mirroruboot() {
+     echo "Mirroring U-boot to alt chip"
+     mtd_copy "${bmcdev}" "${altdev}"
+     mtd_copy "${bmcenvdev}" "${altenvdev}"
+-
+-    copy_ubiblock_to_alt
+-    copy_root_to_alt
+   fi
+ }
+ 

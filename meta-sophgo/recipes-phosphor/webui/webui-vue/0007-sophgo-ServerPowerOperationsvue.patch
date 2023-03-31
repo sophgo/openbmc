@@ -1,0 +1,86 @@
+diff --git a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+index ba9ebce..0c313a2 100644
+--- a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
++++ b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+@@ -148,6 +148,56 @@
+         </page-section>
+       </b-col>
+     </b-row>
++    <b-row>
++      <b-col sm="8" md="6" xl="4">
++        <page-section
++          :section-title="$t('pageServerPowerOperations.serverCpldInfo')"
++        >
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverCpuaPwState') }} {{ $t(cpuaPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverCpubPwState') }} {{ $t(cpubPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverOcpuPwState') }} {{ $t(cpuoPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverOtherPwState') }} {{ $t(otherPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverPsuState') }} {{ $t(psuStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverEfuseState') }} {{ $t(efusStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++        </page-section>
++      </b-col>
++    </b-row>
+   </b-container>
+ </template>
+ 
+@@ -179,6 +229,24 @@ export default {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
++    cpuaPWStatus() {
++      return this.$store.getters['global/cpuaPWStatus'];
++    },
++    cpubPWStatus() {
++      return this.$store.getters['global/cpubPWStatus'];
++    },
++    cpuoPWStatus() {
++      return this.$store.getters['global/cpuoPWStatus'];
++    },
++    otherPWStatus() {
++      return this.$store.getters['global/otherPWStatus'];
++    },
++    psuStatus() {
++      return this.$store.getters['global/psuStatus'];
++    },
++    efusStatus() {
++      return this.$store.getters['global/efusStatus'];
++    },
+     isOperationInProgress() {
+       return this.$store.getters['controls/isOperationInProgress'];
+     },

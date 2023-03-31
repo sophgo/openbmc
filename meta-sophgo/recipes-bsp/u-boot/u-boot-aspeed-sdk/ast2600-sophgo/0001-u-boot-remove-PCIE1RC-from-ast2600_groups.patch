@@ -1,0 +1,13 @@
+diff --git a/drivers/pinctrl/aspeed/pinctrl_ast2600.c b/drivers/pinctrl/aspeed/pinctrl_ast2600.c
+index e819920d5a..7d8919663f 100644
+--- a/drivers/pinctrl/aspeed/pinctrl_ast2600.c
++++ b/drivers/pinctrl/aspeed/pinctrl_ast2600.c
+@@ -470,7 +470,7 @@ static const struct aspeed_group_config ast2600_groups[] = {
+ 	{ "USB2AH", ARRAY_SIZE(usb2ah_link), usb2ah_link },
+ 	{ "USB2BH", ARRAY_SIZE(usb2bh_link), usb2bh_link },
+ 	{ "PCIE0RC", ARRAY_SIZE(pcie0rc_link), pcie0rc_link },
+-	{ "PCIE1RC", ARRAY_SIZE(pcie1rc_link), pcie1rc_link },
++//	{ "PCIE1RC", ARRAY_SIZE(pcie1rc_link), pcie1rc_link },
+ 	{ "TXD1", ARRAY_SIZE(txd1_link), txd1_link },
+ 	{ "RXD1", ARRAY_SIZE(rxd1_link), rxd1_link },
+ 	{ "TXD2", ARRAY_SIZE(txd2_link), txd2_link },

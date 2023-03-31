@@ -1,0 +1,13 @@
+diff --git a/src/layouts/LoginLayout.vue b/src/layouts/LoginLayout.vue
+index cdff204..6904912 100644
+--- a/src/layouts/LoginLayout.vue
++++ b/src/layouts/LoginLayout.vue
+@@ -23,7 +23,7 @@
+         <div class="login-aside__logo-bmc">
+           <img
+             height="60px"
+-            src="@/assets/images/built-on-openbmc-logo.svg"
++            src="@/assets/images/sopho.svg"
+             alt="Built on OpenBMC"
+           />
+         </div>
