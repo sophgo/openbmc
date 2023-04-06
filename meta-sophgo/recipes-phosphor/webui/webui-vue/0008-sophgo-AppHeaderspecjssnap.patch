@@ -1,0 +1,137 @@
+diff --git a/tests/unit/__snapshots__/AppHeader.spec.js.snap b/tests/unit/__snapshots__/AppHeader.spec.js.snap
+index 1ad2b3d..62fb1a9 100644
+--- a/tests/unit/__snapshots__/AppHeader.spec.js.snap
++++ b/tests/unit/__snapshots__/AppHeader.spec.js.snap
+@@ -9,11 +9,11 @@ exports[`AppHeader.vue should render correctly 1`] = `
+       class="link-skip-nav btn btn-light"
+       href="#main-content"
+     >
+-      
++
+       appHeader.skipToContent
+-    
++
+     </a>
+-     
++
+     <b-navbar
+       aria-label="appHeader.applicationHeader"
+       type="dark"
+@@ -26,7 +26,7 @@ exports[`AppHeader.vue should render correctly 1`] = `
+         variant="link"
+       >
+         <!---->
+-         
++
+         <svg
+           fill="currentColor"
+           focusable="false"
+@@ -46,7 +46,7 @@ exports[`AppHeader.vue should render correctly 1`] = `
+           />
+         </svg>
+       </b-button>
+-       
++
+       <b-navbar-nav>
+         <b-navbar-brand
+           class="mr-0"
+@@ -56,13 +56,13 @@ exports[`AppHeader.vue should render correctly 1`] = `
+           <img
+             alt="Built on OpenBMC"
+             class="header-logo"
+-            src="@/assets/images/logo-header.svg"
++            src="@/assets/images/sg2042.svg"
+           />
+         </b-navbar-brand>
+-         
++
+         <!---->
+       </b-navbar-nav>
+-       
++
+       <b-navbar-nav
+         class="ml-auto helper-menu"
+       >
+@@ -93,11 +93,11 @@ exports[`AppHeader.vue should render correctly 1`] = `
+               />
+             </svg>
+           </span>
+-          
++
+           appHeader.health
+-        
++
+         </b-nav-item>
+-         
++
+         <b-nav-item
+           data-test-id="appHeader-container-power"
+           to="/operations/server-power-operations"
+@@ -125,11 +125,11 @@ exports[`AppHeader.vue should render correctly 1`] = `
+               />
+             </svg>
+           </span>
+-          
++
+           appHeader.power
+-        
++
+         </b-nav-item>
+-         
++
+         <li
+           class="nav-item"
+         >
+@@ -156,7 +156,7 @@ exports[`AppHeader.vue should render correctly 1`] = `
+                 d="M12 10H6.78A11 11 0 0127 16h2A13 13 0 006 7.68V4H4v8h8zM20 22h5.22A11 11 0 015 16H3a13 13 0 0023 8.32V28h2V20H20z"
+               />
+             </svg>
+-             
++
+             <span
+               class="responsive-text"
+             >
+@@ -164,7 +164,7 @@ exports[`AppHeader.vue should render correctly 1`] = `
+             </span>
+           </b-button>
+         </li>
+-         
++
+         <li
+           class="nav-item"
+         >
+@@ -174,28 +174,28 @@ exports[`AppHeader.vue should render correctly 1`] = `
+             right=""
+             variant="link"
+           >
+-             
++
+             <b-dropdown-item
+               data-test-id="appHeader-link-profile"
+               to="/profile-settings"
+             >
+               appHeader.profileSettings
+-            
++
+             </b-dropdown-item>
+-             
++
+             <b-dropdown-item
+               data-test-id="appHeader-link-logout"
+             >
+-              
++
+               appHeader.logOut
+-            
++
+             </b-dropdown-item>
+           </b-dropdown>
+         </li>
+       </b-navbar-nav>
+     </b-navbar>
+   </header>
+-   
++
+   <transition-stub
+     name="fade"
+   >
