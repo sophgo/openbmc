@@ -1,0 +1,299 @@
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 82637a4..5ea853a 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -39,6 +39,71 @@
+       </b-col>
+     </b-row>
+     <div id="terminal" ref="panel"></div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div>
++      <b-form novalidate @submit.prevent="setSolPort" :inline="true">
++        <b-button
++              variant="primary"
++              type="submit"
++              data-test-id="SerialOverLanConsole-button-setport"
++        >
++              {{ $t('pageSerialOverLan.setPort') }}
++        </b-button>
++        <dt>
++          {{ $t('pageSerialOverLan.blank') }}
++        </dt>
++        <b-form-group>
++            <b-form-radio-group id="radio-group" v-model="form.port" name="radio-group">
++                <b-form-radio value="port0">{{ $t('pageSerialOverLan.solPortC0U0') }}</b-form-radio>
++                <b-form-radio value="port1">{{ $t('pageSerialOverLan.solPortC0U1') }}</b-form-radio>
++                <b-form-radio value="port2" >{{ $t('pageSerialOverLan.solPortC1U0') }}</b-form-radio>
++                <b-form-radio value="port3">{{ $t('pageSerialOverLan.solPortC1U1') }}</b-form-radio>
++            </b-form-radio-group>
++         </b-form-group>
++      </b-form>
++    </div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div >
++      <dl>
++        <dt>
++          {{'SATA\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.sata1') }} <status-icon :status="sata1StatusIcon" />
++          {{ $t('pageSerialOverLan.sata2') }} <status-icon :status="sata2StatusIcon" />
++        </dt>
++      </dl>
++   </div>
++    <div >
++      <dl>
++        <dt>
++          {{'HDD\xa0\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.hdd1') }}  <status-icon :status="hdd1StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd2') }}  <status-icon :status="hdd2StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd3') }}  <status-icon :status="hdd3StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd4') }}  <status-icon :status="hdd4StatusIcon" />
++        </dt>
++      </dl>
++   </div>
++    <div >
++      <dl>
++        <dt>
++          {{'FAN\xa0\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.fan1') }} <status-icon :status="fan1StatusIcon" />
++          {{ $t('pageSerialOverLan.fan2') }} <status-icon :status="fan2StatusIcon" />
++          {{ $t('pageSerialOverLan.fan3') }} <status-icon :status="fan3StatusIcon" />
++          {{ $t('pageSerialOverLan.fan4') }} <status-icon :status="fan4StatusIcon" />
++          {{ $t('pageSerialOverLan.fan5') }} <status-icon :status="fan5StatusIcon" />
++          {{ $t('pageSerialOverLan.fan6') }} <status-icon :status="fan6StatusIcon" />
++          {{ $t('pageSerialOverLan.fan7') }} <status-icon :status="fan7StatusIcon" />
++          {{ $t('pageSerialOverLan.fan8') }} <status-icon :status="fan8StatusIcon" />
++          {{ $t('pageSerialOverLan.fan9') }} <status-icon :status="fan9StatusIcon" />
++        </dt>
++      </dl>
++    </div>
+   </div>
+ </template>
+ 
+@@ -63,22 +128,196 @@ export default {
+       type: Boolean,
+       default: true,
+     },
++    SolPortType: {
++      type: String,
++      default: null,
++    },
+   },
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      form: {
++        port: '',
++      },
+     };
+   },
+   computed: {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
++    sata1Status() {
++      return this.$store.getters['global/sata1Status'];
++    },
++    sata1StatusIcon() {
++      switch (this.sata1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++
++    sata2Status() {
++      return this.$store.getters['global/sata2Status'];
++    },
++    sata2StatusIcon() {
++      switch (this.sata2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd1Status() {
++      return this.$store.getters['global/hdd1Status'];
++    },
++    hdd1StatusIcon() {
++      switch (this.hdd1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd2Status() {
++      return this.$store.getters['global/hdd2Status'];
++    },
++    hdd2StatusIcon() {
++      switch (this.hdd2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd3Status() {
++      return this.$store.getters['global/hdd3Status'];
++    },
++    hdd3StatusIcon() {
++      switch (this.hdd3Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd4Status() {
++      return this.$store.getters['global/hdd4Status'];
++    },
++    hdd4StatusIcon() {
++      switch (this.hdd4Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan1Status() {
++      return this.$store.getters['global/fan1Status'];
++    },
++    fan1StatusIcon() {
++      switch (this.fan1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan2Status() {
++      return this.$store.getters['global/fan2Status'];
++    },
++    fan2StatusIcon() {
++      switch (this.fan2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan3Status() {
++      return this.$store.getters['global/fan3Status'];
++    },
++    fan3StatusIcon() {
++      switch (this.fan3Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan4Status() {
++      return this.$store.getters['global/fan4Status'];
++    },
++    fan4StatusIcon() {
++      switch (this.fan4Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan5Status() {
++      return this.$store.getters['global/fan5Status'];
++    },
++    fan5StatusIcon() {
++      switch (this.fan5Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan6Status() {
++      return this.$store.getters['global/fan6Status'];
++    },
++    fan6StatusIcon() {
++      switch (this.fan6Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan7Status() {
++      return this.$store.getters['global/fan7Status'];
++    },
++    fan7StatusIcon() {
++      switch (this.fan7Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan8Status() {
++      return this.$store.getters['global/fan8Status'];
++    },
++    fan8StatusIcon() {
++      switch (this.fan8Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan9Status() {
++      return this.$store.getters['global/fan9Status'];
++    },
++    fan9StatusIcon() {
++      switch (this.fan9Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
+     connection() {
+       return this.serverStatus === 'off' ? false : true;
+     },
+     serverStatusIcon() {
+       return this.connection ? 'success' : 'danger';
+     },
++
+   },
+   created() {
+     this.$store.dispatch('global/getServerStatus');
+@@ -157,6 +396,25 @@ export default {
+         'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=600,height=550'
+       );
+     },
++    setSolPort() {
++      if (this.form.port === 'port0')
++      {
++        this.$store.dispatch('controls/setSolToPort0');
++      }
++      if (this.form.port === 'port1')
++      {
++        this.$store.dispatch('controls/setSolToPort1');
++      }
++      if (this.form.port === 'port2')
++      {
++        this.$store.dispatch('controls/setSolToPort2');
++      }
++      if (this.form.port === 'port3')
++      {
++        this.$store.dispatch('controls/setSolToPort3');
++      }
++
++    },
+   },
+ };
+ </script>

@@ -1,0 +1,17 @@
+diff --git a/drivers/soc/aspeed/aspeed-bmc-dev.c b/drivers/soc/aspeed/aspeed-bmc-dev.c
+index 367bb050d99e..bff46c7e7d43 100644
+--- a/drivers/soc/aspeed/aspeed-bmc-dev.c
++++ b/drivers/soc/aspeed/aspeed-bmc-dev.c
+@@ -315,7 +315,11 @@ static void aspeed_bmc_device_init(struct aspeed_bmc_device *bmc_device)
+ 			pcie_config_ctl);
+ 
+ 	/* update class code to others as it is a MFD device */
+-	regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
++	// regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
++	if (bmc_device->pcie2lpc)
++		regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0x0c070100);
++	else
++		regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
+ 
+ #ifdef SCU_TRIGGER_MSI
+ 	//SCUC24[17]: Enable PCI device 1 INTx/MSI from SCU560[15]. Will be added in next version

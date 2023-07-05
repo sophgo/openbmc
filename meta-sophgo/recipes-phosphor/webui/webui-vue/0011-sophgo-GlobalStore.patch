@@ -1,0 +1,144 @@
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index fa2d644..bc3603d 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,12 +34,21 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
+-    cpuaPWStatus:'unreachable',
+-    cpubPWStatus:'unreachable',
+-    cpuoPWStatus:'unreachable',
+-    otherPWStatus:'unreachable',
+-    psuStatus:'unreachable',
+-    efusStatus:'unreachable',
++    sata1Status: null,
++    sata2Status: null,
++    hdd1Status: null,
++    hdd2Status: null,
++    hdd3Status: null,
++    hdd4Status: null,
++    fan1Status: null,
++    fan2Status: null,
++    fan3Status: null,
++    fan4Status: null,
++    fan5Status: null,
++    fan6Status: null,
++    fan7Status: null,
++    fan8Status: null,
++    fan9Status: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -52,12 +61,21 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
+-    cpuaPWStatus:  (state)  => state.cpuaPWStatus,
+-    cpubPWStatus:  (state)  => state.cpubPWStatus,
+-    cpuoPWStatus:  (state)  => state.cpuoPWStatus,
+-    otherPWStatus: (state)  => state.otherPWStatus,
+-    psuStatus:     (state)  => state.psuStatus,
+-    efusStatus:    (state)  => state.efusStatus,
++    sata1Status:   (state)  => state.sata1Status,
++    sata2Status:   (state)  => state.sata2Status,
++    hdd1Status:    (state)  => state.hdd1Status,
++    hdd2Status:    (state)  => state.hdd2Status,
++    hdd3Status:    (state)  => state.hdd3Status,
++    hdd4Status:    (state)  => state.hdd4Status,
++    fan1Status:    (state)  => state.fan1Status,
++    fan2Status:    (state)  => state.fan2Status,
++    fan3Status:    (state)  => state.fan3Status,
++    fan4Status:    (state)  => state.fan4Status,
++    fan5Status:    (state)  => state.fan5Status,
++    fan6Status:    (state)  => state.fan6Status,
++    fan7Status:    (state)  => state.fan7Status,
++    fan8Status:    (state)  => state.fan8Status,
++    fan9Status:    (state)  => state.fan9Status,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -72,12 +90,21 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
+-    setCpuaPWInfo: (state, cpuaPWInfo)  => (state.cpuaPWStatus  = cpuaPWInfo),
+-    setCpubPWInfo: (state, cpubPWInfo)  => (state.cpubPWStatus  = cpubPWInfo),
+-    setCpuoPWInfo: (state, cpuoPWInfo)  => (state.cpuoPWStatus  = cpuoPWInfo),
+-    setOtherPWInfo:(state, otherPWInfo) => (state.otherPWStatus = otherPWInfo),
+-    setPsuInfo:    (state, psuInfo)     => (state.psuStatus     = psuInfo),
+-    setEfusInfo:   (state, efusInfo)    => (state.efusStatus    = efusInfo),
++    setSata1Info:  (state, sata1Info)   => (state.sata1Status    = sata1Info),
++    setSata2Info:  (state, sata2Info)   => (state.sata2Status    = sata2Info),
++    setHdd1Info:  (state, hdd1Info)   => (state.hdd1Status      = hdd1Info),
++    setHdd2Info:  (state, hdd2Info)   => (state.hdd2Status    =  hdd2Info),
++    setHdd3Info:  (state, hdd3Info)   => (state.hdd3Status    =  hdd3Info),
++    setHdd4Info:  (state, hdd4Info)   => (state.hdd4Status    =  hdd4Info),
++    setFan1Info:  (state, fan1Info)   => (state.fan1Status    =  fan1Info),
++    setFan2Info:  (state, fan2Info)   => (state.fan2Status    =  fan2Info),
++    setFan3Info:  (state, fan3Info)   => (state.fan3Status    =  fan3Info),
++    setFan4Info:  (state, fan4Info)   => (state.fan4Status    =  fan4Info),
++    setFan5Info:  (state, fan5Info)   => (state.fan5Status    =  fan5Info),
++    setFan6Info:  (state, fan6Info)   => (state.fan6Status    =  fan6Info),
++    setFan7Info:  (state, fan7Info)   => (state.fan7Status    =  fan7Info),
++    setFan8Info:  (state, fan8Info)   => (state.fan8Status    =  fan8Info),
++    setFan9Info:  (state, fan9Info)   => (state.fan9Status    =  fan9Info),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -109,12 +136,21 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
+-              CpuaPWInfo,
+-              CpubPWInfo,
+-              CpuoPWInfo,
+-              OtherPWInfo,
+-              PsuInfo,
+-              EfusInfo,
++              Sata1Info,
++              Sata2Info,
++              Hdd1Info,
++              Hdd2Info,
++              Hdd3Info,
++              Hdd4Info,
++              Fan1Info,
++              Fan2Info,
++              Fan3Info,
++              Fan4Info,
++              Fan5Info,
++              Fan6Info,
++              Fan7Info,
++              Fan8Info,
++              Fan9Info,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -122,12 +158,21 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
+-            commit('setCpuaPWInfo', CpuaPWInfo);
+-            commit('setCpubPWInfo', CpubPWInfo);
+-            commit('setCpuoPWInfo', CpuoPWInfo);
+-            commit('setOtherPWInfo', OtherPWInfo);
+-            commit('setPsuInfo', PsuInfo);
+-            commit('setEfusInfo', EfusInfo);
++            commit('setSata1Info', Sata1Info);
++            commit('setSata2Info', Sata2Info);
++            commit('setHdd1Info',  Hdd1Info );
++            commit('setHdd2Info',  Hdd2Info );
++            commit('setHdd3Info',  Hdd3Info );
++            commit('setHdd4Info',  Hdd4Info );
++            commit('setFan1Info',  Fan1Info );
++            commit('setFan2Info',  Fan2Info );
++            commit('setFan3Info',  Fan3Info );
++            commit('setFan4Info',  Fan4Info );
++            commit('setFan5Info',  Fan5Info );
++            commit('setFan6Info',  Fan6Info );
++            commit('setFan7Info',  Fan7Info );
++            commit('setFan8Info',  Fan8Info );
++            commit('setFan9Info',  Fan9Info );
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first

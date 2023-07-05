@@ -5,6 +5,7 @@
 
 #include "aspeed-g6-sophgo.dtsi"
 #include <dt-bindings/gpio/aspeed-gpio.h>
+#include <dt-bindings/leds/common.h>
 
 / {
 	model = "AST2600 EVB";
@@ -263,6 +264,114 @@
 		#cooling-cells = <2>;
 		cooling-levels = <0 15 128 255>;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		sata1_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(F, 2) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+
+		sata2_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(F, 3) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd2_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(G, 1) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		frontpanel_warning_led {
+			gpios = <&gpio0 ASPEED_GPIO(G, 2) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		sata1_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(B, 0) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		sata2_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(B, 1) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		sata1_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(B, 2) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		sata2_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(B, 3) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd3_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(I, 6) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd1_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(Z, 2) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd4_act_led {
+			gpios = <&gpio0 ASPEED_GPIO(Y, 0) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd1_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(Y, 1) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd2_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(Y, 2) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd3_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(Y, 3) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd4_fault_led {
+			gpios = <&gpio0 ASPEED_GPIO(V, 4) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd1_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(V, 5) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd2_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(V, 6) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd3_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(V, 7) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		hdd4_state_led {
+			gpios = <&gpio0 ASPEED_GPIO(I, 5) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+		fan_fail_led {
+			gpios = <&gpio0 ASPEED_GPIO(D, 3) GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+			linux,default-trigger = "timer";
+		};
+
+	};
+
 };
 
 &adc0 {
@@ -316,7 +425,8 @@
 			&pinctrl_pwm11g1_default
 			&pinctrl_pwm12g1_default
 			&pinctrl_pwm13g1_default
-			&pinctrl_pwm14g1_default>;
+			&pinctrl_pwm14g1_default
+			&pinctrl_pwm15g1_default>;
 };
 
 &jtag1 {
@@ -515,13 +625,13 @@
 };
 
 &emmc_controller {
-	status = "okay";
+	status = /* "okay" */ "disabled";
 	aspeed-max-tap-delay = <736>;
 	mmc-hs200-1_8v;
 };
 
 &emmc {
-	status = "okay";
+	status = /* "okay" */ "disabled";
 #if 1
 	bus-width = <4>;
 #else
@@ -588,16 +698,16 @@
 	flash@0 {
 		status = "okay";
 		m25p,fast-read;
-		label = "spi1:0";
+		label = "image-host0";
 		spi-max-frequency = <50000000>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
 	};
 
 	flash@1 {
-		status = "disabled";
+		status = "okay";
 		m25p,fast-read;
-		label = "spi1:1";
+		label = "image-host1";
 		spi-max-frequency = <50000000>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
@@ -642,6 +752,7 @@
 
 
 #if 0//sg2042 BMC子板验证阶段，i2c接口没有负载
+
 &i2c4 {
 	status = "okay";
 
@@ -702,24 +813,113 @@
 };
 
 #else
+&i2c0 {
+	status = "okay";
+	temperature-sensor@4c {
+		compatible = "ti,tmp451";
+		reg = <0x4c>;
+	};
+	/* ssif-bmc@10 {
+		compatible = "aspeed,ast2600-ssif-bmc";
+		reg = <0x10>;
+	}; */
 
+
+};
+&i2c1 {
+	status = "okay";
+	temperature-sensor@4c {
+		compatible = "ti,tmp451";
+		reg = <0x4c>;
+	};
+};
+&i2c2 {
+	status = "okay";
+};
+&i2c3 {
+	status = "okay";
+};
+&i2c4 {
+	status = "okay";
+	/* PSU1 FRU @ 0xA0 */
+	 eeprom@50 {
+	 	compatible = "atmel,24c02";
+	 	reg = <0x50>;
+	 };
+	 /* PSU2 FRU @ 0xA2 */
+	 eeprom@51 {
+	 	compatible = "atmel,24c02";
+	 	reg = <0x51>;
+	 };
+	/* PSU1 @ 0xB0 */
+	psu@58 {
+		compatible = "pmbus";
+		reg = <0x58>;
+	};
+	/* PSU2 @ 0xB2 */
+	psu@59 {
+		compatible = "pmbus";
+		reg = <0x59>;
+	};
+};
+&i2c5 {
+	status = "okay";
+	lm75@48 {
+		compatible = "national,lm75a";
+		reg = <0x48>;
+	};
+	lm75@49 {
+		compatible = "national,lm75a";
+		reg = <0x49>;
+	};
+	lm75@4a {
+		compatible = "national,lm75a";
+		reg = <0x4a>;
+	};
+	lm75@4b {
+		compatible = "national,lm75a";
+		reg = <0x4b>;
+	};
+	lm75@4c {
+		compatible = "national,lm75a";
+		reg = <0x4c>;
+	};
+};
 &i2c6 {
 	status = "okay";
 };
 &i2c7 {
 	status = "okay";
 };
-//CPLD用i2c接口
+
 &i2c8 {
 	status = "okay";
+	i2c-mux@71 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x71>;
+	};
 };
 &i2c9 {
 	status = "okay";
+	i2c-mux@71 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x71>;
+	};
 };
 #if 1
 //pin M24 already requested by 1e650010.mdio
 &i2c10 {
 	status = "okay";
+	i2c-mux@71 {
+		compatible = "nxp,pca9546";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x71>;
+	};
 };
 //pin L26 already requested by 1e650018.mdio
 &i2c11 {
@@ -728,12 +928,21 @@
 #endif
 &i2c12 {
 	status = "okay";
+	ds1307: rtc@68 {
+		compatible = "dallas,ds1307";
+		reg = <0x68>;
+	};
 };
 &i2c13 {
 	status = "okay";
 };
 &i2c14 {
 	status = "okay";
+	eeprom@50 {
+		compatible = "atmel,24c08";
+		reg = <0x50>;
+		pagesize = <8>;
+	};
 };
 &i2c15 {
 	status = "okay";
@@ -821,7 +1030,7 @@
 };
 
 &sdhci1 {
-	status = "okay";
+	status =  "okay";
 	bus-width = <4>;
 	max-frequency = <100000000>;
 	sdhci-drive-type = /bits/ 8 <3>;
@@ -835,7 +1044,7 @@
 };
 #endif
 &bmc_dev {
-	status = "okay";
+	status = "okay"/* "disabled" */;
 	memory-region = <&bmc_dev_memory>;
 };
 
@@ -965,7 +1174,7 @@
  * +---------------------+
  */
 &i3c0 {
-	status = "okay";
+	status = /* "okay" */"disable";
 	jdec-spd;
 	/* Renesas IMX3102 multiplexer w/ thermal sensor */
 	imx3102_0: i3cmux@0f,4cc31020000 {
@@ -993,7 +1202,7 @@
 };
 
 &i3c1 {
-	status = "okay";
+	status = /* "okay" */"disable";
 	jdec-spd;
 	/* Renesas IMX3102 multiplexer w/ thermal sensor */
 	imx3102_1: i3cmux@0f,4cc31020000 {
@@ -1021,7 +1230,7 @@
 };
 
 &i3c2 {
-	status = "okay";
+	status = /* "okay" */"disable";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i3c3_default>;
 
@@ -1052,7 +1261,7 @@
 };
 
 &i3c3 {
-	status = "okay";
+	status = /* "okay" */"disable";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i3c4_default>;
 
@@ -1129,3 +1338,8 @@
 	status = "okay";
 	memory-region = <&video_engine_memory>;
 };
+
+
+
+
+

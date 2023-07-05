@@ -1,0 +1,271 @@
+[
+    {
+        "Exposes": [
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 1",
+                    "Pwm": 2,
+                    "Tachs": [
+                        0,1
+                    ]
+                },
+                "Index": 0,
+                "Name": "Fan1",
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 2",
+                    "Pwm": 3,
+                    "Tachs": [
+                        8,9
+                    ]
+                },
+                "Index": 8,
+                "Name": "Fan2",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 3",
+                    "Pwm": 4,
+                    "Tachs": [
+                       2,3
+                    ]
+                },
+                "Index": 2,
+                "Name": "Fan3",
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 4",
+                    "Pwm": 5,
+                    "Tachs": [
+                        10,11
+                    ]
+                },
+                "Index": 10,
+                "Name": "Fan4",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 5",
+                    "Pwm": 6,
+                    "Tachs": [
+                        4,5
+                    ]
+                },
+                "Index": 4,
+                "Name": "Fan5",
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 6",
+                    "Pwm": 7,
+                    "Tachs": [
+                        12,13
+                    ]
+                },
+                "Index": 12,
+                "Name": "Fan6",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 7",
+                    "Pwm": 8,
+                    "Tachs": [
+                        6,7
+                    ]
+                },
+                "Index": 6,
+                "Name": "Fan7",
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 8",
+                    "Pwm": 1,
+                    "Tachs": [
+                        6,7
+                    ]
+                },
+                "Index": 6,
+                "Name": "Fan8",
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 9",
+                    "Pwm": 1,
+                    "Tachs": [
+                        14,15
+                    ]
+                },
+                "Index": 14,
+                "Name": "Fan9",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Address": "0x48",
+                "Bus": 5,
+                "Name": "LOCAL_TEMP1",
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x49",
+                "Bus": 5,
+                "Name": "LOCAL_TEMP2",
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4a",
+                "Bus": 5,
+                "Name": "LOCAL_TEMP3",
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4b",
+                "Bus": 5,
+                "Name": "LOCAL_TEMP4",
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 5,
+                "Name": "LOCAL_TEMP5",
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 0,
+                "Name": "TEMP_CPU0_OUTER",
+                "Name1": "TEMP_CPU0_INNER",
+                "Type": "TMP451"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 1,
+                "Name": "TEMP_CPU1_OUTER",
+                "Name1": "TEMP_CPU1_INNER",
+                "Type": "TMP451"
+            }
+        ],
+        "Name": "sg2042_board",
+        "Probe": "TRUE",
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Model": "$PRODUCT_PRODUCT_NAME",
+            "PartNumber": "$PRODUCT_PART_NUMBER",
+            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+        }
+    }
+]

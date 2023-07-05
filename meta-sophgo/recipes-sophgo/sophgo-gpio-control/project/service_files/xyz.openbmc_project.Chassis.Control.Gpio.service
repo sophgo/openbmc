@@ -1,0 +1,12 @@
+[Unit]
+Description=Sophgo Gpio Control
+ConditionPathExists=/usr/share/sophgo-gpio-control/gpio-config.json
+Before=xyz.openbmc_project.Chassis.Control.Power@.service
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-gpio-control
+
+[Install]
+WantedBy=sysinit.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=start sophgo-fan-control upon first boot
+ConditionPathExists=/usr/sbin/sophgo-fan-control.sh
+[Service]
+ExecStart=/bin/sh -c '/usr/sbin/sophgo-fan-control.sh'
+
+[Install]
+WantedBy=sysinit.target

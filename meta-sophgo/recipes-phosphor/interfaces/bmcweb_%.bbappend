@@ -10,4 +10,6 @@ SRC_URI:append = " \
     file://0002-Support-websocket-control-frame-callback.patch \
     file://0003-Modify-Content-Security-Policy-CSP-to-adapt-WebAssem.patch \
     file://0004-sophgo-get-cpld-info-toUI.patch \
+    file://0005-sophgo-redfidh.patch \
+    file://0006-sophgo-systems.patch \
     "
