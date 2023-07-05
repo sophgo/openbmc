@@ -1,0 +1,41 @@
+diff --git a/src/store/modules/Operations/ControlStore.js b/src/store/modules/Operations/ControlStore.js
+index 9b8bf73..7487a11 100644
+--- a/src/store/modules/Operations/ControlStore.js
++++ b/src/store/modules/Operations/ControlStore.js
+@@ -126,6 +126,36 @@ const ControlStore = {
+           commit('setOperationInProgress', false);
+         });
+     },
++
++    async setSolToPort0({ dispatch, commit }) {
++      const data = { SolPortType: 'port0' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort1({ dispatch, commit }) {
++      const data = { SolPortType: 'port1' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort2({ dispatch, commit }) {
++      const data = { SolPortType: 'port2' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort3({ dispatch, commit }) {
++      const data = { SolPortType: 'port3' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    serverSolPortChange({ commit }, data) {
++      commit('setOperationInProgress', true);
++      api
++        .post('/redfish/v1/Systems/system/Actions/ComputerSystem.ChangeSolPort', data)
++        .catch((error) => {
++          console.log(error);
++          commit('setOperationInProgress', false);
++        });
++    },
+   },
+ };
+ 

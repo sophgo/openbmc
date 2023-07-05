@@ -4,7 +4,8 @@ IMAGE_INSTALL:append = " \
         libmctp \
         entity-manager \
         dbus-sensors \
-        test-hello-yzh \
+        sophgo-fan-control \
+        sophgo-gpio-control \
         "
 
 IMAGE_INSTALL:append = " \

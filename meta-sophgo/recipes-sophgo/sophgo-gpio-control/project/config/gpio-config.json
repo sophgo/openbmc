@@ -1,0 +1,195 @@
+{
+  "gpio_configs":[
+    {
+        "Name" : "sata1Exist",
+        "LineName" : "SATA1_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "sata2Exis",
+        "LineName" : "SATA2_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan4Exist",
+        "LineName" : "FAN4_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan5Exist",
+        "LineName" : "FAN5_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan6Exist",
+        "LineName" : "FAN6_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan8Exist",
+        "LineName" : "FAN8_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan3Exist",
+        "LineName" : "FAN3_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan1Exist",
+        "LineName" : "FAN1_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "PSUPowerOn",
+        "LineName" : "PSU_POWER_ON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan2Exist",
+        "LineName" : "FAN2_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "riserCardThrottle",
+        "LineName" : "RISER_CARD_THROTTLE",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "hdd1Exist",
+        "LineName" : "HDD1_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "solUartV2",
+        "LineName" : "SOL_UART_V2",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "solUartV3",
+        "LineName" : "SOL_UART_V3",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "frontVgaExist",
+        "LineName" : "FRONT_VGA_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan9Exist",
+        "LineName" : "FAN9_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan7Exist",
+        "LineName" : "FAN7_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "hdd2Exist",
+        "LineName" : "HDD2_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "uidButton",
+        "LineName" : "UID_BUTTON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "hdd3Exist",
+        "LineName" : "HDD3_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "phyIrq",
+        "LineName" : "PHY1_RGMII0_IRQ",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "hdd4Exist",
+        "LineName" : "HDD4_EXIST",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan1PowerEn",
+        "LineName" : "FAN1_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan2PowerEn",
+        "LineName" : "FAN2_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan3PowerEn",
+        "LineName" : "FAN3_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan4PowerEn",
+        "LineName" : "FAN4_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan5PowerEn",
+        "LineName" : "FAN5_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan6PowerEn",
+        "LineName" : "FAN6_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan7PowerEn",
+        "LineName" : "FAN7_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan8PowerEn",
+        "LineName" : "FAN8_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "fan9PowerEn",
+        "LineName" : "FAN9_Power_EN",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    }
+],
+  "timing_configs":{
+      "PowerPulseMs": 200,
+      "ForceOffPulseMs": 15000,
+      "ResetPulseMs": 500
+    }
+}

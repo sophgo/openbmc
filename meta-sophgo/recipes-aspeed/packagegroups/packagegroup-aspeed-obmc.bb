@@ -28,13 +28,13 @@ RPROVIDES:${PN}-flash = " virtual-obmc-flash-mgmt"
 RPROVIDES:${PN}-system = " virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-chassis = "AspeedTech Chassis"
-# RDEPENDS:${PN}-chassis = " \
-#     x86-power-control \
-#     "
-
 RDEPENDS:${PN}-chassis = " \
-    sophgo-power-control \
+    x86-power-control \
     "
+
+# RDEPENDS:${PN}-chassis = " \
+#     sophgo-power-control \
+#     "
 
 SUMMARY:${PN}-fans = "AspeedTech Fans"
 RDEPENDS:${PN}-fans = " \
