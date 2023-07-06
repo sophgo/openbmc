@@ -185,6 +185,30 @@
         "LineName" : "FAN9_Power_EN",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "cpuaFlashH0",
+        "LineName" : "CPUA_Flash_H0",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "cpuaFlashH1",
+        "LineName" : "CPUA_Flash_H1",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "cpubFlashH2",
+        "LineName" : "CPUB_Flash_H2",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "cpubFlashH3",
+        "LineName" : "CPUB_Flash_H3",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     }
 ],
   "timing_configs":{
