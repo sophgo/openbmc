@@ -27,16 +27,16 @@ creat_mtd () {
 	if [ -z "$HOST_MTD_0" ] || [ -z "$HOST_MTD_1" ];
 	then
 		# Check the ASpeed SMC driver bound before
-		HOST_SPI=/sys/bus/platform/drivers/spi-aspeed-smc/1e630000.spi
+		HOST_SPI=/sys/bus/platform/drivers/ASPEED_FMC_SPI/1e630000.spi
 		if [ -d "$HOST_SPI" ]; then
 			echo "Unbind the ASpeed spi1 driver"
-			echo 1e630000.spi > /sys/bus/platform/drivers/spi-aspeed-smc/unbind
+			echo 1e630000.spi > /sys/bus/platform/drivers/ASPEED_FMC_SPI/unbind
 			sleep 2
 		fi
 
 		# If the image-host partition is not available, then bind again driver
 		echo "--- Bind the ASpeed spi1 driver"
-		echo 1e630000.spi > /sys/bus/platform/drivers/spi-aspeed-smc/bind
+		echo 1e630000.spi > /sys/bus/platform/drivers/ASPEED_FMC_SPI/bind
 		sleep 2
 
 		HOST_MTD_0=$(< /proc/mtd grep "image-host0" | sed -n 's/^\(.*\):.*/\1/p')
@@ -105,19 +105,15 @@ do
 	then
 		echoerr "Unable to find mtd partition for ${f##*/}."
 		flashSwitchToHost
-		exit 1
+		continue
 	fi
 	if test -n "$checksize" && toobig "$f" "$m"
 	then
 		echoerr "Image ${f##*/} too big for $m."
 		flashSwitchToHost
-		exit 1
+		continue
 	fi
-done
 
-
-for f in $imglist
-do
 	if test ! -s $f
 	then
 		echo "Skipping empty update of ${f#$image}."
@@ -129,8 +125,9 @@ do
 
 	flashcp -v $f /dev/$m
 
-
 done
+
+
 rm -rf $imagePath
 flashSwitchToHost
 sleep 1
