@@ -322,6 +322,10 @@ static bool setGPIOOutput(const std::string& name, const int value,
 
     lg2::info("{GPIO_NAME} set to {GPIO_VALUE}", "GPIO_NAME", name,
               "GPIO_VALUE", value);
+
+
+    gpioLine.release();
+
     return true;
 }
 
