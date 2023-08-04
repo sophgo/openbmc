@@ -6,6 +6,7 @@ IMAGE_INSTALL:append = " \
         dbus-sensors \
         sophgo-fan-control \
         sophgo-gpio-control \
+        sophgo-led-control \
         "
 
 IMAGE_INSTALL:append = " \
