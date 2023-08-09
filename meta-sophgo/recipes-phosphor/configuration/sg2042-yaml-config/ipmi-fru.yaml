@@ -1,0 +1,49 @@
+0x01:
+  /xyz/openbmc_project/inventory/system/board/sg2042_board:
+      entityID: 16
+      entityInstance: 1
+      interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+          Manufacturer:
+            IPMIFruProperty: Manufacturer
+            IPMIFruSection: Board
+          SerialNumber:
+            IPMIFruProperty: Serial Number
+            IPMIFruSection: Board
+          PartNumber:
+            IPMIFruProperty: Part Number
+            IPMIFruSection: Board
+
+
+0x02:
+  /xyz/openbmc_project/inventory/system/board/GOOXI_550W_PSU_1:
+    entityID: 19
+    entityInstance: 3
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+
+
+0x03:
+  /xyz/openbmc_project/inventory/system/board/GOOXI_550W_PSU_2:
+    entityID: 19
+    entityInstance: 3
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
