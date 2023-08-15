@@ -65,19 +65,19 @@ do
         echo "can not get cpu0 tmp"
         CPU0_tmp_original=40000
     fi
-    echo $CPU0_tmp_original
+    # echo $CPU0_tmp_original
     if [ -d "$cpu1_i2c_dir" ]; then
         CPU1_tmp_original=$(cat ${cpu1_i2c_dir}/*/temp2_input)
     else
         CPU1_tmp_original=40000
     fi
-    echo $CPU1_tmp_original
+    # echo $CPU1_tmp_original
     # CPU0_tmp=$(echo "scale=2; $CPU0_tmp_original/1000"|bc)
     CPU0_tmp=$(($CPU0_tmp_original/1000))
-    echo $CPU0_tmp
+    # echo $CPU0_tmp
     # CPU1_tmp=$(echo "scale=2; $CPU1_tmp_original/1000"|bc)
     CPU1_tmp=$(($CPU1_tmp_original/1000))
-    echo $CPU1_tmp
+    # echo $CPU1_tmp
 
 
     # if [ `echo "$CPU0_tmp < $CPU1_tmp"|bc` -eq 1 ] ; then
@@ -86,7 +86,7 @@ do
     else
         max_t=$CPU0_tmp
     fi
-    echo $max_t
+    # echo $max_t
 
 	if [ $max_t -ge 75 ];then
 		PWM_proportion=100
@@ -101,42 +101,42 @@ do
 	elif [ $max_t -lt 40 ] ;then
 		PWM_proportion=40
 	fi
-    echo $PWM_proportion
+    # echo $PWM_proportion
 	pwm=$(($PWM_proportion*$pwm_mux/100))
-	echo $pwm
+	# echo $pwm
 	write_pwm /sys/class/hwmon pwm1 $pwm
 
 
     # monitor fan state when system is poweron
     power_state=$(busctl $dbus_get_method $dbus_name $dbus_path $dbus_inf $dbus_get_property | sed 's/\"//g')
     power_state=${power_state#*" "}
-    echo $power_state
+    # echo $power_state
 
-    if [ $power_state = $power_state_on ];then
+    if [ "$power_state"x = "$power_state_on"x ] ;then
 
         fan2_value=$(cat ${fan2_file})
         echo "fan2:$fan2_value"
-        if [ $fan2_value -lt $fan_value_min ];then
+        if [ $fan2_value -lt $fan_value_min ] ;then
             let fan_fault_count++
         fi
         fan4_value=$(cat ${fan4_file})
         echo "fan4:$fan4_value"
-        if [ $fan4_value -lt $fan_value_min ];then
+        if [ $fan4_value -lt $fan_value_min ] ;then
             let fan_fault_count++
         fi
         fan6_value=$(cat ${fan6_file})
         echo "fan6:$fan6_value"
-        if [ $fan6_value -lt $fan_value_min ];then
+        if [ $fan6_value -lt $fan_value_min ] ;then
             let fan_fault_count++
         fi
         fan9_value=$(cat ${fan9_file})
         echo "fan9:$fan9_value"
-        if [ $fan9_value -lt $fan_value_min ];then
+        if [ $fan9_value -lt $fan_value_min ] ;then
             let fan_fault_count++
         fi
         echo "fan_fault_count:$fan_fault_count"
         # judgment
-        if [ $max_t -ge $poweroff_tmp_for_fanfault ] && [ $fan_fault_count -ge 2 ];then
+        if [ $max_t -ge $poweroff_tmp_for_fanfault ] && [ $fan_fault_count -ge 2 ] ;then
             echo " Fan fault, power down "
             # power off, 2 ways
             # busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Chassis.Transition.Off
