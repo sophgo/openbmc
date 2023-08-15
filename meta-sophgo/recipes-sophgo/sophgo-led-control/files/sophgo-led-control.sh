@@ -187,6 +187,7 @@ do
     fi
 
     sleep 5
+    result_critical=0
 done
 
 
