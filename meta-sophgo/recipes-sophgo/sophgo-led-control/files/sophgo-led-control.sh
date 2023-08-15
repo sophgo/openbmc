@@ -68,7 +68,7 @@ do
     power_state=$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 \
             xyz.openbmc_project.State.Host CurrentHostState | sed 's/\"//g')
     power_state=${power_state#*" "}
-    echo $power_state
+    # echo $power_state
     if [ "$power_state"x = "$power_state_on"x ] ;then
 
         for var in ${fan_bus_path[@]};
