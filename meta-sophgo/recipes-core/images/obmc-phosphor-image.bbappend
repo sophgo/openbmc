@@ -41,6 +41,12 @@ EXTRA_IMAGE_FEATURES:append = " \
 
 OVERLAY_MKFS_OPTS:cypress-s25hx:static-rwfs-jffs2 = " -c 16 -e 262144 --pad=${RWFS_SIZE} "
 
+# password: root
+SOPHGO_OPENBMC_PASSWORD = "'\$6\$UGMqyqdG\$uwiTSdLrKTW8i9c6BsZQQNCzQngW0tJM7jmaZnRgbT1Qi5EUra17TNmfyK0IUXwz.5BVx3Yk7evFW5sfpJgK20'"
+EXTRA_USERS_PARAMS:pn-obmc-phosphor-image = " \
+  usermod -p ${SOPHGO_OPENBMC_PASSWORD} root; \
+  "
+
 do_generate_rwfs_static:static-rwfs-jffs2() {
     rwdir=$(pwd)
     rwdir=${rwdir}/jffs2
