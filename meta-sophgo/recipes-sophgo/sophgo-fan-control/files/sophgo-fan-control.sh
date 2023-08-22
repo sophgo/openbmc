@@ -27,19 +27,24 @@ fan9_value=0
 fan_fault_count=0
 fan_value_min=3000
 poweroff_tmp_for_fanfault=50
+dbus_set_method="set-property"
+dbus_get_method="get-property"
 power_state_on="xyz.openbmc_project.State.Host.HostState.Running"
 power_state_off="xyz.openbmc_project.State.Host.HostState.Off"
 dbus_name="xyz.openbmc_project.State.Host"
-dbus_path="/xyz/openbmc_project/state/host0"
-dbus_inf="xyz.openbmc_project.State.Host"
-dbus_get_property="CurrentHostState"
-dbus_get_method="get-property"
 
-dbus_set_property="RequestedHostTransition"
-dbus_set_method="set-property"
+
+dbus_chassis_path="/xyz/openbmc_project/state/chassis0"
+dbus_chassis_inf="xyz.openbmc_project.State.Chassis"
+dbus_set_chassis_property="RequestedPowerTransition"
+
+
+dbus_host_path="/xyz/openbmc_project/state/host0"
+dbus_host_inf="xyz.openbmc_project.State.Host"
+dbus_set_host_property="RequestedHostTransition"
+dbus_get_host_property="CurrentHostState"
 # force poweroff
 set_force_power_off="xyz.openbmc_project.State.Chassis.Transition.Off"
-set_graceful_power_off="xyz.openbmc_project.State.Host.Transition.Off"
 property_type="s"
 power_state=$power_state_on
 function write_pwm(){
@@ -108,7 +113,7 @@ do
 
 
     # monitor fan state when system is poweron
-    power_state=$(busctl $dbus_get_method $dbus_name $dbus_path $dbus_inf $dbus_get_property | sed 's/\"//g')
+    power_state=$(busctl $dbus_get_method $dbus_name $dbus_host_path $dbus_host_inf $dbus_get_host_property | sed 's/\"//g')
     power_state=${power_state#*" "}
     # echo $power_state
 
@@ -140,7 +145,7 @@ do
             echo " Fan fault, power down "
             # power off, 2 ways
             # busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Chassis.Transition.Off
-            busctl $dbus_set_method $dbus_name $dbus_path $dbus_inf $dbus_set_property $property_type $set_force_power_off
+            busctl $dbus_set_method $dbus_name $dbus_chassis_path $dbus_chassis_inf $dbus_set_chassis_property $property_type $set_force_power_off
             # gpioset 0 71=0
             # sleep 15
             # gpioset 0 71=1
