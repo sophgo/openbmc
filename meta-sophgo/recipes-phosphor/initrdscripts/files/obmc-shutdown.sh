@@ -2,7 +2,7 @@
 
 echo shutdown: "$@"
 
-export PS1=shutdown-sh#\
+export PS1=shutdown-sh#\ 
 # exec bin/sh
 
 cd /
@@ -48,7 +48,12 @@ then
 		else
 			wd=
 		fi
-		$update --clean-saved-files --no-restore-files
+		if ls /run/initramfs/image-bmc
+		then
+			$update --clean-saved-files --no-restore-files
+		else
+			$update --clean-saved-files
+		fi
 		remaining=$(ls $image*)
 		if test -n "$remaining"
 		then
@@ -98,5 +103,5 @@ fi
 
 echo "Execute ${1-reboot} -f if all unmounted ok, or exec /init"
 
-export PS1=shutdown-sh#\
+export PS1=shutdown-sh#\ 
 exec /bin/sh
