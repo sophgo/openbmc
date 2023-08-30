@@ -47,6 +47,10 @@ dbus_get_host_property="CurrentHostState"
 set_force_power_off="xyz.openbmc_project.State.Chassis.Transition.Off"
 property_type="s"
 power_state=$power_state_on
+
+power_off_flag=0
+power_on_flag=0
+
 function write_pwm(){
     for file in `ls $1`
     do
@@ -111,49 +115,53 @@ do
 	# echo $pwm
 	write_pwm /sys/class/hwmon pwm1 $pwm
 
-
     # monitor fan state when system is poweron
     power_state=$(busctl $dbus_get_method $dbus_name $dbus_host_path $dbus_host_inf $dbus_get_host_property | sed 's/\"//g')
     power_state=${power_state#*" "}
-    # echo $power_state
 
     if [ "$power_state"x = "$power_state_on"x ] ;then
 
+        if [ $power_on_flag -eq 0 ] ;then
+            echo "fan-control: system is powerOn"
+            let power_on_flag++
+        fi
+
         fan2_value=$(cat ${fan2_file})
-        echo "fan2:$fan2_value"
         if [ $fan2_value -lt $fan_value_min ] ;then
             let fan_fault_count++
+            echo "fan2:$fan2_value"
         fi
         fan4_value=$(cat ${fan4_file})
-        echo "fan4:$fan4_value"
         if [ $fan4_value -lt $fan_value_min ] ;then
             let fan_fault_count++
+            echo "fan4:$fan4_value"
         fi
         fan6_value=$(cat ${fan6_file})
-        echo "fan6:$fan6_value"
         if [ $fan6_value -lt $fan_value_min ] ;then
             let fan_fault_count++
+            echo "fan6:$fan6_value"
         fi
         fan9_value=$(cat ${fan9_file})
-        echo "fan9:$fan9_value"
         if [ $fan9_value -lt $fan_value_min ] ;then
             let fan_fault_count++
+            echo "fan9:$fan9_value"
         fi
-        echo "fan_fault_count:$fan_fault_count"
         # judgment
         if [ $max_t -ge $poweroff_tmp_for_fanfault ] && [ $fan_fault_count -ge 2 ] ;then
-            echo " Fan fault, power down "
-            # power off, 2 ways
-            # busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Chassis.Transition.Off
+            echo " fan-control:Fan fault, power down "
+            echo "fan-control:fan_fault_count $fan_fault_count"
             busctl $dbus_set_method $dbus_name $dbus_chassis_path $dbus_chassis_inf $dbus_set_chassis_property $property_type $set_force_power_off
-            # gpioset 0 71=0
-            # sleep 15
-            # gpioset 0 71=1
         fi
         fan_fault_count=0
+        power_off_flag=0
     else
-        echo "system is poweroff"
+        if [ $power_off_flag -eq 0 ] ;then
+            echo "fan-control: system is poweroff"
+            let power_off_flag++
+            power_on_flag=0
+        fi
     fi
+
 	sleep 5
 done
 
