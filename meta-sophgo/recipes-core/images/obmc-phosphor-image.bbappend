@@ -7,6 +7,7 @@ IMAGE_INSTALL:append = " \
         sophgo-fan-control \
         sophgo-gpio-control \
         sophgo-led-control \
+        sophgo-cpld-monitor \
         "
 
 IMAGE_INSTALL:append = " \

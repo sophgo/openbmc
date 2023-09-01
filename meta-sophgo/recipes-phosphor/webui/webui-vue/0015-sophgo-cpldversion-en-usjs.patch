@@ -1,0 +1,12 @@
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index fa001b2..3182424 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -326,6 +326,7 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
++        "sectionTitleCpldCards": "CPLD",
+         "sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
