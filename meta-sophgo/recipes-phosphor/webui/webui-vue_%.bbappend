@@ -15,6 +15,9 @@ SRC_URI:append = " file://0011-sophgo-GlobalStore.patch "
 SRC_URI:append = " file://0012-sophgo-ControlStore.patch "
 SRC_URI:append = " file://0013-sophgo-SerialOverLanConsole.patch "
 SRC_URI:append = " file://0014-sophgo-ServerPowerOperations.patch "
+SRC_URI:append = " file://0015-sophgo-cpldversion-en-usjs.patch "
+SRC_URI:append = " file://0016-sophgo-cpldversion-GlobalStore.patch "
+SRC_URI:append = " file://0017-sophgo-cpldversion-Firmware.patch "
 
 
 
@@ -22,6 +25,7 @@ SRC_URI:append = " file://0014-sophgo-ServerPowerOperations.patch "
 SRC_URI += "file://sg2042.svg;subdir=git/src/assets/images \
             file://sophgo.svg;subdir=git/src/assets/images \
             file://sopho.svg;subdir=git/src/assets/images \
+            file://FirmwareCardsCpld.vue;subdir=git/src/views/Operations/Firmware \
             "
 
 # SRC_URI += "file://sg2042.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \

@@ -12,4 +12,5 @@ SRC_URI:append = " \
     file://0004-sophgo-get-cpld-info-toUI.patch \
     file://0005-sophgo-redfidh.patch \
     file://0006-sophgo-systems.patch \
+    file://0007-sophgo-cpld-systems.patch \
     "

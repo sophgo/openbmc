@@ -1,0 +1,35 @@
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index a2acb9b..25f46ad 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -14,6 +14,10 @@
+ 
+         <!-- Host Firmware -->
+         <host-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- Cpld Firmware -->
++        <cpld-cards v-if="1" />
++
+       </b-col>
+     </b-row>
+ 
+@@ -39,9 +43,11 @@ import AlertsServerPower from './FirmwareAlertServerPower';
+ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
++import CpldCards from './FirmwareCardsCpld';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
++
+ import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
+ 
+ export default {
+@@ -51,6 +57,7 @@ export default {
+     BmcCards,
+     FormUpdate,
+     HostCards,
++    CpldCards,
+     PageSection,
+     PageTitle,
+   },
