@@ -699,18 +699,18 @@
 		status = "okay";
 		m25p,fast-read;
 		label = "image-host0";
-		spi-max-frequency = <50000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-max-frequency = <25000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
 	};
 
 	flash@1 {
 		status = "okay";
 		m25p,fast-read;
 		label = "image-host1";
-		spi-max-frequency = <50000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-max-frequency = <25000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
 	};
 };
 
