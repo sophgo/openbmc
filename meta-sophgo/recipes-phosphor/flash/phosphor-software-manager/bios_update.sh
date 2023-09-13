@@ -104,13 +104,11 @@ do
 	if test -z "$m"
 	then
 		echoerr "Unable to find mtd partition for ${f##*/}."
-		flashSwitchToHost
 		continue
 	fi
 	if test -n "$checksize" && toobig "$f" "$m"
 	then
 		echoerr "Image ${f##*/} too big for $m."
-		flashSwitchToHost
 		continue
 	fi
 
@@ -132,4 +130,4 @@ rm -rf $imagePath
 flashSwitchToHost
 sleep 1
 # set dbus property to reboot host
-# busctl $dbus_set_method $dbus_name $dbus_path $dbus_inf $dbus_set_property $property_type $set_graceful_reboot
+busctl $dbus_set_method $dbus_name $dbus_path $dbus_inf $dbus_set_property $property_type $set_graceful_reboot
