@@ -1,0 +1,36 @@
+diff --git a/src/store/plugins/WebSocketPlugin.js b/src/store/plugins/WebSocketPlugin.js
+index cbdc932..202e889 100644
+--- a/src/store/plugins/WebSocketPlugin.js
++++ b/src/store/plugins/WebSocketPlugin.js
+@@ -10,10 +10,19 @@
+ const WebSocketPlugin = (store) => {
+   let ws;
+   const data = {
+-    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging'],
++    paths: [
++      '/xyz/openbmc_project/state/host0',
++      '/xyz/openbmc_project/logging',
++      '/xyz/openbmc_project/gpio/fan',
++      '/xyz/openbmc_project/gpio/hdd',
++      '/xyz/openbmc_project/gpio/sata'
++    ],
+     interfaces: [
+       'xyz.openbmc_project.State.Host',
+       'xyz.openbmc_project.Logging.Entry',
++      'xyz.openbmc_project.Gpio.Fan',
++      'xyz.openbmc_project.Gpio.Hdd',
++      'xyz.openbmc_project.Gpio.Sata',
+     ],
+   };
+ 
+@@ -41,6 +50,10 @@ const WebSocketPlugin = (store) => {
+         }
+       } else if (path === '/xyz/openbmc_project/logging') {
+         store.dispatch('eventLog/getEventLogData');
++      } else if ((path === '/xyz/openbmc_project/gpio/fan') ||
++                 (path === '/xyz/openbmc_project/gpio/hdd') ||
++                 (path === '/xyz/openbmc_project/gpio/sata')) {
++        store.dispatch('global/getSystemInfo');
+       }
+     };
+   };
