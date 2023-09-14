@@ -502,6 +502,136 @@
                     }
                 ],
                 "Type": "TMP451"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 2,
+                "Name": "TEMP_SWITCH0_OUTER",
+                "Name1": "TEMP_SWITCH0_INNER",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "TMP451"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 3,
+                "Name": "TEMP_SWITCH1_OUTER",
+                "Name1": "TEMP_SWITCH1_INNER",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "TMP451"
             }
         ],
         "Name": "sg2042_board",

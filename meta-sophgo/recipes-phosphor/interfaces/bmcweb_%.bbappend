@@ -14,3 +14,6 @@ SRC_URI:append = " \
     file://0006-sophgo-systems.patch \
     file://0007-sophgo-cpld-systems.patch \
     "
+EXTRA_OEMESON:append = " \
+    -Drest=enabled \
+    "
