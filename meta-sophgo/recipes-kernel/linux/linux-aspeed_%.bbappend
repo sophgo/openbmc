@@ -6,6 +6,7 @@ PACKAGE_ARCH = "ast2600-sophgo"
 SRC_URI:append = " file://0000-sophgo-ssif_bmc.patch "
 SRC_URI:append = " file://0001-sophgo-gigadevice.patch "
 SRC_URI:append = " file://0002-sophgo-bmcdev-ipmiinterface.patch "
+SRC_URI:append = " file://0003-sophgo-lm90-add-ct7451.patch "
 
 # KERNEL_DEVICETREE += "aspeed-ast2600-sophgo.dtb"
 # S = "${WORKDIR}"

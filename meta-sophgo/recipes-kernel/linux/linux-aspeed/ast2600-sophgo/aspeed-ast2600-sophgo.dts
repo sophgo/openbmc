@@ -816,7 +816,7 @@
 &i2c0 {
 	status = "okay";
 	temperature-sensor@4c {
-		compatible = "ti,tmp451";
+		compatible = "sensylink,ct7451";
 		reg = <0x4c>;
 	};
 	/* ssif-bmc@10 {
@@ -829,15 +829,23 @@
 &i2c1 {
 	status = "okay";
 	temperature-sensor@4c {
-		compatible = "ti,tmp451";
+		compatible = "sensylink,ct7451";
 		reg = <0x4c>;
 	};
 };
 &i2c2 {
 	status = "okay";
+	temperature-sensor@4c {
+		compatible = "sensylink,ct7451";
+		reg = <0x4c>;
+	};
 };
 &i2c3 {
 	status = "okay";
+	temperature-sensor@4c {
+		compatible = "sensylink,ct7451";
+		reg = <0x4c>;
+	};
 };
 &i2c4 {
 	status = "okay";

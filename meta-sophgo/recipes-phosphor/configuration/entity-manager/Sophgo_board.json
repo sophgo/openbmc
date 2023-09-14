@@ -436,7 +436,7 @@
                         "Value": 0
                     }
                 ],
-                "Type": "TMP451"
+                "Type": "CT7451"
             },
             {
                 "Address": "0x4c",
@@ -501,7 +501,7 @@
                         "Value": 0
                     }
                 ],
-                "Type": "TMP451"
+                "Type": "CT7451"
             },
             {
                 "Address": "0x4c",
@@ -514,14 +514,14 @@
                         "Name": "upper critical",
                         "Index": 1,
                         "Severity": 1,
-                        "Value": 75
+                        "Value": 85
                     },
                     {
                         "Direction": "greater than",
                         "Name": "upper non critical",
                         "Index": 1,
                         "Severity": 0,
-                        "Value": 70
+                        "Value": 75
                     },
                     {
                         "Direction": "less than",
@@ -542,14 +542,14 @@
                         "Name": "upper critical",
                         "Index": 2,
                         "Severity": 1,
-                        "Value": 75
+                        "Value": 108
                     },
                     {
                         "Direction": "greater than",
                         "Name": "upper non critical",
                         "Index": 2,
                         "Severity": 0,
-                        "Value": 70
+                        "Value": 98
                     },
                     {
                         "Direction": "less than",
@@ -566,7 +566,7 @@
                         "Value": 0
                     }
                 ],
-                "Type": "TMP451"
+                "Type": "CT7451"
             },
             {
                 "Address": "0x4c",
@@ -579,14 +579,14 @@
                         "Name": "upper critical",
                         "Index": 1,
                         "Severity": 1,
-                        "Value": 75
+                        "Value": 85
                     },
                     {
                         "Direction": "greater than",
                         "Name": "upper non critical",
                         "Index": 1,
                         "Severity": 0,
-                        "Value": 70
+                        "Value": 75
                     },
                     {
                         "Direction": "less than",
@@ -607,14 +607,14 @@
                         "Name": "upper critical",
                         "Index": 2,
                         "Severity": 1,
-                        "Value": 75
+                        "Value": 108
                     },
                     {
                         "Direction": "greater than",
                         "Name": "upper non critical",
                         "Index": 2,
                         "Severity": 0,
-                        "Value": 70
+                        "Value": 98
                     },
                     {
                         "Direction": "less than",
@@ -631,7 +631,7 @@
                         "Value": 0
                     }
                 ],
-                "Type": "TMP451"
+                "Type": "CT7451"
             }
         ],
         "Name": "sg2042_board",
