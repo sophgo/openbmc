@@ -8,6 +8,7 @@ IMAGE_INSTALL:append = " \
         sophgo-gpio-control \
         sophgo-led-control \
         sophgo-cpld-monitor \
+        sophgo-extend-file \
         "
 
 IMAGE_INSTALL:append = " \
