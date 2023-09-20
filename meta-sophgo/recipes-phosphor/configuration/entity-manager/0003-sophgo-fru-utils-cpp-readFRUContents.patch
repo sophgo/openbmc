@@ -1,0 +1,37 @@
+diff --git a/src/fru_utils.cpp b/src/fru_utils.cpp
+index cbf3bd1..3eb2471 100644
+--- a/src/fru_utils.cpp
++++ b/src/fru_utils.cpp
+@@ -86,7 +86,6 @@ std::pair<DecodeState, std::string>
+     }
+ 
+     uint8_t c = *(iter++);
+-
+     /* 0xc1 is the end marker */
+     if (c == 0xc1)
+     {
+@@ -411,7 +410,6 @@ resCodes
+                     fruCustomFieldName +
+                     std::to_string(fieldIndex - fruAreaFieldNames->size() + 1);
+             }
+-
+             if (state == DecodeState::ok)
+             {
+                 // Strip non null characters from the end
+@@ -634,11 +632,15 @@ bool findFRUHeader(FRUReader& reader, const std::string& errorHelp,
+     return false;
+ }
+ 
+-std::vector<uint8_t> readFRUContents(FRUReader& reader,
++std::vector<uint8_t> readFRUContents(int bus, int slave_addr, FRUReader& reader,
+                                      const std::string& errorHelp)
+ {
+     std::array<uint8_t, I2C_SMBUS_BLOCK_MAX> blockData{};
+     off_t baseOffset = 0x0;
++    if (((bus == 6) || (bus ==11)) && (slave_addr == 0x6A)) {
++        baseOffset = 0x20;
++    }
++
+ 
+     if (!findFRUHeader(reader, errorHelp, blockData, baseOffset))
+     {
