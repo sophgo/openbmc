@@ -1,9 +1,9 @@
+#  global variable
 fan_dbus_name="xyz.openbmc_project.FanSensor"
 fan_bus_path[0]="/xyz/openbmc_project/sensors/fan_tach/Fan2"
 fan_bus_path[1]="/xyz/openbmc_project/sensors/fan_tach/Fan4"
 fan_bus_path[2]="/xyz/openbmc_project/sensors/fan_tach/Fan6"
 fan_bus_path[3]="/xyz/openbmc_project/sensors/fan_tach/Fan9"
-
 
 psu_dbus_name="xyz.openbmc_project.PSUSensor"
 
@@ -42,6 +42,10 @@ tmp_bus_path[5]="/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_INNER"
 tmp_bus_path[6]="/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_OUTER"
 tmp_bus_path[7]="/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_INNER"
 tmp_bus_path[8]="/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_OUTER"
+tmp_bus_path[9]="/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH0_INNER"
+tmp_bus_path[10]="/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH0_OUTER"
+tmp_bus_path[11]="/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH1_INNER"
+tmp_bus_path[12]="/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH1_OUTER"
 
 
 
@@ -61,133 +65,107 @@ frontpanel_warning_led_brightness=/sys/class/leds/frontpanel_warning_led/brightn
 
 power_state_on="xyz.openbmc_project.State.Host.HostState.Running"
 
-sleep 30
+#  Function Definition
+get_sensors_state() {
 
-while true;
-do
-    power_state=$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 \
-            xyz.openbmc_project.State.Host CurrentHostState | sed 's/\"//g')
-    power_state=${power_state#*" "}
-    # echo $power_state
-    if [ "$power_state"x = "$power_state_on"x ] ;then
+    newarr=($1)
 
-        for var in ${fan_bus_path[@]};
-        do
-            result_WarningAlarmLow=$(busctl get-property $fan_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmLow)
-            if [ $? = 0 ] ;then
-                result_WarningAlarmLow=${result_WarningAlarmLow#*" "}
-                if [ "$result_WarningAlarmLow"x = "true"x ] ;then
-                    let result_warning++
-                fi
-            fi
-            result_WarningAlarmHigh=$(busctl get-property $fan_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_WarningAlarmHigh=${result_WarningAlarmHigh#*" "}
-                if [ "$result_WarningAlarmHigh"x = "true"x ] ;then
-                    let result_warning++
-                fi
-            fi
-            result_CriticalAlarmLow=$(busctl get-property $fan_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmLow)
-            if [ $? = 0 ] ;then
-                result_CriticalAlarmLow=${result_CriticalAlarmLow#*" "}
-                if [ "$result_CriticalAlarmLow"x = "true"x ] ;then
-                    let result_critical++
-                fi
-            fi
-            result_CriticalAlarmHigh=$(busctl get-property $fan_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_CriticalAlarmHigh=${result_CriticalAlarmHigh#*" "}
-                if [ "$result_CriticalAlarmHigh"x = "true"x ] ;then
-                    let result_critical++
-                fi
-
-            fi
-        done
-    fi
-    # 4-0058
-    if [ -d "$psu1_hwmon_path" ] ;then
-        for var in ${psu1_bus_path[@]};
-        do
-            result_WarningAlarmHigh=$(busctl get-property $psu_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_WarningAlarmHigh=${result_WarningAlarmHigh#*" "}
-                if [ "$result_WarningAlarmHigh"x = "true"x ] ;then
-                    let result_warning++
-                fi
-            fi
-            result_CriticalAlarmHigh=$(busctl get-property $psu_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_CriticalAlarmHigh=${result_CriticalAlarmHigh#*" "}
-                if [ "$result_CriticalAlarmHigh"x = "true"x ] ;then
-                    let result_critical++
-                fi
-            fi
-        done
-    fi
-    # 4-0059
-    if [ -d "$psu2_hwmon_path" ] ;then
-        for var in ${psu2_bus_path[@]};
-        do
-            result_WarningAlarmHigh=$(busctl get-property $psu_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_WarningAlarmHigh=${result_WarningAlarmHigh#*" "}
-                if [ "$result_WarningAlarmHigh"x = "true"x ] ;then
-                    let result_warning++
-                fi
-            fi
-            result_CriticalAlarmHigh=$(busctl get-property $psu_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmHigh)
-            if [ $? = 0 ] ;then
-                result_CriticalAlarmHigh=${result_CriticalAlarmHigh#*" "}
-                if [ "$result_CriticalAlarmHigh"x = "true"x ] ;then
-                    let result_critical++
-                fi
-            fi
-        done
-    fi
-
-    for var in ${tmp_bus_path[@]};
+    for var in ${newarr[@]};
     do
-        result_WarningAlarmLow=$(busctl get-property $tmp_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmLow)
+        # echo "var: $var"
+        # echo "busName: $2"
+        result_WarningAlarmLow=$(busctl get-property $2 $var $sensors_warning_inf $sensors_WarningAlarmLow)
         if [ $? = 0 ] ;then
+            # echo "result: $?"
+            # echo "result_WarningAlarmLow: $result_WarningAlarmLow"
             result_WarningAlarmLow=${result_WarningAlarmLow#*" "}
             if [ "$result_WarningAlarmLow"x = "true"x ] ;then
                 let result_warning++
             fi
         fi
-        result_WarningAlarmHigh=$(busctl get-property $tmp_dbus_name $var $sensors_warning_inf $sensors_WarningAlarmHigh)
+        result_WarningAlarmHigh=$(busctl get-property $2 $var $sensors_warning_inf $sensors_WarningAlarmHigh)
         if [ $? = 0 ] ;then
             result_WarningAlarmHigh=${result_WarningAlarmHigh#*" "}
             if [ "$result_WarningAlarmHigh"x = "true"x ] ;then
                 let result_warning++
             fi
         fi
-        result_CriticalAlarmLow=$(busctl get-property $tmp_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmLow)
+        result_CriticalAlarmLow=$(busctl get-property $2 $var $sensors_critical_inf $sensors_CriticalAlarmLow)
         if [ $? = 0 ] ;then
             result_CriticalAlarmLow=${result_CriticalAlarmLow#*" "}
             if [ "$result_CriticalAlarmLow"x = "true"x ] ;then
                 let result_critical++
             fi
         fi
-        result_CriticalAlarmHigh=$(busctl get-property $tmp_dbus_name $var $sensors_critical_inf $sensors_CriticalAlarmHigh)
+        result_CriticalAlarmHigh=$(busctl get-property $2 $var $sensors_critical_inf $sensors_CriticalAlarmHigh)
         if [ $? = 0 ] ;then
             result_CriticalAlarmHigh=${result_CriticalAlarmHigh#*" "}
             if [ "$result_CriticalAlarmHigh"x = "true"x ] ;then
                 let result_critical++
             fi
-        fi
 
+        fi
     done
+
+}
+
+is_power_on() {
+    power_state=$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host CurrentHostState | sed 's/\"//g')
+    power_state=${power_state#*" "}
+    if [ "$power_state"x = "$power_state_on"x ] ;then
+        echo "1"
+    else
+        echo "0"
+    fi
+}
+
+
+
+clear_record() {
+    result_critical=0
+    result_warning=0
+}
+
+
+open_sys_alarm_led() {
+    echo "timer" > $frontpanel_warning_led_trigger
+}
+
+close_sys_alarm_led() {
+    echo "none" > $frontpanel_warning_led_trigger
+    echo 0 > $frontpanel_warning_led_brightness
+}
+
+sleep 30
+
+while true;
+do
+    # power_state
+    # echo "power state : $(is_power_on)"
+    if [ $(is_power_on) = 1 ] ;then
+        get_sensors_state "${fan_bus_path[*]}" $fan_dbus_name
+    fi
+    # 4-0058
+    if [ -d "$psu1_hwmon_path" ] ;then
+        get_sensors_state "${psu1_bus_path[*]}" $psu_dbus_name
+    fi
+    # 4-0059
+    if [ -d "$psu2_hwmon_path" ] ;then
+        get_sensors_state "${psu2_bus_path[*]}" $psu_dbus_name
+    fi
+
+    get_sensors_state "${tmp_bus_path[*]}" $tmp_dbus_name
 
     if [ $result_critical -ge 1 ] || [ $result_warning -ge 1 ];then
         echo "cirtical : $result_critical , warning: $result_warning"
-        echo "timer" > $frontpanel_warning_led_trigger
+        open_sys_alarm_led
     else
-        echo "none" > $frontpanel_warning_led_trigger
-        echo 0 > $frontpanel_warning_led_brightness
+        close_sys_alarm_led
     fi
-
+    clear_record
     sleep 5
-    result_critical=0
+
 done
 
 

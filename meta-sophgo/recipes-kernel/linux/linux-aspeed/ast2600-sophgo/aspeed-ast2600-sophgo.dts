@@ -860,15 +860,15 @@
 	 	reg = <0x51>;
 	 };
 	/* PSU1 @ 0xB0 */
-	psu@58 {
-		compatible = "pmbus";
-		reg = <0x58>;
-	};
+	// psu@58 {
+	// 	compatible = "pmbus";
+	// 	reg = <0x58>;
+	// };
 	/* PSU2 @ 0xB2 */
-	psu@59 {
-		compatible = "pmbus";
-		reg = <0x59>;
-	};
+	// psu@59 {
+	// 	compatible = "pmbus";
+	// 	reg = <0x59>;
+	// };
 };
 &i2c5 {
 	status = "okay";

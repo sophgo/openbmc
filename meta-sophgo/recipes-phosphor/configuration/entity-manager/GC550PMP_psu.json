@@ -118,7 +118,7 @@
                         "Severity": 1,
                         "Value": 52
                     },
-                    
+
                     {
                         "Direction": "greater than",
                         "Label": "iout1",
@@ -133,7 +133,7 @@
                         "Severity": 1,
                         "Value": 52
                     },
-                    
+
                     {
                         "Direction": "greater than",
                         "Label": "iout2",
@@ -146,14 +146,14 @@
                         "Label": "temp1",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 50
+                        "Value": 55
                     },
                     {
                         "Direction": "greater than",
                         "Label": "temp1",
                         "Name": "upper non critical",
                         "Severity": 0,
-                        "Value": 55
+                        "Value": 50
                     }
                 ],
                 "Type": "pmbus"

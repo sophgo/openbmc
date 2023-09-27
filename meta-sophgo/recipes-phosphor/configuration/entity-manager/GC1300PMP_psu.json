@@ -102,14 +102,14 @@
                         "Label": "pin",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 600
+                        "Value": 1200
                     },
                     {
                         "Direction": "greater than",
                         "Label": "pin",
                         "Name": "upper non critical",
                         "Severity": 0,
-                        "Value": 540
+                        "Value": 1000
                     },
                     {
                         "Direction": "greater than",
@@ -146,14 +146,14 @@
                         "Label": "temp1",
                         "Name": "upper critical",
                         "Severity": 1,
-                        "Value": 50
-                    },
-                    {
-                        "Direction": "greater than",
-                        "Label": "temp1",
-                        "Name": "upper non critical",
-                        "Severity": 0,
                         "Value": 55
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Label": "temp1",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 50
                     }
                 ],
                 "Type": "pmbus"
