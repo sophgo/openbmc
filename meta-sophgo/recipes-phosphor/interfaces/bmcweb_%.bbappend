@@ -13,6 +13,7 @@ SRC_URI:append = " \
     file://0005-sophgo-redfidh.patch \
     file://0006-sophgo-systems.patch \
     file://0007-sophgo-cpld-systems.patch \
+    file://0008-sophgo-mask-user-asdbg.patch \
     "
 EXTRA_OEMESON:append = " \
     -Drest=enabled \
