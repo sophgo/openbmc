@@ -9,6 +9,7 @@ IMAGE_INSTALL:append = " \
         sophgo-led-control \
         sophgo-cpld-monitor \
         sophgo-extend-file \
+        loadsvf \
         "
 
 IMAGE_INSTALL:append = " \

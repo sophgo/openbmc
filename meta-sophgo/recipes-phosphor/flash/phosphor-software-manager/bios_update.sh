@@ -2,7 +2,8 @@
 
 
 imagePath=$1
-image=$imagePath/image-host
+image=$imagePath/image-bmc
+image_purpose=$imagePath/image-host
 image0=$imagePath/image-host0
 image1=$imagePath/image-host1
 
@@ -83,7 +84,7 @@ flashSwitchToHost() {
 cp $image $image0
 cp $image $image1
 rm -f $image
-imglist=$(echo $image*)
+imglist=$(echo $image_purpose*)
 if test "$imglist" = "$image*" -a ! -e "$imglist"
 then
 	# shell didn't expand the wildcard, so no files exist
