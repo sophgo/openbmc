@@ -10,6 +10,7 @@ IMAGE_INSTALL:append = " \
         sophgo-cpld-monitor \
         sophgo-extend-file \
         loadsvf \
+        phosphor-image-signing \
         "
 
 IMAGE_INSTALL:append = " \
