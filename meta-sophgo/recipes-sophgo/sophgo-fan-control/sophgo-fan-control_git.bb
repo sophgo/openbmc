@@ -14,6 +14,7 @@ RDEPENDS:${PN} += "bash"
 SRC_URI += " \
     file://sophgo-fan-control.sh \
     file://sophgo-fan-control.service \
+    file://sophgo-riser-i2c-ctr.sh \
 "
 
 inherit allarch systemd bash-completion obmc-phosphor-systemd
@@ -28,6 +29,7 @@ do_install () {
 
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/sophgo-fan-control.sh ${D}/${sbindir}
+    install -m 0755 ${WORKDIR}/sophgo-riser-i2c-ctr.sh ${D}/${sbindir}
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/sophgo-fan-control.service ${D}${systemd_system_unitdir}

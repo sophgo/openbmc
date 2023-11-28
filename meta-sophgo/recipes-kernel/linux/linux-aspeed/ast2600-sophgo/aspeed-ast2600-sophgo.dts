@@ -650,7 +650,7 @@
 };
 
 &rtc {
-	status = "okay";
+	// status = "okay";
 };
 #if 1
 &fmc {
@@ -902,32 +902,32 @@
 
 &i2c8 {
 	status = "okay";
-	i2c-mux@71 {
-		compatible = "nxp,pca9546";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg = <0x71>;
-	};
+	// i2c-mux@71 {
+	// 	compatible = "nxp,pca9546";
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+	// 	reg = <0x71>;
+	// };
 };
 &i2c9 {
 	status = "okay";
-	i2c-mux@71 {
-		compatible = "nxp,pca9546";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg = <0x71>;
-	};
+	// i2c-mux@71 {
+	// 	compatible = "nxp,pca9546";
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+	// 	reg = <0x71>;
+	// };
 };
 #if 1
 //pin M24 already requested by 1e650010.mdio
 &i2c10 {
 	status = "okay";
-	i2c-mux@71 {
-		compatible = "nxp,pca9546";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg = <0x71>;
-	};
+	// i2c-mux@71 {
+	// 	compatible = "nxp,pca9546";
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+	// 	reg = <0x71>;
+	// };
 };
 //pin L26 already requested by 1e650018.mdio
 &i2c11 {

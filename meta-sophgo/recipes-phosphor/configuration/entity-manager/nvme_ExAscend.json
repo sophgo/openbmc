@@ -4,19 +4,19 @@
         {
             "Address": "0x6A",
             "Bus": "$bus",
-            "Name": "NVMe $index Temp",
+            "Name": "NVMe $bus % 2 + 1 Temp",
             "Thresholds": [
                 {
                     "Direction": "greater than",
                     "Name": "upper critical",
                     "Severity": 1,
-                    "Value": 115
+                    "Value": 90
                 },
                 {
                     "Direction": "greater than",
                     "Name": "upper non critical",
                     "Severity": 0,
-                    "Value": 110
+                    "Value": 85
                 },
                 {
                     "Direction": "less than",
@@ -35,7 +35,7 @@
         }
     ],
     "Logging": "Off",
-    "Name": "NVMe $index",
+    "Name": "NVMe $BUS % 2 + 1",
     "Probe": "xyz.openbmc_project.FruDevice({'PRODUCT_PRODUCT_NAME': 'PE4'})",
     "Type": "NVMe",
     "xyz.openbmc_project.Inventory.Decorator.Asset": {
