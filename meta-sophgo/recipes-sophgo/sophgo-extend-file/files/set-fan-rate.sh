@@ -13,7 +13,7 @@ function write_pwm(){
     done
 }
 
-value=$(ps | grep sophgo-fan-control.sh |wc -l)
+value=$(ps | grep sophgo-fan-control.sh | wc -l)
 if [ $value -ge 2 ]; then
     echo "stop sophgo-fan-control.service"
     systemctl stop sophgo-fan-control.service
@@ -27,7 +27,7 @@ fi
 
 case "$1" in
     [1-9][0-9]*)
-        echo "$1 is number."
+        echo "$1 is valid."
         ;;
     *)
         echo "Usage: $0 number {0~255}"
