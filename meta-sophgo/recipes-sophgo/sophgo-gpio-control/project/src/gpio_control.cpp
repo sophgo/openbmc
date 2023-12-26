@@ -86,6 +86,12 @@ enum HostFlashPort
     HOST
 };
 
+enum IdentifyLedSet
+{
+    ON = 0,
+    OFF
+};
+
 enum SolPort
 {
     H0U0 = 0,
@@ -143,6 +149,8 @@ static ConfigData cpuaFlashH0Config;
 static ConfigData cpuaFlashH1Config;
 static ConfigData cpubFlashH2Config;
 static ConfigData cpubFlashH3Config;
+static ConfigData identifyLedGetConfig;
+static ConfigData identifyLedSetConfig;
 
 
 
@@ -184,7 +192,9 @@ boost::container::flat_map<std::string, ConfigData*> powerSignalMap = {
     {"cpuaFlashH0",        &cpuaFlashH0Config},
     {"cpuaFlashH1",        &cpuaFlashH1Config},
     {"cpubFlashH2",        &cpubFlashH2Config},
-    {"cpubFlashH3",        &cpubFlashH3Config}};
+    {"cpubFlashH3",        &cpubFlashH3Config},
+    {"identifyLedGet",     &identifyLedGetConfig},
+    {"identifyLedSet",     &identifyLedSetConfig}};
 
 
 
@@ -198,15 +208,17 @@ static std::shared_ptr<sdbusplus::asio::dbus_interface> solUartIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> cpuaFlashIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> cpubFlashIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> phyIrqIface;//作用未知
+static std::shared_ptr<sdbusplus::asio::dbus_interface> identifyLedIface;
 
 
 
 
 // LED flashing cycle
 boost::container::flat_map<std::string, int> TimerMap = {
-    {"PowerPulseMs", 200},
+    {"PowerPulseMs",    200  },
     {"ForceOffPulseMs", 15000},
-    {"ResetPulseMs", 500}};
+    {"ResetPulseMs",    500  },
+    {"LedSwitchPullMs", 300  }};
 
 
 // Timers
@@ -284,6 +296,9 @@ static gpiod::line cpubFlashH2Line;
 static boost::asio::posix::stream_descriptor cpubFlashH2Event(io);
 static gpiod::line cpubFlashH3Line;
 static boost::asio::posix::stream_descriptor cpubFlashH3Event(io);
+static gpiod::line identifyLedGetLine;
+static boost::asio::posix::stream_descriptor identifyLedGetEvent(io);
+static gpiod::line identifyLedSetLine;
 
 
 
@@ -325,6 +340,36 @@ static bool setGPIOOutput(const std::string& name, const int value,
 
 
     gpioLine.release();
+
+    return true;
+}
+
+static bool setGPIOOutputNotRelease(const std::string& name, const int value,
+                          gpiod::line& gpioLine)
+{
+    // Find the GPIO line
+    gpioLine = gpiod::find_line(name);
+    if (!gpioLine)
+    {
+        lg2::error("Failed to find the {GPIO_NAME} line", "GPIO_NAME", name);
+        return false;
+    }
+
+    // Request GPIO output to specified value
+    try
+    {
+        gpioLine.request({appName, gpiod::line_request::DIRECTION_OUTPUT, {}},
+                         value);
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Failed to request {GPIO_NAME} output: {ERROR}", "GPIO_NAME",
+                   name, "ERROR", e);
+        return false;
+    }
+
+    lg2::info("{GPIO_NAME} set to {GPIO_VALUE}", "GPIO_NAME", name,
+              "GPIO_VALUE", value);
 
     return true;
 }
@@ -513,7 +558,9 @@ static int checkGpioLineName()
        (cpuaFlashH0Config.lineName.empty())          || \
        (cpuaFlashH1Config.lineName.empty())          || \
        (cpubFlashH2Config.lineName.empty())          || \
-       (cpubFlashH3Config.lineName.empty()))
+       (cpubFlashH3Config.lineName.empty())          || \
+       (identifyLedGetConfig.lineName.empty())          || \
+       (identifyLedSetConfig.lineName.empty()))
     {
         return -1;
     }
@@ -649,9 +696,16 @@ static void hdd2ExistHandler(bool state)
 static void hdd3ExistHandler(bool state)
 {
     hddExistIface->set_property("hdd3ExistState", !state);
-}static void hdd4ExistHandler(bool state)
+}
+
+static void hdd4ExistHandler(bool state)
 {
     hddExistIface->set_property("hdd4ExistState", !state);
+}
+
+static void identifyLedStateHandler(bool state)
+{
+    identifyLedIface->set_property("identifyLedState", state);
 }
 
 
@@ -694,6 +748,41 @@ enum class CpuFlashPort
     FLASH_TO_HOST,
     FLASH_TO_BMC,
 };
+
+static int setGPIOOutputForMs(const ConfigData& config, const int value,
+                              const int durationMs,gpiod::line gpioLine)
+{
+    ;
+    if (!setGPIOOutputNotRelease(config.lineName, value, gpioLine))
+    {
+        return -1;
+    }
+    const std::string name = config.lineName;
+
+    gpioAssertTimer.expires_after(std::chrono::milliseconds(durationMs));
+    gpioAssertTimer.async_wait(
+        [gpioLine, value, name](const boost::system::error_code ec) {
+            // Set the GPIO line back to the opposite value
+            gpioLine.set_value(!value);
+            lg2::info("{GPIO_NAME} released", "GPIO_NAME", name);
+            if (ec)
+            {
+                // operation_aborted is expected if timer is canceled before
+                // completion.
+                if (ec != boost::asio::error::operation_aborted)
+                {
+                    lg2::error("{GPIO_NAME} async_wait failed: {ERROR_MSG}",
+                               "GPIO_NAME", name, "ERROR_MSG", ec.message());
+                }
+            }
+        });
+    return 0;
+}
+
+static void switchIdentifyLed()
+{
+    setGPIOOutputForMs(identifyLedSetConfig, IdentifyLedSet::ON, TimerMap["LedSwitchPullMs"], identifyLedSetLine);
+}
 
 #ifdef FLASH_CONTROL_VIA_DBUS
 static void transitionCpuAFlashPort(CpuFlashPort port)
@@ -769,6 +858,7 @@ int main(int argc, char* argv[])
     cpuaFlashIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/cpuaflash", "xyz.openbmc_project.Gpio.CpuA");
     cpubFlashIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/cpubflash", "xyz.openbmc_project.Gpio.CpuB");
 #endif
+    identifyLedIface = objectServer.add_interface("/xyz/openbmc_project/gpio/identifyLed", "xyz.openbmc_project.Gpio.identifyLed");
 
     // Request GPIO events 初始化过程中先获取一次在位状态
     if (!requestGPIOEvents(sata1ExistConfig.lineName, sata1ExistHandler,
@@ -914,7 +1004,14 @@ int main(int argc, char* argv[])
                     (hdd4ExistLine.get_value() == hdd4ExistConfig.polarity));
 
 
-
+    //identifyLed
+    if (!requestGPIOEvents(identifyLedGetConfig.lineName, identifyLedStateHandler,
+                            identifyLedGetLine, identifyLedGetEvent))
+    {
+        return -1;
+    }
+    identifyLedIface->register_property("identifyLedState",
+                    (identifyLedGetLine.get_value() == identifyLedGetConfig.polarity));
 
 
 
@@ -943,7 +1040,10 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
-
+    if(!setGPIOOutput(identifyLedSetConfig.lineName, IdentifyLedSet::OFF, identifyLedSetLine))
+    {
+        return -1;
+    }
 
 
     // Request DBUS events
@@ -970,6 +1070,19 @@ int main(int argc, char* argv[])
             resp = requested;
             return 1;
         });
+
+    // identifyLedIface->register_method("identifyLedSwitch", switchIdentifyLed);
+    identifyLedIface->register_property(
+        "identifyLedSwitch",
+        bool(1),
+        [](const bool requested, bool resp) {
+            switchIdentifyLed();
+            resp = requested;
+            return 1;
+        });
+
+
+
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->register_property(
         "CpuAFlashTransition",
@@ -1003,12 +1116,14 @@ int main(int argc, char* argv[])
         });
 #endif
 
+
     sataExistIface->initialize();
     hddExistIface->initialize();
     fanExistIface->initialize();
     riserCardIface->initialize();
     PSUPowerOnIface->initialize();
     solUartIface->initialize();
+    identifyLedIface->initialize();
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->initialize();
     cpubFlashIface->initialize();

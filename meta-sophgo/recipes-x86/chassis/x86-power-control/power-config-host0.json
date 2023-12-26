@@ -62,7 +62,7 @@
         },
         {
             "Name": "SioPowerGood",
-            "LineName": "SIO_POWER_GOOD",
+            "LineName": "",
             "Type": "GPIO",
             "Polarity": "ActiveHigh"
         },

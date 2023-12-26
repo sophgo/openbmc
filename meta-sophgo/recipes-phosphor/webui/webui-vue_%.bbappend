@@ -20,6 +20,7 @@ SRC_URI:append = " file://0016-sophgo-cpldversion-GlobalStore.patch "
 SRC_URI:append = " file://0017-sophgo-cpldversion-Firmware.patch "
 SRC_URI:append = " file://0018-sophgo-enable-subscribe.patch "
 SRC_URI:append = " file://0019-sophgo-WebSocketPlugin.patch "
+SRC_URI:append = " file://0020-sophgo-inventory.patch "
 
 
 
