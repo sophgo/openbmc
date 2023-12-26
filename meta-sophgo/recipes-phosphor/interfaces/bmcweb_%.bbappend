@@ -14,6 +14,7 @@ SRC_URI:append = " \
     file://0006-sophgo-systems.patch \
     file://0007-sophgo-cpld-systems.patch \
     file://0008-sophgo-mask-user-asdbg.patch \
+    file://0009-sophgo-identifyLed.patch \
     "
 EXTRA_OEMESON:append = " \
     -Drest=enabled \

@@ -209,11 +209,24 @@
         "LineName" : "CPUB_Flash_H3",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "identifyLedGet",
+        "LineName" : "SIO_POWER_GOOD",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "identifyLedSet",
+        "LineName" : "SIO_ONCONTROL",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     }
 ],
   "timing_configs":{
       "PowerPulseMs": 200,
       "ForceOffPulseMs": 15000,
-      "ResetPulseMs": 500
+      "ResetPulseMs": 500,
+      "LedSwitchOullMs": 300
     }
 }
