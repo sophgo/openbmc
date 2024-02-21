@@ -21,7 +21,15 @@ SRC_URI:append = " file://0017-sophgo-cpldversion-Firmware.patch "
 SRC_URI:append = " file://0018-sophgo-enable-subscribe.patch "
 SRC_URI:append = " file://0019-sophgo-WebSocketPlugin.patch "
 SRC_URI:append = " file://0020-sophgo-inventory.patch "
-
+SRC_URI:append = " file://0021-sophgo-navigation-add-fanspeed.patch "
+SRC_URI:append = " file://0022-sophgo-naviga-ibm-add-fanspeed.patch "
+SRC_URI:append = " file://0023-sophgo-router-ibm-add-fanspeed.patch "
+SRC_URI:append = " file://0024-sophgo-naviga-intel-add-fanspeed.patch "
+SRC_URI:append = " file://0025-sophgo-router-intel-add-fanspeed.patch "
+SRC_URI:append = " file://0026-sophgo-enUS.patch "
+SRC_URI:append = " file://0027-sophgo-ruRU.patch "
+SRC_URI:append = " file://0028-sophgo-route-add-fanspeed.patch "
+SRC_URI:append = " file://0029-sophgo-index-add-fanspeed.patch "
 
 
 
@@ -29,9 +37,21 @@ SRC_URI += "file://sg2042.svg;subdir=git/src/assets/images \
             file://sophgo.svg;subdir=git/src/assets/images \
             file://sopho.svg;subdir=git/src/assets/images \
             file://FirmwareCardsCpld.vue;subdir=git/src/views/Operations/Firmware \
+            file://FanSpeedStore.js;subdir=git/src/store/modules/Settings/ \
+            file://FanSpeed/FanSpeed.vue \
+            file://FanSpeed/index.js \
             "
 
 # SRC_URI += "file://sg2042.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
 #             file://sophgo.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
 #             file://sopho.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
+#             file://FirmwareCardsCpld.vue;subdir=../../../../../workspace/sources/webui-vue/src/views/Operations/Firmware \
 #             "
+
+
+
+do_create_FanSpeed_dir() {
+    install -d ${S}/src/views/Settings/FanSpeed
+    cp -r ${WORKDIR}/FanSpeed/* ${S}/src/views/Settings/FanSpeed
+}
+addtask do_create_FanSpeed_dir after do_unpack before do_patch

@@ -15,6 +15,7 @@ SRC_URI:append = " \
     file://0007-sophgo-cpld-systems.patch \
     file://0008-sophgo-mask-user-asdbg.patch \
     file://0009-sophgo-identifyLed.patch \
+    file://0010-sophgo-systems-add-fanspeed.patch \
     "
 EXTRA_OEMESON:append = " \
     -Drest=enabled \

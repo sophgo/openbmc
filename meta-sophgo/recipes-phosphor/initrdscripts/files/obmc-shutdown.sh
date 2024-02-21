@@ -50,7 +50,8 @@ then
 		fi
 		if ls /run/initramfs/image-bmc
 		then
-			$update --clean-saved-files --no-restore-files
+			# $update --clean-saved-files --no-restore-files
+			$update --clean-saved-files
 		else
 			$update --clean-saved-files
 		fi

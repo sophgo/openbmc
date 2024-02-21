@@ -1,0 +1,95 @@
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index 130248af..c6da4a45 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -33,11 +33,16 @@
+ #include <boost/system/error_code.hpp>
+ #include <sdbusplus/asio/property.hpp>
+ #include <sdbusplus/unpack_properties.hpp>
++#include <sdbusplus/server.hpp>
+ 
+ #include <array>
+ #include <string_view>
+ #include <variant>
+ 
++#include <cstdio>
++#include <cstdlib>
++
++
+ namespace redfish
+ {
+ 
+@@ -1883,6 +1888,45 @@ inline void setAutomaticRetry(const std::shared_ptr<bmcweb::AsyncResp>& aResp,
+         dbus::utility::DbusVariantType(autoRebootEnabled));
+ }
+ 
++
++inline void
++    setFanSpeed(/* const std::shared_ptr<bmcweb::AsyncResp>& aResp, */
++                          const std::string& fanSpeed)
++{
++    BMCWEB_LOG_DEBUG << "Set fan speed.";
++    auto setFanSpeedFile = "set-fan-rate@" + fanSpeed + ".service";
++
++#if 0
++    auto io = std::make_shared<boost::asio::io_context>();
++    sdbusplus::asio::connection bus(io);
++
++    auto method = bus.new_method_call("org.freedesktop.systemd1", "/org/freedesktop/systemd1",
++                                      "org.freedesktop.systemd1.Manager", "StartUnit");
++
++    method.append(setFanSpeedFile, "replace");
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const sdbusplus::exception_t& e)
++    {
++        messages::internalError(aResp->res);
++        return;
++    }
++#else
++    std::string cmd = "systemctl start " + setFanSpeedFile;
++    int result = std::system(cmd.c_str());
++
++    if (result == -1) {
++        std::cout << "bmcweb: systemctl start failed!" << std:: endl;
++        return;
++    } else {
++        return;
++    }
++#endif
++}
++
++
+ /**
+  * @brief Sets power restore policy properties.
+  *
+@@ -3231,6 +3275,7 @@ inline void requestRoutesSystems(App& app)
+         std::optional<std::string> indicatorLed;
+         std::optional<std::string> assetTag;
+         std::optional<std::string> powerRestorePolicy;
++        std::optional<std::string> fanSpeed;
+         std::optional<std::string> powerMode;
+         std::optional<bool> wdtEnable;
+         std::optional<std::string> wdtTimeOutAction;
+@@ -3252,6 +3297,7 @@ inline void requestRoutesSystems(App& app)
+                         "LocationIndicatorActive", locationIndicatorActive,
+                         "AssetTag", assetTag,
+                         "PowerRestorePolicy", powerRestorePolicy,
++                        "FanSpeed", fanSpeed,
+                         "PowerMode", powerMode,
+                         "HostWatchdogTimer/FunctionEnabled", wdtEnable,
+                         "HostWatchdogTimer/TimeoutAction", wdtTimeOutAction,
+@@ -3317,6 +3363,11 @@ inline void requestRoutesSystems(App& app)
+             setPowerRestorePolicy(asyncResp, *powerRestorePolicy);
+         }
+ 
++        if (fanSpeed)
++        {
++            setFanSpeed(/* asyncResp, */ *fanSpeed);
++        }
++
+         if (powerMode)
+         {
+             setPowerMode(asyncResp, *powerMode);

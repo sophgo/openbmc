@@ -1,0 +1,7 @@
+[Unit]
+Description=Set fan speed to %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/sh -c '/usr/sbin/set-fan-rate.sh %i'
