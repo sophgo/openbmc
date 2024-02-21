@@ -1,0 +1,16 @@
+diff --git a/src/components/AppNavigation/AppNavigationMixin.js b/src/components/AppNavigation/AppNavigationMixin.js
+index bbbbb1e..2a2e5f7 100644
+--- a/src/components/AppNavigation/AppNavigationMixin.js
++++ b/src/components/AppNavigation/AppNavigationMixin.js
+@@ -118,6 +118,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.dateTime'),
+               route: '/settings/date-time',
+             },
++            {
++              id: 'fan-speed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+             {
+               id: 'network',
+               label: this.$t('appNavigation.network'),

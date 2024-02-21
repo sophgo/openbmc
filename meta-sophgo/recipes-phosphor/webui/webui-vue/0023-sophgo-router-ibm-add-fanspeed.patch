@@ -1,0 +1,27 @@
+diff --git a/src/env/router/ibm.js b/src/env/router/ibm.js
+index 0ccf90b..a25284e 100644
+--- a/src/env/router/ibm.js
++++ b/src/env/router/ibm.js
+@@ -27,6 +27,7 @@ import ServerPowerOperations from '@/views/Operations/ServerPowerOperations';
+ import Certificates from '@/views/SecurityAndAccess/Certificates';
+ import Power from '@/views/ResourceManagement/Power';
+ import i18n from '@/i18n';
++import FanSpeed from '@/views/Settings/FanSpeed';
+ 
+ // Custom components
+ import Dumps from '@/views/Logs/Dumps';
+@@ -183,6 +184,14 @@ const routes = [
+           title: i18n.t('appPageTitle.dateTime'),
+         },
+       },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       {
+         path: '/operations/firmware',
+         name: 'firmware',

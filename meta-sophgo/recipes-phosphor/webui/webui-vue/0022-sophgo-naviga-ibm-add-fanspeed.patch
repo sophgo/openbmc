@@ -1,0 +1,16 @@
+diff --git a/src/env/components/AppNavigation/ibm.js b/src/env/components/AppNavigation/ibm.js
+index ed84e17..8a5e3cc 100644
+--- a/src/env/components/AppNavigation/ibm.js
++++ b/src/env/components/AppNavigation/ibm.js
+@@ -92,6 +92,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.powerRestorePolicy'),
+               route: '/settings/power-restore-policy',
+             },
++            {
++              id: 'fanspeed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+           ],
+         },
+         {

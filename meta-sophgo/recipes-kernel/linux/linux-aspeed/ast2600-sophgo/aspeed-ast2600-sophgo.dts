@@ -428,6 +428,9 @@
 			&pinctrl_pwm14g1_default
 			&pinctrl_pwm15g1_default>;
 };
+&jtag0 {
+	status = "okay";
+};
 
 &jtag1 {
 	status = "okay";
