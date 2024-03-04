@@ -1,74 +1,51 @@
 <template>
   <b-container fluid="xl">
-    <page-title />
+    <page-title :description="$t('pageFanSpeed.description')" />
 
-    <page-section :section-title="$t('pageFanSpeed.configureSettings')">
-      <b-form novalidate @submit.prevent="submitForm">
-        <b-form-group
-          label="Configure fan speed"
-          label-sr-only
-        >
-          <b-form-radio
-            v-model="form.configurationSelected"
-            value="manual"
-            data-test-id="fanSpeed-radio-configureManual"
+    <b-row>
+      <b-col sm="8" md="6" xl="12">
+        <b-form-group :label="$t('pageFanSpeed.policiesLabel.Manul')">
+          <b-form-radio-group
+            v-model="currentFanSpeedControlPolicy"
+            name="fanspeed-control-policy"
           >
-            {{ $t('pageFanSpeed.form.manual') }}
-          </b-form-radio>
-          <b-row class="mt-3 ml-3">
-            <b-col sm="6" lg="4" xl="3">
-              <b-form-group
-                :label="$t('pageFanSpeed.form.pwm')"
-                label-for="input-manual-pwm"
-              >
-                <b-form-text id="pwm-format-help">0-255</b-form-text>
-                <b-input-group>
-                  <b-form-input
-                    id="input-manual-pwm"
-                    type="number"
-                    v-model.number="form.manual.pwm"
-                    min="0"
-                    max="255"
-                    :disabled="autoOptionSelected"
-                    @input="validateInput"
-                  />
-                </b-input-group>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-form-radio
-            v-model="form.configurationSelected"
-            value="auto"
-            data-test-id="fanSpeed-radio-configureAuto"
-          >
-            Auto
-          </b-form-radio>
-          <b-button
-            variant="primary"
-            type="submit"
-            data-test-id="fanSpeed-button-saveSettings"
-          >
-            {{ $t('global.action.saveSettings') }}
-          </b-button>
+          <b-form-radio value="low">{{ $t('pageFanSpeed.gradeDesc.Low') }}</b-form-radio>
+          <b-form-radio value="medium">{{ $t('pageFanSpeed.gradeDesc.Medium') }}</b-form-radio>
+          <b-form-radio value="high">{{ $t('pageFanSpeed.gradeDesc.High') }}</b-form-radio>
+          </b-form-radio-group>
         </b-form-group>
-      </b-form>
-    </page-section>
+      </b-col>
+    </b-row>
+
+    <b-row>
+      <b-col sm="8" md="6" xl="12">
+        <b-form-group :label="$t('pageFanSpeed.policiesLabel.Auto')">
+          <b-form-radio-group
+            v-model="currentFanSpeedControlPolicy"
+            name="fanspeed-control-policy"
+          >
+          <b-form-radio value="auto">{{ $t('pageFanSpeed.gradeDesc.Auto') }}</b-form-radio>
+          </b-form-radio-group>
+        </b-form-group>
+      </b-col>
+    </b-row>
+
+    <b-button variant="primary" type="submit" @click="submitForm">
+      {{ $t('global.action.saveSettings') }}
+    </b-button>
   </b-container>
 </template>
 
 <script>
 import PageTitle from '@/components/Global/PageTitle';
-import PageSection from '@/components/Global/PageSection';
-
 import BVToastMixin from '@/components/Mixins/BVToastMixin';
-import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
 import LocalTimezoneLabelMixin from '@/components/Mixins/LocalTimezoneLabelMixin';
 import VuelidateMixin from '@/components/Mixins/VuelidateMixin.js';
-
+import LoadingBarMixin from '@/components/Mixins/LoadingBarMixin';
 
 export default {
   name: 'FanSpeed',
-  components: { PageTitle, PageSection },
+  components: { PageTitle },
   mixins: [
     BVToastMixin,
     LoadingBarMixin,
@@ -81,49 +58,42 @@ export default {
   },
   data() {
     return {
-      locale: this.$store.getters['global/languagePreference'],
-      form: {
-        configurationSelected: 'manual',
-        manual: {
-          pwm: 255,
-        },
-        auto: '',
-      },
-      loading,
+      policyValue: null,
     };
   },
+
   computed: {
-    autoOptionSelected() {
-      return this.form.configurationSelected === 'auto';
+    currentFanSpeedControlPolicy: {
+      get() {
+        return this.$store.getters['fanSpeed/fanSpeedPolicy'];
+      },
+      set(policy) {
+        this.policyValue = policy;
+      },
     },
   },
-  // created() {
-  //   this.startLoader();
-  // },
+  created() {
+    this.startLoader();
+    this.renderFanSpeedSettings();
+  },
   methods: {
-    validateInput() {
-      if (this.form.manual.pwm < 0) {
-        this.form.manual.pwm = 0;
-      } else if (this.form.manual.pwm > 255) {
-        this.form.manual.pwm = 255;
-      }
+    renderFanSpeedSettings() {
+      Promise.all([
+        this.$store.dispatch('fanSpeed/getFanSpeed'),
+      ]).finally(() => {
+        this.endLoader();
+      });
     },
     submitForm() {
       this.startLoader();
-      let pwmString;
-      let isAUTOEnabled = this.form.configurationSelected === 'auto';
-      //manual
-      if (!isAUTOEnabled) {
-        // console.log('111');
-        pwmString = this.form.manual.pwm.toString();
-      } else { //auto
-        // console.log('222');
-        pwmString = "auto";
-      }
-      console.log('333:',pwmString);
       this.$store
-      .dispatch('fanSpeed/setFanSpeed', pwmString);
-      this.endLoader();
+      .dispatch(
+        'fanSpeed/setFanSpeed',
+        this.policyValue
+      )
+      .finally(() => {
+          this.renderFanSpeedSettings();
+      });
     },
   },
 };

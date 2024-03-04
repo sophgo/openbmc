@@ -51,7 +51,8 @@ export default {
       return this.$store.getters['global/cpldVersion'];
     },
     backupVersion() {
-      return this.backup?.version || '--';
+      // return this.backup?.version || '--';
+      return '--';
     },
   },
 };

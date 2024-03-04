@@ -1,0 +1,34 @@
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 755e76c..93d224c 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -218,12 +218,28 @@
+             "message": "To change how date and time are displayed (either UTC or browser offset) throughout the application, visit ",
+             "link": "Profile Settings"
+         },
+-        "configureSettings": "Configure settings",
++        "description": " Control strategy for setting fan speed .",
++        "policiesLabel": {
++            "Manul":"Manul control policy",
++            "Auto":"Automatic control policy"
++        },
+         "form": {
+             "pwm": "Pwm",
+             "manual": "Manual",
+             "auto": "Auto"
+         },
++        "grade": {
++            "Low": "low",
++            "Medium": "medium",
++            "High": "high",
++            "Auto":"auto"
++        },
++        "gradeDesc": {
++            "Low": "Low speed",
++            "Medium": "Medium speed",
++            "High": "High speed",
++            "Auto":"Auto"
++        },
+         "toast": {
+             "errorSaveSettings": "Error saving pwm settings.",
+             "successSaveSettings": "Successfully saved pwm settings."

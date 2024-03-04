@@ -1,6 +1,8 @@
 FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
+
+
 SRC_URI:append = " file://0001-Update-to-vue-5.0.8.patch "
 SRC_URI:append = " file://0002-Use-aspeed-s-novnc-fork.patch "
 SRC_URI:append = " file://0003-sophgo-eslintrcjs.patch "
@@ -30,6 +32,9 @@ SRC_URI:append = " file://0026-sophgo-enUS.patch "
 SRC_URI:append = " file://0027-sophgo-ruRU.patch "
 SRC_URI:append = " file://0028-sophgo-route-add-fanspeed.patch "
 SRC_URI:append = " file://0029-sophgo-index-add-fanspeed.patch "
+SRC_URI:append = " file://0030-sophgo-enUs.patch "
+SRC_URI:append = " file://0031-sophgo-WebSocketPlugin.patch "
+
 
 
 
@@ -41,17 +46,15 @@ SRC_URI += "file://sg2042.svg;subdir=git/src/assets/images \
             file://FanSpeed/FanSpeed.vue \
             file://FanSpeed/index.js \
             "
-
-# SRC_URI += "file://sg2042.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
-#             file://sophgo.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
-#             file://sopho.svg;subdir=../../../../../workspace/sources/webui-vue/src/assets/images/ \
-#             file://FirmwareCardsCpld.vue;subdir=../../../../../workspace/sources/webui-vue/src/views/Operations/Firmware \
-#             "
-
-
-
 do_create_FanSpeed_dir() {
+    echo "---${WORKDIR}---${S}---${THISDIR}---"
     install -d ${S}/src/views/Settings/FanSpeed
-    cp -r ${WORKDIR}/FanSpeed/* ${S}/src/views/Settings/FanSpeed
+    cp ${WORKDIR}/FanSpeed/FanSpeed.vue ${S}/src/views/Settings/FanSpeed/
+    cp ${WORKDIR}/FanSpeed/index.js ${S}/src/views/Settings/FanSpeed/
 }
 addtask do_create_FanSpeed_dir after do_unpack before do_patch
+
+
+
+
+
