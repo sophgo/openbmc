@@ -1,0 +1,21 @@
+diff --git a/http/app.hpp b/http/app.hpp
+index d3afe60f..21dffec7 100644
+--- a/http/app.hpp
++++ b/http/app.hpp
+@@ -180,6 +180,7 @@ class App
+         return *this;
+     }
+ #endif
++    std::string fanSpeed;
+ 
+   private:
+     std::shared_ptr<boost::asio::io_context> io;
+@@ -197,6 +198,8 @@ class App
+ #else
+     std::unique_ptr<server_t> server;
+ #endif
++
++
+ };
+ } // namespace crow
+ using App = crow::App;

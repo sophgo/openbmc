@@ -17,11 +17,35 @@ property_type="s"
 
 set_graceful_reboot="xyz.openbmc_project.State.Host.Transition.ForceWarmReboot"
 
-echoerr() {
+function echoerr() {
 	echo 1>&2 "ERROR: $@"
 }
 
-creat_mtd () {
+
+
+function flashSwitchToBmc() {
+    gpioset 0 56=0
+    gpioset 0 57=0
+    gpioset 0 58=0
+    gpioset 0 59=0
+}
+
+
+function flashSwitchToHost() {
+    gpioset 0 56=1
+    gpioset 0 57=1
+    gpioset 0 58=1
+    gpioset 0 59=1
+}
+
+
+function  abnormal_exit() {
+	# rm -rf $imagePath
+	flashSwitchToHost
+	exit 1
+}
+
+function creat_mtd () {
 	# Check the image-host partition available
 	HOST_MTD_0=$(< /proc/mtd grep "image-host0" | sed -n 's/^\(.*\):.*/\1/p')
 	HOST_MTD_1=$(< /proc/mtd grep "image-host1" | sed -n 's/^\(.*\):.*/\1/p')
@@ -45,20 +69,20 @@ creat_mtd () {
 		if [ -z "$HOST_MTD_0" ] || [ -z "$HOST_MTD_1" ];
 		then
 			echo "Fail to probe Host SPI-NOR device"
-			# exit 1
+			abnormal_exit
 		fi
 	fi
 }
 
 
-findmtd() {
+function findmtd() {
 	m=$(grep -xl "$1" /sys/class/mtd/*/name)
 	m=${m%/name}
 	m=${m##*/}
 	echo $m
 }
 
-toobig() {
+function toobig() {
 	if test $(stat -L -c "%s" "$1") -gt $(cat /sys/class/mtd/"$2"/size)
 	then
 		return 0
@@ -66,20 +90,7 @@ toobig() {
 	return 1
 }
 
-flashSwitchToBmc() {
-    gpioset 0 56=0
-    gpioset 0 57=0
-    gpioset 0 58=0
-    gpioset 0 59=0
-}
 
-
-flashSwitchToHost() {
-    gpioset 0 56=1
-    gpioset 0 57=1
-    gpioset 0 58=1
-    gpioset 0 59=1
-}
 
 cp $image $image0
 cp $image $image1
