@@ -29,8 +29,6 @@ do_install () {
     install -m 0755 ${WORKDIR}/set-fan-rate.sh ${D}/${sbindir}
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/temp-test-record.sh ${D}/${sbindir}
-    install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/cpld-update.sh ${D}/${sbindir}
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/set-fan-rate@.service ${D}${systemd_system_unitdir}
