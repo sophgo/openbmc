@@ -3,26 +3,15 @@
         "Exposes": [
             {
                 "Connector": {
-                    "Name": "System Fan Connector 1",
-                    "Pwm": 2,
-                    "Tachs": [
-                        0,1
-                    ]
-                },
-                "Index": 0,
-                "Name": "Fan1",
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
                     "Name": "System Fan Connector 2",
-                    "Pwm": 3,
+                    "PwmName":"Fan2_pwm",
+                    "Pwm": 2,
                     "Tachs": [
                         8,9
                     ]
                 },
                 "Index": 8,
-                "Name": "Fan2",
+                "Name": "Fan2_tach",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -49,30 +38,19 @@
                         "Value": 4000
                     }
                 ],
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
-                    "Name": "System Fan Connector 3",
-                    "Pwm": 4,
-                    "Tachs": [
-                       2,3
-                    ]
-                },
-                "Index": 2,
-                "Name": "Fan3",
                 "Type": "AspeedFan"
             },
             {
                 "Connector": {
                     "Name": "System Fan Connector 4",
-                    "Pwm": 5,
+                    "PwmName":"Fan4_pwm",
+                    "Pwm": 4,
                     "Tachs": [
                         10,11
                     ]
                 },
                 "Index": 10,
-                "Name": "Fan4",
+                "Name": "Fan4_tach",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -99,30 +77,19 @@
                         "Value": 4000
                     }
                 ],
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
-                    "Name": "System Fan Connector 5",
-                    "Pwm": 6,
-                    "Tachs": [
-                        4,5
-                    ]
-                },
-                "Index": 4,
-                "Name": "Fan5",
                 "Type": "AspeedFan"
             },
             {
                 "Connector": {
                     "Name": "System Fan Connector 6",
-                    "Pwm": 7,
+                    "PwmName":"Fan6_pwm",
+                    "Pwm": 6,
                     "Tachs": [
                         12,13
                     ]
                 },
                 "Index": 12,
-                "Name": "Fan6",
+                "Name": "Fan6_tach",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -153,38 +120,15 @@
             },
             {
                 "Connector": {
-                    "Name": "System Fan Connector 7",
-                    "Pwm": 8,
-                    "Tachs": [
-                        6,7
-                    ]
-                },
-                "Index": 6,
-                "Name": "Fan7",
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
-                    "Name": "System Fan Connector 8",
-                    "Pwm": 1,
-                    "Tachs": [
-                        6,7
-                    ]
-                },
-                "Index": 6,
-                "Name": "Fan8",
-                "Type": "AspeedFan"
-            },
-            {
-                "Connector": {
                     "Name": "System Fan Connector 9",
-                    "Pwm": 1,
+                    "PwmName":"Fan9_pwm",
+                    "Pwm": 0,
                     "Tachs": [
                         14,15
                     ]
                 },
                 "Index": 14,
-                "Name": "Fan9",
+                "Name": "Fan9_tach",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
