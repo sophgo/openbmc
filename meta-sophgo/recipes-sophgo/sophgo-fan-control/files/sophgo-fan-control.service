@@ -1,9 +1,0 @@
-[Unit]
-Description=start sophgo-fan-control upon first boot
-ConditionPathExists=/usr/sbin/sophgo-fan-control.sh
-After=xyz.openbmc_project.Chassis.Control.Power@0.service
-[Service]
-ExecStart=/bin/sh -c '/usr/sbin/sophgo-fan-control.sh'
-
-[Install]
-WantedBy=sysinit.target

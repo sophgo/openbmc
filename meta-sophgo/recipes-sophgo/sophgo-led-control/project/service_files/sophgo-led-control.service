@@ -1,0 +1,15 @@
+[Unit]
+Description=Sophgo Led Control
+ConditionPathExists=/usr/share/sophgo-led-control/led-config.json
+After=xyz.openbmc_project.Chassis.Control.Power@.service
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.hwmontempsensor.service
+After=xyz.openbmc_project.fansensor.service
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-led-control
+
+[Install]
+WantedBy=sysinit.target

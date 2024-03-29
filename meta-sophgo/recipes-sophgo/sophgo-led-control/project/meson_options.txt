@@ -1,0 +1,2 @@
+option('sophgo-test', type: 'feature', value : 'enabled',
+       description: 'Test')
