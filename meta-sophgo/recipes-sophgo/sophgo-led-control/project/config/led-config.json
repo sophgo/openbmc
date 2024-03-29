@@ -1,0 +1,219 @@
+{
+  "sysAlarmLed":[
+    {
+        "type" : "input",
+        "index" : 0,
+        "isPowerOn" : true,
+        "dbusName":"xyz.openbmc_project.FanSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/fan_tach/Fan2_tach",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 1,
+        "isPowerOn" : true,
+        "dbusName":"xyz.openbmc_project.FanSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/fan_tach/Fan4_tach",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 2,
+        "isPowerOn" : true,
+        "dbusName":"xyz.openbmc_project.FanSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/fan_tach/Fan6_tach",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 3,
+        "isPowerOn" : true,
+        "dbusName":"xyz.openbmc_project.FanSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/fan_tach/Fan9_tach",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 4,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP1",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 5,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP2",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 6,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP3",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 7,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP4",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 8,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP5",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 9,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_INNER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 10,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_OUTER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 11,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_INNER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 12,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_OUTER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 13,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH0_INNER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 14,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH0_OUTER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 15,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/TEMP_SWITCH1_INNER",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "input",
+        "index" : 16,
+        "isPowerOn" : false,
+        "dbusName":"xyz.openbmc_project.HwmonTempSensor",
+        "dbusPath" : "/xyz/openbmc_project/sensors/temperature/ ",
+        "dbusIntf" : "xyz.openbmc_project.Sensor.Threshold.Warning",
+        "dbusProperty" : {
+            "WarningAlarmHigh" : false,
+            "WarningAlarmLow"  : false
+        }
+    },
+    {
+        "type" : "output",
+        "index" : 17,
+        "dbusName":"xyz.openbmc_project.LED.Controller.frontpanel_warning_led",
+        "dbusPath" : "/xyz/openbmc_project/led/physical/frontpanel_warning_led",
+        "dbusIntf" : "xyz.openbmc_project.Led.Physical",
+        "DutyOn" : 50,
+        "Period" : 1000,
+        "State" : "xyz.openbmc_project.Led.Physical.Action.On"
+    }
+]
+
+}
