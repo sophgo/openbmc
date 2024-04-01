@@ -12,6 +12,7 @@ IMAGE_INSTALL:append = " \
         sophgo-rtc-device \
         loadsvf \
         phosphor-image-signing \
+        kernel-module-jtag-aspeed-internal \
         "
 
 IMAGE_INSTALL:append = " \

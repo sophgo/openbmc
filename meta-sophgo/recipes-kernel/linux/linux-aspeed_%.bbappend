@@ -17,11 +17,16 @@ SRC_URI:append = " file://0003-sophgo-lm90-add-ct7451.patch "
 #################################################################################################################
 
 
+
+
 SRC_URI += "file://aspeed-g6-sophgo.dtsi;subdir=git/arch/arm/boot/dts \
             file://aspeed-ast2600-sophgo.dts;subdir=git/arch/arm/boot/dts \
             file://sophgo_defconfig;subdir=git/arch/arm/configs \
             "
 
+SRC_URI:append = " file://jtag_aspeed.cfg "
+
+# IMAGE_INSTALL:append = " kernel-module-jtag-aspeed-internal"
 
 #################################################################################################################
 # Note: For reference only

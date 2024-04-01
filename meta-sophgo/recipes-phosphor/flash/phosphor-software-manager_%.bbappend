@@ -20,7 +20,7 @@ SRC_URI:append = " file://0003-sophgo-obmc-flash-host-bios-service.patch \
 
 SRC_URI += " \
     file://bios_update.sh \
-    file://cpld-update.sh \
+    file://cpld_update.sh \
     file://sophgo-cpld-update@.service \
 "
 
@@ -40,10 +40,14 @@ PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled"
 FILES:${PN} += "/lib/systemd/system/obmc-flash-host-bios@.service"
 
 FILES:${PN} += "/usr/sbin/bios_update.sh"
+FILES:${PN} += "/usr/sbin/cpld_update.sh"
 
 do_install:append() {
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/bios_update.sh ${D}/${sbindir}
+
+    install -d ${D}/${sbindir}
+    install -m 0755 ${WORKDIR}/cpld_update.sh ${D}/${sbindir}
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/sophgo-cpld-update@.service ${D}${systemd_system_unitdir}
