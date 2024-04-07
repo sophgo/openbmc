@@ -1,0 +1,53 @@
+diff --git a/src/store/modules/Settings/NetworkStore.js b/src/store/modules/Settings/NetworkStore.js
+index 125eca7..a368c7e 100644
+--- a/src/store/modules/Settings/NetworkStore.js
++++ b/src/store/modules/Settings/NetworkStore.js
+@@ -47,10 +47,12 @@ const NetworkStore = {
+           useDnsEnabled: DHCPv4.UseDNSServers,
+           useDomainNameEnabled: DHCPv4.UseDomainName,
+           useNtpEnabled: DHCPv4.UseNTPServers,
++          dhcpEnabled: DHCPv4.DHCPEnabled,
+         };
+       });
+     },
+     setNtpState: (state, ntpState) => (state.ntpState = ntpState),
++    setDhcpState: (state, dhcpState) => (state.dhcpState = dhcpState),
+     setSelectedInterfaceId: (state, selectedInterfaceId) =>
+       (state.selectedInterfaceId = selectedInterfaceId),
+     setSelectedInterfaceIndex: (state, selectedInterfaceIndex) =>
+@@ -174,6 +176,35 @@ const NetworkStore = {
+           );
+         });
+     },
++    async saveDhcpState({ commit, state }, dhcpState) {
++      commit('setDhcpState', dhcpState);
++      const data = {
++        DHCPv4: {
++          DHCPEnabled: dhcpState,
++        },
++      };
++      // Saving to the first interface automatically updates DHCPv4 and DHCPv6
++      // on all interfaces
++      return api
++        .patch(
++          `/redfish/v1/Managers/bmc/EthernetInterfaces/${state.firstInterfaceId}`,
++          data
++        )
++        .then(() => {
++          return i18n.t('pageNetwork.toast.successSaveNetworkSettings', {
++            setting: i18n.t('pageNetwork.dhcp'),
++          });
++        })
++        .catch((error) => {
++          console.log(error);
++          commit('setDhcpState', !dhcpState);
++          throw new Error(
++            i18n.t('pageNetwork.toast.errorSaveNetworkSettings', {
++              setting: i18n.t('pageNetwork.dhcp'),
++            })
++          );
++        });
++    },
+     async setSelectedTabIndex({ commit }, tabIndex) {
+       commit('setSelectedInterfaceIndex', tabIndex);
+     },
