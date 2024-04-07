@@ -13,6 +13,7 @@ IMAGE_INSTALL:append = " \
         loadsvf \
         phosphor-image-signing \
         kernel-module-jtag-aspeed-internal \
+        kernel-module-bonding \
         "
 
 IMAGE_INSTALL:append = " \

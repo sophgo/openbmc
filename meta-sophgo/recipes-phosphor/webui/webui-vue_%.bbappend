@@ -34,6 +34,8 @@ SRC_URI:append = " file://0028-sophgo-route-add-fanspeed.patch "
 SRC_URI:append = " file://0029-sophgo-index-add-fanspeed.patch "
 SRC_URI:append = " file://0030-sophgo-enUs.patch "
 SRC_URI:append = " file://0031-sophgo-WebSocketPlugin.patch "
+SRC_URI:append = " file://0032-sophgo-NetworkStore.patch "
+SRC_URI:append = " file://0033-sophgo-NetworkGlobalSettings.patch "
 
 
 
