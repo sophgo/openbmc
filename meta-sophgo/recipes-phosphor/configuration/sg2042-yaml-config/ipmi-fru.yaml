@@ -16,7 +16,7 @@
 
 
 0x02:
-  /xyz/openbmc_project/inventory/system/board/GOOXI_550W_PSU_1:
+  /xyz/openbmc_project/inventory/system/board/GOOXI_1300W_PSU_1:
     entityID: 19
     entityInstance: 3
     interfaces:
@@ -33,7 +33,7 @@
 
 
 0x03:
-  /xyz/openbmc_project/inventory/system/board/GOOXI_550W_PSU_2:
+  /xyz/openbmc_project/inventory/system/board/GOOXI_1300W_PSU_2:
     entityID: 19
     entityInstance: 3
     interfaces:

@@ -699,6 +699,7 @@
 				&pinctrl_qspi1_default>;
 	status = "okay";
 
+	//64MB
 	flash@0 {
 		status = "okay";
 		m25p,fast-read;
@@ -706,8 +707,26 @@
 		spi-max-frequency = <25000000>;
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <1>;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			p1@0 {
+				reg = <0x0 0x2800000>; //
+				label = "p01";
+			};
+			p2@2800000 {
+				reg = <0x2800000 0x30000>; // 3*64KB host user data
+				label = "p02";
+			};
+			p3@2830000 {
+				reg = <0x2830000 0x17D0000>;
+				label = "p03";
+			};
+		};
 	};
 
+	//64MB
 	flash@1 {
 		status = "okay";
 		m25p,fast-read;
@@ -715,6 +734,23 @@
 		spi-max-frequency = <25000000>;
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <1>;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			p1@0 {
+				reg = <0x0 0x2800000>; //
+				label = "p11";
+			};
+			p2@2800000 {
+				reg = <0x2800000 0x30000>; // 3*64KB host user data
+				label = "p12";
+			};
+			p3@2830000 {
+				reg = <0x2830000 0x17D0000>;
+				label = "p13";
+			};
+		};
 	};
 };
 
