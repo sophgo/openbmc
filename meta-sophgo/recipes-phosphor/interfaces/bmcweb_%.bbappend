@@ -17,6 +17,8 @@ SRC_URI:append = " \
     file://0009-sophgo-identifyLed.patch \
     file://0010-sophgo-systems-add-fanspeed.patch \
     file://0011-sophgo-ethernet.patch \
+    file://0012-sophgo-redfish-add-sollog.patch \
+    file://0013-sophgo-systems-hpp-add-sollog.patch \
     "
 EXTRA_OEMESON:append = " \
     -Drest=enabled \

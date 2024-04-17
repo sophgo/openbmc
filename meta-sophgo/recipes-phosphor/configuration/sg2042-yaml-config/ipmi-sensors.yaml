@@ -58,7 +58,7 @@
   entityID: 29
   entityInstance: 13
   sensorType: 4
-  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan2_tach
   sensorReadingType: 1
   multiplierM: 100
   offsetB: 0
@@ -77,36 +77,16 @@
 11:
     <<: *FAN_DEFAULTS
     entityInstance: 14
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan4_tach
 
 12:
     <<: *FAN_DEFAULTS
     entityInstance: 15
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan3
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan6_tach
 13:
     <<: *FAN_DEFAULTS
     entityInstance: 16
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan4
-14:
-    <<: *FAN_DEFAULTS
-    entityInstance: 17
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan5
-15:
-    <<: *FAN_DEFAULTS
-    entityInstance: 18
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan6
-16:
-    <<: *FAN_DEFAULTS
-    entityInstance: 19
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan7
-# 17:
-#     <<: *FAN_DEFAULTS
-#     entityInstance: 20
-#     path: /xyz/openbmc_project/sensors/fan_tach/Fan8
-18:
-    <<: *FAN_DEFAULTS
-    entityInstance: 21
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan9
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan9_tach
 19:
     <<: *FAN_DEFAULTS
     entityInstance: 22

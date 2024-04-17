@@ -1,0 +1,357 @@
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 5ea853a..f380a1a 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -67,42 +67,20 @@
+     <div>
+       <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
+       <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
+     </div>
+-    <div >
+-      <dl>
+-        <dt>
+-          {{'SATA\xa0state:\xa0\xa0'}}
+-          {{ $t('pageSerialOverLan.sata1') }} <status-icon :status="sata1StatusIcon" />
+-          {{ $t('pageSerialOverLan.sata2') }} <status-icon :status="sata2StatusIcon" />
+-        </dt>
+-      </dl>
+-   </div>
+-    <div >
+-      <dl>
+-        <dt>
+-          {{'HDD\xa0\xa0state:\xa0\xa0'}}
+-          {{ $t('pageSerialOverLan.hdd1') }}  <status-icon :status="hdd1StatusIcon" />
+-          {{ $t('pageSerialOverLan.hdd2') }}  <status-icon :status="hdd2StatusIcon" />
+-          {{ $t('pageSerialOverLan.hdd3') }}  <status-icon :status="hdd3StatusIcon" />
+-          {{ $t('pageSerialOverLan.hdd4') }}  <status-icon :status="hdd4StatusIcon" />
+-        </dt>
+-      </dl>
+-   </div>
+-    <div >
+-      <dl>
+-        <dt>
+-          {{'FAN\xa0\xa0state:\xa0\xa0'}}
+-          {{ $t('pageSerialOverLan.fan1') }} <status-icon :status="fan1StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan2') }} <status-icon :status="fan2StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan3') }} <status-icon :status="fan3StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan4') }} <status-icon :status="fan4StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan5') }} <status-icon :status="fan5StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan6') }} <status-icon :status="fan6StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan7') }} <status-icon :status="fan7StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan8') }} <status-icon :status="fan8StatusIcon" />
+-          {{ $t('pageSerialOverLan.fan9') }} <status-icon :status="fan9StatusIcon" />
+-        </dt>
+-      </dl>
++    <div>
++      <label for="logContent" class="bold-black-label">SOL log export:</label>
++    </div>
++    <div class="container">
++      <div class="button-container">
++        <button @click="fetchLogFile">Load</button>
++        <button @click="clearLogContent">Clear</button>
++        <button @click="downloadLogFile" :disabled="!logContent">Save</button>
++      </div>
++      <div class="textarea-container">
++        <textarea v-model="logContent" class="log-content" readonly></textarea>
++      </div>
+     </div>
+   </div>
+ </template>
+@@ -115,6 +93,7 @@ import { Terminal } from 'xterm';
+ import { throttle } from 'lodash';
+ import IconLaunch from '@carbon/icons-vue/es/launch/20';
+ import StatusIcon from '@/components/Global/StatusIcon';
++import axios from 'axios';
+ 
+ export default {
+   name: 'SerialOverLanConsole',
+@@ -139,178 +118,14 @@ export default {
+       form: {
+         port: '',
+       },
++      logContent: '',
+     };
+   },
+   computed: {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
+-    sata1Status() {
+-      return this.$store.getters['global/sata1Status'];
+-    },
+-    sata1StatusIcon() {
+-      switch (this.sata1Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+ 
+-    sata2Status() {
+-      return this.$store.getters['global/sata2Status'];
+-    },
+-    sata2StatusIcon() {
+-      switch (this.sata2Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    hdd1Status() {
+-      return this.$store.getters['global/hdd1Status'];
+-    },
+-    hdd1StatusIcon() {
+-      switch (this.hdd1Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    hdd2Status() {
+-      return this.$store.getters['global/hdd2Status'];
+-    },
+-    hdd2StatusIcon() {
+-      switch (this.hdd2Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    hdd3Status() {
+-      return this.$store.getters['global/hdd3Status'];
+-    },
+-    hdd3StatusIcon() {
+-      switch (this.hdd3Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    hdd4Status() {
+-      return this.$store.getters['global/hdd4Status'];
+-    },
+-    hdd4StatusIcon() {
+-      switch (this.hdd4Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan1Status() {
+-      return this.$store.getters['global/fan1Status'];
+-    },
+-    fan1StatusIcon() {
+-      switch (this.fan1Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan2Status() {
+-      return this.$store.getters['global/fan2Status'];
+-    },
+-    fan2StatusIcon() {
+-      switch (this.fan2Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan3Status() {
+-      return this.$store.getters['global/fan3Status'];
+-    },
+-    fan3StatusIcon() {
+-      switch (this.fan3Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan4Status() {
+-      return this.$store.getters['global/fan4Status'];
+-    },
+-    fan4StatusIcon() {
+-      switch (this.fan4Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan5Status() {
+-      return this.$store.getters['global/fan5Status'];
+-    },
+-    fan5StatusIcon() {
+-      switch (this.fan5Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan6Status() {
+-      return this.$store.getters['global/fan6Status'];
+-    },
+-    fan6StatusIcon() {
+-      switch (this.fan6Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan7Status() {
+-      return this.$store.getters['global/fan7Status'];
+-    },
+-    fan7StatusIcon() {
+-      switch (this.fan7Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan8Status() {
+-      return this.$store.getters['global/fan8Status'];
+-    },
+-    fan8StatusIcon() {
+-      switch (this.fan8Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+-    fan9Status() {
+-      return this.$store.getters['global/fan9Status'];
+-    },
+-    fan9StatusIcon() {
+-      switch (this.fan9Status) {
+-        case 'Exist':
+-          return 'success';
+-        default:
+-          return 'secondary';
+-      }
+-    },
+     connection() {
+       return this.serverStatus === 'off' ? false : true;
+     },
+@@ -415,6 +230,29 @@ export default {
+       }
+ 
+     },
++    async fetchLogFile() {
++      try {
++        const response = await axios.get('/sol/logs');
++        this.logContent = response.data;
++      } catch (error) {
++        console.error('Error fetching log file:', error);
++        this.logContent = 'Failed to load log file.';
++      }
++    },
++    downloadLogFile() {
++      const blob = new Blob([this.logContent], { type: 'text/plain' });
++      const url = URL.createObjectURL(blob);
++      const link = document.createElement('a');
++      link.href = url;
++      link.download = 'sol-log.txt';
++      document.body.appendChild(link);
++      link.click();
++      document.body.removeChild(link);
++      URL.revokeObjectURL(url);
++    },
++    clearLogContent() {
++      this.logContent = '';
++    },
+   },
+ };
+ </script>
+@@ -431,3 +269,78 @@ export default {
+   margin: 1.5%;
+ }
+ </style>
++
++
++<style scoped>
++
++.container {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  padding-left: 0;
++  padding-right: 0;
++  height: 200px;
++  border: 2px solid #c8c2c2;
++}
++
++.button-container {
++  display: flex;
++  flex-direction: column; /* 垂直排列按钮 */
++  justify-content: space-between;
++  padding-left: 0; /* 消除内边距 */
++  margin-left: 0px; /* 消除外边距 */
++  margin-right: 0px;
++  height: 100%;
++  background-color: #f2eeee;
++}
++
++.button-container button {
++  padding: 5px 16px;
++  margin-left: 0; /* 消除按钮左边距 */
++  color: #fff;
++  background-color: #2d60e5;
++  border-color: #d9dadc;
++  border-radius: 4px;
++  margin-left: 10px;
++  margin-right: 10px;
++
++}
++
++.button-container button:first-child {
++  margin-top: 10px;
++}
++
++.button-container button:last-child {
++  margin-bottom: 10px;
++}
++
++.textarea-container {
++  flex-grow: 1;
++  flex-direction: column;
++  justify-content: space-between;
++  flex-grow: 1;
++  width: 100%;
++  height: 100%;
++}
++.log-content {
++  width: 100%;
++  /* margin-top: 5px; */
++  box-sizing: border-box;
++  resize: none;
++  background-color: #19273c;
++  color: white;
++  height: 100%;
++}
++
++.bold-black-label {
++  margin-bottom: 5px;
++  /* font-weight: bold; */
++  color: #353333;
++  font-size: 20px;
++}
++
++
++.spacer {
++  flex-grow: 1;
++}
++</style>

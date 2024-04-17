@@ -36,6 +36,7 @@ SRC_URI:append = " file://0030-sophgo-enUs.patch "
 SRC_URI:append = " file://0031-sophgo-WebSocketPlugin.patch "
 SRC_URI:append = " file://0032-sophgo-NetworkStore.patch "
 SRC_URI:append = " file://0033-sophgo-NetworkGlobalSettings.patch "
+SRC_URI:append = " file://0034-sophgo-SerialOverLanConsole-add-log-load.patch"
 
 
 
