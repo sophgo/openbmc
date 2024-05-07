@@ -112,6 +112,7 @@ static constexpr auto platform = "/sys/devices/platform/";
 namespace fs = std::filesystem;
 
 std::chrono::high_resolution_clock::time_point g_time_point;
+std::chrono::high_resolution_clock::time_point g_time_powerOn_point;
 int wait_count = 0;
 /*******************************************************************************
  * D-bus
@@ -457,12 +458,14 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
                     std::cout << "power on." << "\n";
                     std::cout.flush();
                     set_detect_dbus_ready_timer(0);
+                    g_time_powerOn_point = std::chrono::high_resolution_clock::now();
 
                 } else {
                     std::cout << "power off." << "\n";
                         //关闭定时器，按默认风速控制
                     cancel_auto_timer();
                     cancel_sensor_monitor_timer();
+                    g_aicard_temp = -1;
                 }
             }
         });
@@ -481,9 +484,11 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
                 std::cout << "power on 00." << "\n";
                 std::cout.flush();
                 set_detect_dbus_ready_timer(0);
+                g_time_powerOn_point = std::chrono::high_resolution_clock::now();
             } else {
                 std::cout << "power off 00." << "\n";
                 std::cout.flush();
+                g_aicard_temp = -1;
             }
 
         },
@@ -742,6 +747,8 @@ double readFanTachValue(std::string readPath, std::string serviceName)
     return value;
 }
 
+
+double g_aicard_temp_pre;
 double readTempValue(std::string readPath, std::string serviceName)
 {
     double value;
@@ -750,6 +757,11 @@ double readTempValue(std::string readPath, std::string serviceName)
     } else if (string_starts_with(readPath, "/xyz/openbmc_project/")) {
         if (string_starts_with(readPath, "/xyz/openbmc_project/sensors/temperature/AiCard_Temp")) {
             value = g_aicard_temp;
+            if (g_aicard_temp_pre != g_aicard_temp) {
+                std::cout << "Aicard temp : " << g_aicard_temp << "Pre" << g_aicard_temp_pre <<std::endl;
+            }
+            g_aicard_temp_pre = g_aicard_temp;
+
         } else {
             value = dbusPropertyRead(readPath, serviceName);
         }
@@ -954,7 +966,7 @@ void cycle_sensor_monitor(const boost::system::error_code& ec)
                     }
 
                 } else if (value >= config.shutdownThreshold) {
-                    std::cout << name << "high temperature,force power off." << std::endl;
+                    std::cout << name << " high temperature " << value << ",force power off." << std::endl;
                     outputMax = 100;
                     forcePowerOff(conn);
                     /* if (!config.state)  */{
@@ -1069,8 +1081,14 @@ int main(int argc, char* argv[])
     double  initial_value = -1;
     aiCardTempInterface->register_property(sensorProperty, initial_value,
         [](const double& newValue, double& value) {
+            std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - g_time_powerOn_point);
             value = newValue;
-            g_aicard_temp = newValue;
+            if ((isPowerOn) && (value > 100) && (elapsed.count() < 60000)) {
+                std::cout << "Dbus aicard temp error: " << value << std::endl;
+            } else {
+                g_aicard_temp = newValue;
+            }
             return 1;
         });
 

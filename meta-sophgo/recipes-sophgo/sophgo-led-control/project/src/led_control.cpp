@@ -59,7 +59,13 @@
 #include <sdbusplus/exception.hpp>
 #include <xyz/openbmc_project/Sensor/Device/error.hpp>
 
+
+#include <functional>
+
 #include <chrono>
+
+#include <map>
+#include <iterator>
 
 namespace power
 {
@@ -87,6 +93,14 @@ constexpr const char* get = "Get";
 constexpr const char* set = "Set";
 }// namespace properties
 
+
+namespace interfaceManager
+{
+constexpr const char* interface = "org.freedesktop.DBus.ObjectManager";
+constexpr const char* add = "InterfacesAdded";
+constexpr const char* remove = "InterfacesRemoved";
+}// namespace properties
+
 namespace led_control
 {
 
@@ -95,7 +109,7 @@ std::shared_ptr<sdbusplus::asio::connection> conn;
 
 bool g_isPowerOn = false;
 std::atomic<int> sys_fault_count(0);
-
+std::atomic<int> is_sysAlarmLed_dbus_ready(false);
 std::chrono::high_resolution_clock::time_point g_time_point;
 /*******************************************************************************
  * D-bus
@@ -114,6 +128,7 @@ static std::shared_ptr<sdbusplus::asio::dbus_interface> ledControlInterface;
 */
 std::map<int, SysAlarmLed> g_sysAlarmLedMap   = {};
 std::map<int, std::unique_ptr<sdbusplus::bus::match_t>> g_sysAlarmMatch   = {};
+const std::string sysAlarmLedPath = "/sys/devices/platform/leds/leds/frontpanel_warning_led/";
 /*=============================================================================*/
 
 /*******************************************************************************
@@ -122,6 +137,57 @@ std::map<int, std::unique_ptr<sdbusplus::bus::match_t>> g_sysAlarmMatch   = {};
 static boost::asio::deadline_timer sysAlarmLedControlTimer(io);
 /*=============================================================================*/
 
+
+bool check_service_exists(const char* service_name, const char* object_path)
+{
+    sd_bus *bus = nullptr;
+    sd_bus_error bus_error = SD_BUS_ERROR_NULL;
+    sd_bus_message *msg = nullptr;
+    int ret;
+
+    // Connect to the user or system bus
+    ret = sd_bus_open_system(&bus);
+    if (ret < 0) {
+        std::cerr << "Failed to connect to system bus: " << strerror(-ret) << std::endl;
+        goto finish;
+    }
+
+
+    ret = sd_bus_call_method(bus,
+                             service_name, // service name
+                             object_path, // object path
+                             "org.freedesktop.DBus.Introspectable",
+                             "Introspect",
+                             &bus_error, // sd_bus_error
+                             &msg, // sd_bus_message
+                             ""); // input signature (empty for no input arguments)
+
+    if (ret < 0) {
+        // std::cerr << "Failed to issue method call: " << bus_error.message << std::endl;
+        goto finish;
+    }
+
+finish:
+    sd_bus_error_free(&bus_error);
+    sd_bus_message_unref(msg);
+    sd_bus_unref(bus);
+
+    return ret < 0 ? false : true;
+}
+
+inline constexpr auto interfacesAdded() noexcept
+{
+    return "type='signal',"
+           "interface='org.freedesktop.DBus.ObjectManager',"
+           "member='InterfacesAdded',";
+}
+
+inline constexpr auto interfacesRemoved() noexcept
+{
+    return "type='signal',"
+           "interface='org.freedesktop.DBus.ObjectManager',"
+           "member='InterfacesRemoved',";
+}
 
 /*******************************************************************************
  * build data
@@ -201,7 +267,8 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
            const std::variant<std::string>& state) {
             if (ec)
             {
-                std::cout << "power state get error" << "\n";
+                std::cout << "Power state get error: " << ec.value() << " - " << ec.message() << "\n";
+                std::cout.flush();
                 return;
             }
             g_isPowerOn = std::get<std::string>(state).ends_with("Running");
@@ -260,6 +327,47 @@ void asyn_monitor_sys_state (const std::shared_ptr<sdbusplus::asio::connection>&
                 }
 
             });
+        } else if (sysLedData.type == "output") {
+
+            std::cout << "output: dbusName = " << sysLedData.dbusName << " dbusPath = " << sysLedData.dbusPath << std::endl;
+
+            if(!check_service_exists(sysLedData.dbusName.c_str(), sysLedData.dbusPath.c_str())) {
+                std::cout << "output: dbusName = " << sysLedData.dbusName << " dbusPath = " << sysLedData.dbusPath << " is not ready!" << std::endl;
+                std::cout << "Match interfaceAdded -03!" << std::endl;
+                g_sysAlarmMatch[index]= std::make_unique<sdbusplus::bus::match::match>(
+                static_cast<sdbusplus::bus::bus&>(*conn),
+                match_rules::interfacesAdded() +
+                match_rules::argNpath(0, sysLedData.dbusPath) +
+                match_rules::sender(sysLedData.dbusName),
+                [index,&sysLedData](sdbusplus::message::message& msg) {
+                    sdbusplus::message::object_path path;
+                    boost::container::flat_map<std::string, dbusPropertiesList> data;
+
+                    msg.read(path, data);
+
+                    std::cout << "Interface add at path: " << static_cast<std::string>(path) << std::endl;
+                    for (auto& [iface, properties] : data) {
+                        std::cout << "Interface name: " << iface << std::endl;
+                        if (iface == sysLedData.dbusIntf) {
+                            if (!is_sysAlarmLed_dbus_ready.load()) {
+                                is_sysAlarmLed_dbus_ready.store(true);
+                                set_auto_timer(10);
+                            }
+
+                        }
+                    }
+
+                });
+            } else {
+                std::cout << "output: dbusName = " << sysLedData.dbusName << " dbusPath = " << sysLedData.dbusPath << " is ready!" << std::endl;
+                if (!is_sysAlarmLed_dbus_ready.load()) {
+                    is_sysAlarmLed_dbus_ready.store(true);
+                    set_auto_timer(10);
+                }
+            }
+
+
+
         }
     }
 }
@@ -383,14 +491,76 @@ void turn_off_sys_alarm_led(void)
     }
 }
 
+bool writeToSysFsFile(const std::string& file, const std::string& content)
+{
+    std::ofstream ofs(file);
+    if (!ofs.is_open()) {
+        std::cerr << "Cannot open file: " << file << std::endl;
+        return false;
+    }
+    ofs << content;
+    if (!ofs.good()) {
+        std::cerr << "Failed to write to file: " << file << std::endl;
+        return false;
+    }
+    return true;
+}
+
+int turn_on_sys_alarm_led_sysfs(void)
+{
+    if (!writeToSysFsFile(sysAlarmLedPath + "brightness", "0")) {
+        return 1;
+    }
+
+    if (!writeToSysFsFile(sysAlarmLedPath + "trigger", "timer")) {
+        return 1;
+    }
+    // 成功将trigger设置为timer后会路径下会出现delay_on和delay_off两个文件
+    if (!writeToSysFsFile(sysAlarmLedPath + "delay_on", "500")) {
+        return 1;
+    }
+
+    if (!writeToSysFsFile(sysAlarmLedPath + "delay_off", "500")) {
+        return 1;
+    }
+
+    // 设置 LED 灯的最大亮度（这一步通常不是必须的，除非你需要改变默认的最大亮度）
+    // 通常情况下，你应该先读取 max_brightness 的值，然后确保你设置的亮度不超过这个值。
+    // 在这里，我们假设最大亮度是 255。
+    // if (!writeToSysFsFile(ledPath + "max_brightness", "255")) {
+    //     return 1;
+    // }
+
+    // 设置 LED 灯的亮度为最大（这将使得 LED 在亮起时是最亮的）
+    // if (!writeToSysFsFile(ledPath + "brightness", "255")) {
+    //     return 1;
+    // }
+
+    return 0;
+}
+
+int turn_off_sys_alarm_led_sysfs(void)
+{
+    // 将 LED 的触发器设置回 none
+    if (!writeToSysFsFile(sysAlarmLedPath + "trigger", "none")) {
+        return 1;
+    }
+
+    // 将 LED 的亮度设置为 0，关闭 LED
+    if (!writeToSysFsFile(sysAlarmLedPath + "brightness", "0")) {
+        return 1;
+    }
+    return 0;
+}
+
 void cycle_sys_led_control (const boost::system::error_code& ec)
 {
     if (sys_fault_count.load() > 0) {
         // std::cout << "sys_fault_count: " << sys_fault_count.load() << std::endl;
-        turn_on_sys_alarm_led();
+        turn_on_sys_alarm_led_sysfs();
     } else {
         // std::cout << "sys_fault_count: " << sys_fault_count.load() << std::endl;
-        turn_off_sys_alarm_led();
+        turn_off_sys_alarm_led_sysfs();
     }
     repeat_auto_timer();
 }
@@ -436,7 +606,9 @@ int main(int argc, char* argv[])
 
     setupPowerMatch(conn);
     asyn_monitor_sys_state(conn);
-    set_auto_timer(10);
+
+
+
 
     io.run();
 

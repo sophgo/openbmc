@@ -60,6 +60,27 @@ std::shared_ptr<sdbusplus::asio::connection> conn;
 static std::string node = "0";
 static const std::string appName = "sophgo-gpio-control";
 
+std::atomic<int> first_wdt_event_flag(false);
+
+#define WDT_DELAY 60
+
+namespace power_control
+{
+const static constexpr char* busname = "xyz.openbmc_project.State.Host";
+const static constexpr char* path = "/xyz/openbmc_project/state/host0";
+const static constexpr char* interface = "xyz.openbmc_project.State.Host";
+const static constexpr char* property = "RequestedHostTransition";
+const static constexpr char* forceRestart = "xyz.openbmc_project.State.Host.Transition.ForceWarmReboot";
+} // namespace power_control
+
+namespace properties
+{
+constexpr const char* interface = "org.freedesktop.DBus.Properties";
+constexpr const char* get = "Get";
+constexpr const char* set = "Set";
+}
+
+
 enum class DbusConfigType
 {
     name = 1,
@@ -151,6 +172,7 @@ static ConfigData cpubFlashH2Config;
 static ConfigData cpubFlashH3Config;
 static ConfigData identifyLedGetConfig;
 static ConfigData identifyLedSetConfig;
+static ConfigData hostWdtConfig;
 
 
 
@@ -194,7 +216,8 @@ boost::container::flat_map<std::string, ConfigData*> powerSignalMap = {
     {"cpubFlashH2",        &cpubFlashH2Config},
     {"cpubFlashH3",        &cpubFlashH3Config},
     {"identifyLedGet",     &identifyLedGetConfig},
-    {"identifyLedSet",     &identifyLedSetConfig}};
+    {"identifyLedSet",     &identifyLedSetConfig},
+    {"hostWdt",            &hostWdtConfig}};
 
 
 
@@ -224,8 +247,11 @@ boost::container::flat_map<std::string, int> TimerMap = {
 // Timers
 // Time holding GPIOs asserted
 static boost::asio::steady_timer gpioAssertTimer(io);
-static boost::asio::deadline_timer getCpldInfoTimer(io);
-static boost::asio::deadline_timer syn_delaytimer(io, boost::posix_time::seconds(1));
+static boost::asio::deadline_timer hostWdtTimer(io);
+
+
+
+
 
 // GPIO Lines and Event Descriptors
 static gpiod::line sata1ExistLine;
@@ -300,7 +326,8 @@ static gpiod::line identifyLedGetLine;
 static boost::asio::posix::stream_descriptor identifyLedGetEvent(io);
 static gpiod::line identifyLedSetLine;
 
-
+static gpiod::line hostWdtLine;
+static boost::asio::posix::stream_descriptor hostWdtEvent(io);
 
 
 enum class SetCpldPowerState
@@ -559,8 +586,9 @@ static int checkGpioLineName()
        (cpuaFlashH1Config.lineName.empty())          || \
        (cpubFlashH2Config.lineName.empty())          || \
        (cpubFlashH3Config.lineName.empty())          || \
-       (identifyLedGetConfig.lineName.empty())          || \
-       (identifyLedSetConfig.lineName.empty()))
+       (identifyLedGetConfig.lineName.empty())       || \
+       (identifyLedSetConfig.lineName.empty())       || \
+       (hostWdtConfig.lineName.empty()))
     {
         return -1;
     }
@@ -573,8 +601,56 @@ static int checkGpioLineName()
 
 
 
+void forcePowerRestart(const boost::system::error_code& ec)
+{
+
+    if (ec == boost::asio::error::operation_aborted) {
+        std::cout << "Wdt timer is canceled!" << std::endl;
+        return;
+    }
+
+    conn->async_method_call(
+        [](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cout << "Force power off D-Bus responses error: " << std::endl;
+                return;
+            }
+            std::cout << "Force power off" << std::endl;
+            first_wdt_event_flag.store(false);
+        },
+        power_control::busname,
+        power_control::path,
+        properties::interface, properties::set,
+        power_control::interface,
+        power_control::property,
+        dbus::utility::DbusVariantType{power_control::forceRestart});
+
+}
 
 
+
+void set_wdt_timer(int sec)
+{
+    hostWdtTimer.expires_from_now( boost::posix_time::seconds(sec));
+    hostWdtTimer.async_wait(forcePowerRestart);
+}
+
+int cancel_auto_timer(void)
+{
+    boost::system::error_code ec;
+    hostWdtTimer.cancel(ec);
+    // 检查是否发生错误
+    if (ec) {
+        // 处理错误
+        std::cerr << "Error on canceling the timer: " << ec.message() << std::endl;
+        return -1;
+    } else {
+        // 定时器取消成功
+        std::cout << "Wdt timer cancelled successfully." << std::endl;
+        return 0;
+    }
+}
 
 
 
@@ -708,6 +784,22 @@ static void identifyLedStateHandler(bool state)
     identifyLedIface->set_property("identifyLedState", state);
 }
 
+
+static void hostWdtHandler(bool state)
+{
+    if (state) {
+        if (first_wdt_event_flag.load()) {
+            //update timer
+            set_wdt_timer(WDT_DELAY);
+            std::cout << "Wdt signal" << std::endl;
+        } else {
+            first_wdt_event_flag.store(true);
+            //enable timer
+            set_wdt_timer(WDT_DELAY);
+            std::cout << "First wdt signal" << std::endl;
+        }
+    }
+}
 
 enum class SolUartPort
 {
@@ -845,9 +937,10 @@ int main(int argc, char* argv[])
     }
 
     // Request the dbus names
-    auto gpioBus = std::make_shared<sdbusplus::asio::connection>(io);
-    gpioBus->request_name(gpioDbusName.c_str());
-    sdbusplus::asio::object_server objectServer(gpioBus);
+    conn = std::make_shared<sdbusplus::asio::connection>(io);
+    // auto gpioBus = std::make_shared<sdbusplus::asio::connection>(io);
+    conn->request_name(gpioDbusName.c_str());
+    sdbusplus::asio::object_server objectServer(conn);
     sataExistIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/sata", "xyz.openbmc_project.Gpio.Sata");
     hddExistIface   = objectServer.add_interface("/xyz/openbmc_project/gpio/hdd", "xyz.openbmc_project.Gpio.Hdd");
     fanExistIface   = objectServer.add_interface("/xyz/openbmc_project/gpio/fan", "xyz.openbmc_project.Gpio.Fan");
@@ -1010,6 +1103,14 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
+
+
+    if (!requestGPIOEvents(hostWdtConfig.lineName, hostWdtHandler,
+                            hostWdtLine, hostWdtEvent))
+    {
+        return -1;
+    }
+
     identifyLedIface->register_property("identifyLedState",
                     (identifyLedGetLine.get_value() == identifyLedGetConfig.polarity));
 

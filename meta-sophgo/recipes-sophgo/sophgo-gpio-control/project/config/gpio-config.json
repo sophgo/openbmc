@@ -221,6 +221,12 @@
         "LineName" : "SIO_ONCONTROL",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "hostWdt",
+        "LineName" : "HOST_WDT",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
     }
 ],
   "timing_configs":{

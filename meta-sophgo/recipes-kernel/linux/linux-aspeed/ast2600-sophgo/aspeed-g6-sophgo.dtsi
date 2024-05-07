@@ -772,7 +772,7 @@
 				/* K 0~7*/"","","","","","","","",
 				/* L 0~7*/"","","","","","","","",
 				/* M 0~7*/"FRONT_VGA_EXIST","FAN9_EXIST","FAN7_EXIST","CHASSIS_POWER_BUTTON","HDD2_EXIST","UID_BUTTON","","",
-				/* N 0~7*/"CPLD_RESERVED0","CPLD_RESERVED1","CPLD_RESERVED2","FAN1_Power_EN","FAN2_Power_EN","FAN3_Power_EN","","",
+				/* N 0~7*/"CPLD_RESERVED0","HOST_WDT","CPLD_RESERVED2","FAN1_Power_EN","FAN2_Power_EN","FAN3_Power_EN","","",
 				/* O 0~7*/"","","","","","","","",
 				/* P 0~7*/"","","","","","","","",
 				/* Q 0~7*/"","","","","","","","",

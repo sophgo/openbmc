@@ -207,6 +207,7 @@
     {
         "type" : "output",
         "index" : 17,
+        "sysFsPath" : "/sys/devices/platform/leds/leds/frontpanel_warning_led/",
         "dbusName":"xyz.openbmc_project.LED.Controller.frontpanel_warning_led",
         "dbusPath" : "/xyz/openbmc_project/led/physical/frontpanel_warning_led",
         "dbusIntf" : "xyz.openbmc_project.Led.Physical",
