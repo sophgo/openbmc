@@ -465,7 +465,7 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
                         //关闭定时器，按默认风速控制
                     cancel_auto_timer();
                     cancel_sensor_monitor_timer();
-                    g_aicard_temp = -1;
+                    g_aicard_temp = 0xff;
                 }
             }
         });
