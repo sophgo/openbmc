@@ -19,10 +19,16 @@ namespace led_control
 
 namespace fs = std::filesystem;
 
+using dbusPropertiesList =
+    boost::container::flat_map<std::string,
+                               std::variant<std::string, uint64_t>>;
+namespace match_rules = sdbusplus::bus::match::rules;
+
 struct SysAlarmLed {
     std::string type;
     int index;
     bool isPowerOn; // 只对输入类型有效
+    std::string sysFsPath;
     std::string dbusName;
     std::string dbusPath;
     std::string dbusIntf;
@@ -49,6 +55,7 @@ struct SysAlarmLed {
                 dbusProperty[prop.first] = false/* prop.second */;
             }
         } else {
+            sysFsPath = j.at("sysFsPath").get<std::string>();
             DutyOn = j.at("DutyOn").get<unsigned char>();
             Period = j.at("Period").get<unsigned short>();
             State = j.at("State").get<std::string>();
@@ -59,12 +66,16 @@ struct SysAlarmLed {
 /*******************************************************************************
  *  Function declaration
 */
+bool check_service_exists(const char* service_name, const char* object_path);
 void buildSysLedData(const nlohmann::json& data);
 static int loadConfigValues();
 void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn);
 void asyn_monitor_sys_state (const std::shared_ptr<sdbusplus::asio::connection>& conn);
 void turn_on_sys_alarm_led(void);
 void turn_off_sys_alarm_led(void);
+bool writeToSysFsFile(const std::string& file, const std::string& content);
+int turn_on_sys_alarm_led_sysfs(void);
+int turn_off_sys_alarm_led_sysfs(void);
 void cycle_sys_led_control (const boost::system::error_code& ec);
 void set_auto_timer(int sec);
 void repeat_auto_timer(void);
