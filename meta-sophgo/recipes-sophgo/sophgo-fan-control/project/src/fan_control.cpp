@@ -1084,7 +1084,7 @@ int main(int argc, char* argv[])
             std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - g_time_powerOn_point);
             value = newValue;
-            if ((isPowerOn) && (value > 100) && (elapsed.count() < 60000)) {
+            if ((isPowerOn) && (value > 100) && (elapsed.count() < 300000)) {
                 std::cout << "Dbus aicard temp error: " << value << std::endl;
             } else {
                 g_aicard_temp = newValue;
