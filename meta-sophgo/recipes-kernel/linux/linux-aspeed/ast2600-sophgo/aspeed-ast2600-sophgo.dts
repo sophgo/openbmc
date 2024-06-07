@@ -537,6 +537,22 @@
 	};
 };
 
+
+&vuart3 {
+	port = <0x3F8>;
+	sirq = <4>;
+	sirq-polarity = <0>;
+	status = "okay";
+};
+&vuart4 {
+	port = <0x2F8>;
+	sirq = <3>;
+	sirq-polarity = <0>;
+	status = "okay";
+};
+
+
+
 &mdio0 {
 	status = "okay";
 

@@ -787,6 +787,7 @@ static void identifyLedStateHandler(bool state)
 
 static void hostWdtHandler(bool state)
 {
+#if 0
     if (state) {
         if (first_wdt_event_flag.load()) {
             //update timer
@@ -799,6 +800,9 @@ static void hostWdtHandler(bool state)
             std::cout << "First wdt signal" << std::endl;
         }
     }
+#else
+    std::cout << "Wdt signal" << std::endl;
+#endif
 }
 
 enum class SolUartPort

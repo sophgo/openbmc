@@ -114,6 +114,8 @@ namespace fs = std::filesystem;
 std::chrono::high_resolution_clock::time_point g_time_point;
 std::chrono::high_resolution_clock::time_point g_time_powerOn_point;
 int wait_count = 0;
+
+double Ai_templimit=200;
 /*******************************************************************************
  * D-bus
 */
@@ -1084,7 +1086,8 @@ int main(int argc, char* argv[])
             std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - g_time_powerOn_point);
             value = newValue;
-            if ((isPowerOn) && (value > 100) && (elapsed.count() < 300000)) {
+            // 开机300s之内如果板卡温度高于100度则认为是温度读取异常，如果温度高于200度，则认为温度读取异常，因为控制策略下不会出现高于200的温度，200必须大于AI卡的关机温度上限
+            if ((isPowerOn) && (((value > 100) && (elapsed.count() < 300000)) || (value > Ai_templimit))) {
                 std::cout << "Dbus aicard temp error: " << value << std::endl;
             } else {
                 g_aicard_temp = newValue;
