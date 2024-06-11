@@ -1,0 +1,97 @@
+diff --git a/src/views/Settings/Network/NetworkGlobalSettings.vue b/src/views/Settings/Network/NetworkGlobalSettings.vue
+index 3028767..44af522 100644
+--- a/src/views/Settings/Network/NetworkGlobalSettings.vue
++++ b/src/views/Settings/Network/NetworkGlobalSettings.vue
+@@ -3,8 +3,8 @@
+     v-if="firstInterface"
+     :section-title="$t('pageNetwork.networkSettings')"
+   >
+-    <b-row>
+-      <b-col md="3">
++    <b-row no-gutters>
++      <b-col md="2">
+         <dl>
+           <dt>
+             {{ $t('pageNetwork.hostname') }}
+@@ -15,7 +15,7 @@
+           <dd>{{ dataFormatter(firstInterface.hostname) }}</dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useDomainName') }}</dt>
+           <dd>
+@@ -34,7 +34,7 @@
+           </dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useDns') }}</dt>
+           <dd>
+@@ -53,7 +53,7 @@
+           </dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useNtp') }}</dt>
+           <dd>
+@@ -72,6 +72,25 @@
+           </dd>
+         </dl>
+       </b-col>
++      <b-col md="2">
++        <dl>
++          <dt>{{ $t('pageNetwork.dhcp') }}</dt>
++          <dd>
++            <b-form-checkbox
++              id="dhcpSwitch"
++              v-model="dhcpState"
++              data-test-id="networkSettings-switch-dhcp"
++              switch
++              @change="changeDhcpState"
++            >
++              <span v-if="dhcpState">
++                {{ $t('global.status.enabled') }}
++              </span>
++              <span v-else>{{ $t('global.status.disabled') }}</span>
++            </b-form-checkbox>
++          </dd>
++        </dl>
++      </b-col>
+     </b-row>
+   </page-section>
+ </template>
+@@ -125,6 +144,15 @@ export default {
+         return newValue;
+       },
+     },
++    dhcpState: {
++      get() {
++        return this.$store.getters['network/globalNetworkSettings'][0]
++          .dhcpEnabled;
++      },
++      set(newValue) {
++        return newValue;
++      },
++    },
+   },
+   created() {
+     this.$store.dispatch('network/getEthernetData').finally(() => {
+@@ -153,6 +181,12 @@ export default {
+         .then((message) => this.successToast(message))
+         .catch(({ message }) => this.errorToast(message));
+     },
++    changeDhcpState(state) {
++      this.$store
++        .dispatch('network/saveDhcpState', state)
++        .then((message) => this.successToast(message))
++        .catch(({ message }) => this.errorToast(message));
++    },
+     initSettingsModal() {
+       this.$bvModal.show('modal-hostname');
+     },

@@ -1,0 +1,70 @@
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 82637a4..78b641c 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -39,6 +39,29 @@
+       </b-col>
+     </b-row>
+     <div id="terminal" ref="panel"></div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div>
++      <b-form novalidate @submit.prevent="setSolPort" :inline="true">
++        <b-button
++              variant="primary"
++              type="submit"
++              data-test-id="SerialOverLanConsole-button-setport"
++        >
++              {{ $t('pageSerialOverLan.setPort') }}
++        </b-button>
++        <dt>
++          {{ $t('pageSerialOverLan.blank') }}
++        </dt>
++        <b-form-group>
++            <b-form-radio-group id="radio-group" v-model="form.port" name="radio-group">
++                <b-form-radio value="port0">{{ $t('pageSerialOverLan.solPortC0U0') }}</b-form-radio>
++                <b-form-radio value="port1">{{ $t('pageSerialOverLan.solPortC0U1') }}</b-form-radio>
++            </b-form-radio-group>
++        </b-form-group>
++      </b-form>
++    </div>
+   </div>
+ </template>
+ 
+@@ -63,10 +86,17 @@ export default {
+       type: Boolean,
+       default: true,
+     },
++    SolPortType: {
++      type: String,
++      default: null,
++    },
+   },
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      form: {
++        port: '',
++      },
+     };
+   },
+   computed: {
+@@ -157,6 +187,17 @@ export default {
+         'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=600,height=550'
+       );
+     },
++
++    setSolPort() {
++      if (this.form.port === 'port0')
++      {
++        this.$store.dispatch('controls/setSolToPort0');
++      }
++      if (this.form.port === 'port1')
++      {
++        this.$store.dispatch('controls/setSolToPort1');
++      }
++    },
+   },
+ };
+ </script>

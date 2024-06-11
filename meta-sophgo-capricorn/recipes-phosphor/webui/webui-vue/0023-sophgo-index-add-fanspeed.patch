@@ -1,0 +1,20 @@
+diff --git a/src/store/index.js b/src/store/index.js
+index ba248c5..4e647da 100644
+--- a/src/store/index.js
++++ b/src/store/index.js
+@@ -32,6 +32,7 @@ import KeyClearStore from './modules/Operations/KeyClearStore';
+ import WebSocketPlugin from './plugins/WebSocketPlugin';
+ import DateTimeStore from './modules/Settings/DateTimeStore';
+ import VirtualMediaStore from './modules/Operations/VirtualMediaStore';
++import FanSpeedStore from './modules/Settings/FanSpeedStore';
+ 
+ Vue.use(Vuex);
+ 
+@@ -69,6 +70,7 @@ export default new Vuex.Store({
+     policies: PoliciesStore,
+     factoryReset: FactoryResetStore,
+     keyClear: KeyClearStore,
++    fanSpeed:FanSpeedStore,
+   },
+   plugins: [WebSocketPlugin],
+ });

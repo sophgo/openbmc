@@ -1,0 +1,25 @@
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index ffb6a2e..8aef43e 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -326,6 +326,7 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
++        "sectionTitleCpldCards": "CPLD",
+         "sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
+@@ -820,7 +821,11 @@
+         "disconnected": "Disconnected",
+         "openNewTab": "Open in new tab",
+         "status": "Status",
+-        "subTitle": "SOL console redirects the server's serial port output to this window."
++        "subTitle": "SOL console redirects the server's serial port output to this window.",
++        "setPort": "Set port",
++        "solPortC0U0": "UART0",
++        "solPortC0U1": "UART1",
++        "blank":"\u2002\u2002"
+     },
+     "pageServerPowerOperations": {
+         "currentStatus": "Current status",

@@ -1,0 +1,19 @@
+diff --git a/src/env/router/ibm.js b/src/env/router/ibm.js
+index 0ccf90b..6a58ca0 100644
+--- a/src/env/router/ibm.js
++++ b/src/env/router/ibm.js
+@@ -183,6 +183,14 @@ const routes = [
+           title: i18n.t('appPageTitle.dateTime'),
+         },
+       },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       {
+         path: '/operations/firmware',
+         name: 'firmware',

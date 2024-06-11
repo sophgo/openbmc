@@ -1,0 +1,412 @@
+[
+    {
+        "Exposes": [
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 1",
+                    "PwmName":"Fan0_pwm",
+                    "Pwm": 0,
+                    "Tachs": 0
+                },
+                "Index": 0,
+                "Name": "Fan0_tach",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 2",
+                    "PwmName":"Fan1_pwm",
+                    "Pwm": 1,
+                    "Tachs": 1
+                },
+                "Index": 1,
+                "Name": "Fan1_tach",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 2,
+                "Name": "BMC_Temp1",
+                "Name1": "BMC_Temp2",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "CT7451"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 4,
+                "Name": "CPU_Temp1",
+                "Name1": "CPU_Temp2",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "CT7451"
+            },
+
+            {
+                "Address": "0x48",
+                "Bus": 5,
+                "Name": "Temp1",
+                "Type": "LM75A",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ]
+            },
+            {
+                "Address": "0x49",
+                "Bus": 5,
+                "Name": "Temp2",
+                "Type": "LM75A",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ]
+            },
+            {
+                "Address": "0x4a",
+                "Bus": 5,
+                "Name": "Temp3",
+                "Type": "LM75A",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ]
+            },
+            {
+                "Address": "0x4b",
+                "Bus": 5,
+                "Name": "Temp4",
+                "Type": "LM75A",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 70
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ]
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 15,
+                "Name": "SWITCH_Temp1",
+                "Name1": "SWITCH_Temp2",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "CT7451"
+            }
+        ],
+        "Name": "SG2042",
+        "Probe": "TRUE",
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Model": "$PRODUCT_PRODUCT_NAME",
+            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+        }
+    }
+]

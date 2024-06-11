@@ -1,0 +1,107 @@
+diff --git a/activation.cpp b/activation.cpp
+index 7c1f735..122d85a 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -141,6 +141,20 @@ auto Activation::activation(Activations value) -> Activations
+ 
+             return softwareServer::Activation::activation(value);
+         }
++
++        if (purpose == VersionPurpose::Cpld)
++        {
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Initiate image writing to cpld
++            svfWriteCpld();
++
++            return softwareServer::Activation::activation(value);
++        }
+ #endif
+ 
+         activationProgress->progress(10);
+@@ -316,6 +330,11 @@ void Activation::unitStateChange(sdbusplus::message_t& msg)
+         onStateChangesBios(msg);
+         return;
+     }
++    if (purpose == VersionPurpose::Cpld)
++    {
++        onStateChangesCpld(msg);
++        return;
++    }
+ #endif
+ 
+     onStateChanges(msg);
+@@ -392,6 +411,69 @@ bool Activation::checkApplyTimeImmediate()
+ }
+ 
+ #ifdef HOST_BIOS_UPGRADE
++void Activation::svfWriteCpld()
++{
++    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++    auto cpldServiceFile = "sophgo-cpld-update@" + versionId + ".service";
++    method.append(cpldServiceFile, "replace");
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const sdbusplus::exception_t& e)
++    {
++        error("Error in trying to upgrade Cpld: {ERROR}", "ERROR", e);
++        report<InternalFailure>();
++    }
++}
++
++void Activation::onStateChangesCpld(sdbusplus::message_t& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto cpldServiceFile = "sophgo-cpld-update@" + versionId + ".service";
++
++    if (newStateUnit == cpldServiceFile)
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++
++        if (newStateResult == "done")
++        {
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            info("Cpld upgrade completed successfully.");
++            parent.cpldVersion->version(
++                parent.versions.find(versionId)->second->version());
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++        }
++        else if (newStateResult == "failed")
++        {
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            error("Cpld upgrade failed.");
++        }
++    }
++
++    return;
++}
++
+ void Activation::flashWriteHost()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
