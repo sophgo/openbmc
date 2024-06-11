@@ -1,0 +1,44 @@
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 95d7a08..27c0e9d 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,6 +34,7 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
++    cpldVersion: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -46,6 +47,7 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
++    cpldVersion:   (state)  => state.cpldVersion,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -60,6 +62,7 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
++    setCpldInfo:  (state, cpldInfo)   => (state.cpldVersion   =  cpldInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -91,6 +94,7 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
++              CpldInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -98,6 +102,7 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
++            commit('setCpldInfo',  CpldInfo );
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first

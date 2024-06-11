@@ -1,0 +1,58 @@
+{
+  "gpio_configs":[
+    {
+        "Name" : "PSUPowerOn",
+        "LineName" : "PSU_POWERON_CTRL",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "riserCardThrottle",
+        "LineName" : "RISER_CARD_THROTTLE",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "solUartV2",
+        "LineName" : "SOL_UART_V2",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "solUartV3",
+        "LineName" : "SOL_UART_V3",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "phyIrq",
+        "LineName" : "PHY1_RGMII0_IRQ",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "identifyLedGet",
+        "LineName" : "SIO_POWER_GOOD",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "identifyLedSet",
+        "LineName" : "SIO_ONCONTROL",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "biosFlashSwitch",
+        "LineName" : "BIOS_FLASH_SWITCH",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    }
+],
+  "timing_configs":{
+      "PowerPulseMs": 200,
+      "ForceOffPulseMs": 15000,
+      "ResetPulseMs": 500,
+      "LedSwitchPullMs": 300
+    }
+}

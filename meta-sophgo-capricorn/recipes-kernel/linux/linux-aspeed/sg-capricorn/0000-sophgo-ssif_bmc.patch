@@ -1,0 +1,49 @@
+diff --git a/drivers/char/ipmi/ssif_bmc.c b/drivers/char/ipmi/ssif_bmc.c
+index c7bf25692441..68433ce31c8d 100644
+--- a/drivers/char/ipmi/ssif_bmc.c
++++ b/drivers/char/ipmi/ssif_bmc.c
+@@ -235,6 +235,7 @@ static void set_multipart_response_buffer(struct ssif_bmc_ctx *ssif_bmc, u8 *val
+ 	data_len = ssif_bmc->response.len;
+ 	switch (ssif_bmc->smbus_cmd) {
+ 	case SSIF_IPMI_MULTIPART_READ_START:
++	case SSIF_IPMI_MULTIPART_WRITE_END:
+ 		/*
+ 		 * Read Start length is 32 bytes.
+ 		 * Read Start transfer first 30 bytes of IPMI response
+@@ -295,7 +296,7 @@ static void set_multipart_response_buffer(struct ssif_bmc_ctx *ssif_bmc, u8 *val
+ 
+ 	default:
+ 		/* Do not expect to go to this case */
+-		pr_err("Error: Unexpected SMBus command received 0x%x\n", ssif_bmc->smbus_cmd);
++		pr_err("0-Error: Unexpected SMBus command received 0x%x\n", ssif_bmc->smbus_cmd);
+ 		break;
+ 	}
+ 
+@@ -358,13 +359,14 @@ static void handle_read_processed(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
+ 		switch (ssif_bmc->smbus_cmd) {
+ 		case SSIF_IPMI_MULTIPART_READ_START:
+ 		case SSIF_IPMI_MULTIPART_READ_MIDDLE:
++		case SSIF_IPMI_MULTIPART_WRITE_END:
+ 			buf = (u8 *)&ssif_bmc->response_buf;
+ 			*val = buf[ssif_bmc->msg_idx];
+ 			ssif_bmc->msg_idx++;
+ 			break;
+ 		default:
+ 			/* Do not expect to go to this case */
+-			pr_err("Error: Unexpected SMBus command received 0x%x\n",
++			pr_err("2-Error: Unexpected SMBus command received 0x%x\n",
+ 			       ssif_bmc->smbus_cmd);
+ 			break;
+ 		}
+@@ -538,8 +540,9 @@ static void initialize_transfer(struct ssif_bmc_ctx *ssif_bmc, u8 *val)
+ 		 * In that case check for pending response and clear it
+ 		 */
+ 		if (ssif_bmc->response_in_progress) {
+-			pr_err("Warn: SSIF new request with pending response");
+-			complete_response(ssif_bmc);
++			// pr_err("Warn: SSIF new request with pending response");
++			pr_err("W");
++			// complete_response(ssif_bmc);
+ 		}
+ 	}
+ }
