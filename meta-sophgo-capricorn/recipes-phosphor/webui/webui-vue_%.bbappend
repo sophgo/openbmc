@@ -29,6 +29,7 @@ SRC_URI:append = " file://0022-sophgo-routes-add-fanspeed.patch "
 SRC_URI:append = " file://0023-sophgo-index-add-fanspeed.patch "
 SRC_URI:append = " file://0024-sophgo-NetworkStore.patch "
 SRC_URI:append = " file://0025-sophgo-NetworkGlobalSettings.patch "
+SRC_URI:append = " file://0026-sophgo-SerialOverLanConsole-add-log-load.patch "
 
 
 
