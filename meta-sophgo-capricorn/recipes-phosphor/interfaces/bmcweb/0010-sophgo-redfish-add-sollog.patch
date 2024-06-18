@@ -1,0 +1,12 @@
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index a7b2af9f..66af1c63 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -170,6 +170,7 @@ class RedfishService
+         requestRoutesSystemActionsReset(app);
+         requestRoutesSystemActionsChangeSolPort(app);
+         requestRoutesSystemResetActionInfo(app);
++        requestRoutesSystemsSol(app);
+         requestRoutesBiosService(app);
+         requestRoutesBiosReset(app);
+ 
