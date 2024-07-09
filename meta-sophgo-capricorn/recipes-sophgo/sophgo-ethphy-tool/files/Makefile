@@ -1,4 +1,4 @@
-TARGET=sophgo-ethphy-tool
+TARGET=phytool
 
 #获取当前目录下的c文件集
 CUR_SOURCE=${wildcard *.c}

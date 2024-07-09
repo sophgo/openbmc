@@ -14,6 +14,7 @@ IMAGE_INSTALL:append = " \
         phosphor-image-signing \
         kernel-module-jtag-aspeed-internal \
         kernel-module-bonding \
+        sophgo-phytool \
         "
 
 IMAGE_INSTALL:append = " \

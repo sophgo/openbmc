@@ -7,6 +7,7 @@ SRC_URI += " \
            file://set-fan-rate.sh \
            file://get-cpld-info.sh \
            file://temp-test-record.sh \
+           file://power-control-test.sh \
            "
 
 
@@ -23,6 +24,8 @@ do_install () {
     install -m 0755 ${WORKDIR}/set-fan-rate.sh ${D}/${sbindir}
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/temp-test-record.sh ${D}/${sbindir}
+    install -d ${D}/${sbindir}
+    install -m 0755 ${WORKDIR}/power-control-test.sh ${D}/${sbindir}
 }
 
 
