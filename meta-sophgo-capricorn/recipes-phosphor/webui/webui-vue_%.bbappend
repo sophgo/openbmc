@@ -31,7 +31,10 @@ SRC_URI:append = " file://0024-sophgo-NetworkStore.patch "
 SRC_URI:append = " file://0025-sophgo-NetworkGlobalSettings.patch "
 SRC_URI:append = " file://0026-sophgo-SerialOverLanConsole-add-log-load.patch "
 
-
+SRC_URI:append = " file://0027-sophgo-enUS-add-1684x.patch "
+SRC_URI:append = " file://0028-sophgo-GlobalStore-add-1684x.patch "
+SRC_URI:append = " file://0029-sophgo-websocketplugin-add-1684x.patch "
+SRC_URI:append = " file://0030-sophgo-sensors-add-1684x.patch "
 
 # close the following content when using the devtool command
 SRC_URI += "file://sg2042.svg;subdir=git/src/assets/images \

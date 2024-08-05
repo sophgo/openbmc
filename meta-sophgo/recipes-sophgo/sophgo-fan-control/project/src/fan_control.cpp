@@ -1095,6 +1095,10 @@ int main(int argc, char* argv[])
             return 1;
         });
 
+    aiCardTempInterface->register_property("sg1684xExistState", 0, sdbusplus::asio::PropertyPermission::readWrite);
+
+
+
     fanControlInterface->initialize();
     aiCardTempInterface->initialize();
 
