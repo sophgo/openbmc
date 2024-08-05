@@ -1,0 +1,28 @@
+diff --git a/src/store/plugins/WebSocketPlugin.js b/src/store/plugins/WebSocketPlugin.js
+index 48281c6..a518e2b 100644
+--- a/src/store/plugins/WebSocketPlugin.js
++++ b/src/store/plugins/WebSocketPlugin.js
+@@ -10,11 +10,12 @@
+ const WebSocketPlugin = (store) => {
+   let ws;
+   const data = {
+-    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging', '/xyz/openbmc_project/gpio/identifyLed'],
++    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging', '/xyz/openbmc_project/gpio/identifyLed', '/xyz/openbmc_project/sensors/temperature/AiCard_Temp'],
+     interfaces: [
+       'xyz.openbmc_project.State.Host',
+       'xyz.openbmc_project.Logging.Entry',
+       'xyz.openbmc_project.Gpio.identifyLed',
++      'xyz.openbmc_project.Sensor.Value',
+     ],
+   };
+ 
+@@ -42,7 +43,8 @@ const WebSocketPlugin = (store) => {
+         }
+       } else if (path === '/xyz/openbmc_project/logging') {
+         store.dispatch('eventLog/getEventLogData');
+-      } else if (path === '/xyz/openbmc_project/gpio/identifyLed') {
++      } else if ((path === '/xyz/openbmc_project/gpio/identifyLed') ||
++                 (path === '/xyz/openbmc_project/sensors/temperature/AiCard_Temp')) {
+         store.dispatch('global/getSystemInfo');
+       }
+     };

@@ -9,8 +9,10 @@ option_end_flag="--"
 dbus_name="xyz.openbmc_project.FanControl"
 dbus_path="/xyz/openbmc_project/sensors/temperature/AiCard_Temp"
 dbus_intf="xyz.openbmc_project.Sensor.Value"
-dbus_property="Value"
-property_type="d"
+dbus_property_tmp="Value"
+property_type_tmp="d"
+dbus_property_isexist="sg1684xExistState"
+property_type_isexist="i"
 
 
 source $riser_i2c_file
@@ -22,9 +24,11 @@ if [ $? -eq 0 ] ;then
         if [ $result -eq 1 ] ;then
             AI_card_temp=$(riser_get_max_temp_of_aicard)
             # echo ${AI_card_temp}
-            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property} ${property_type} ${AI_card_temp}
+            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property_tmp} ${property_type_tmp} ${AI_card_temp}
+            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property_isexist} ${property_type_isexist} 1
         else
-            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property} ${property_type} ${option_end_flag} ${no_ai_card_value}
+            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property_tmp} ${property_type_tmp} ${option_end_flag} ${no_ai_card_value}
+            busctl set-property ${dbus_name} ${dbus_path} ${dbus_intf} ${dbus_property_isexist} ${property_type_isexist} 0
         fi
         # echo "riser scan"
         sleep 3

@@ -1,0 +1,49 @@
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 27c0e9d..2c42199 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -35,6 +35,8 @@ const GlobalStore = {
+     serialNumber: null,
+     serverStatus: 'unreachable',
+     cpldVersion: null,
++    sg1684xStatus:null,
++    sg1684xTmp:null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -48,6 +50,8 @@ const GlobalStore = {
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
+     cpldVersion:   (state)  => state.cpldVersion,
++    sg1684xStatus: (state)  => state.sg1684xStatus,
++    sg1684xTmp:    (state)  => state.sg1684xTmp,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -63,6 +67,8 @@ const GlobalStore = {
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
+     setCpldInfo:  (state, cpldInfo)   => (state.cpldVersion   =  cpldInfo),
++    setsg1684xInfo: (state, sg1684xInfo)   => (state.sg1684xStatus   =  sg1684xInfo),
++    setsg1684xTmpInfo: (state, sg1684xTmpInfo)   => (state.sg1684xTmp   =  sg1684xTmpInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -95,6 +101,8 @@ const GlobalStore = {
+               Model,
+               PowerState,
+               CpldInfo,
++              sg1684xInfo,
++              sg1684xTmpInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -103,6 +111,8 @@ const GlobalStore = {
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
+             commit('setCpldInfo',  CpldInfo );
++            commit('setsg1684xInfo', sg1684xInfo);
++            commit('setsg1684xTmpInfo', sg1684xTmpInfo);
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
