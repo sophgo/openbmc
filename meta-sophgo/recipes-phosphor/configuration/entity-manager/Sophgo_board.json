@@ -160,7 +160,7 @@
             {
                 "Address": "0x48",
                 "Bus": 5,
-                "Name": "LOCAL_TEMP1",
+                "Name": "AIR_INLET_TEMP1",
                 "Type": "LM75A",
                 "Thresholds": [
                     {
@@ -192,7 +192,7 @@
             {
                 "Address": "0x49",
                 "Bus": 5,
-                "Name": "LOCAL_TEMP2",
+                "Name": "AIR_INLET_TEMP2",
                 "Type": "LM75A",
                 "Thresholds": [
                     {
@@ -224,7 +224,7 @@
             {
                 "Address": "0x4a",
                 "Bus": 5,
-                "Name": "LOCAL_TEMP3",
+                "Name": "AIR_INLET_TEMP3",
                 "Type": "LM75A",
                 "Thresholds": [
                     {
@@ -256,7 +256,7 @@
             {
                 "Address": "0x4b",
                 "Bus": 5,
-                "Name": "LOCAL_TEMP4",
+                "Name": "AIR_OUTLET_TEMP1",
                 "Type": "LM75A",
                 "Thresholds": [
                     {
@@ -288,7 +288,7 @@
             {
                 "Address": "0x4c",
                 "Bus": 5,
-                "Name": "LOCAL_TEMP5",
+                "Name": "AIR_OUTLET_TEMP2",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -320,8 +320,8 @@
             {
                 "Address": "0x4c",
                 "Bus": 0,
-                "Name": "TEMP_CPU0_OUTER",
-                "Name1": "TEMP_CPU0_INNER",
+                "Name": "cpu0_ambient_temp",
+                "Name1": "cpu0_junction_temp",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -385,8 +385,8 @@
             {
                 "Address": "0x4c",
                 "Bus": 1,
-                "Name": "TEMP_CPU1_OUTER",
-                "Name1": "TEMP_CPU1_INNER",
+                "Name": "cpu1_ambient_temp",
+                "Name1": "cpu1_junction_temp",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -450,8 +450,8 @@
             {
                 "Address": "0x4c",
                 "Bus": 2,
-                "Name": "TEMP_SWITCH0_OUTER",
-                "Name1": "TEMP_SWITCH0_INNER",
+                "Name": "switch0_ambient_temp",
+                "Name1": "switch0_junction_temp",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -515,8 +515,8 @@
             {
                 "Address": "0x4c",
                 "Bus": 3,
-                "Name": "TEMP_SWITCH1_OUTER",
-                "Name1": "TEMP_SWITCH1_INNER",
+                "Name": "switch1_ambient_temp",
+                "Name1": "switch1_junction_temp",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
