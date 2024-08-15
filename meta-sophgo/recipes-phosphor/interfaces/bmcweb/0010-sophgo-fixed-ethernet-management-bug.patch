@@ -1,0 +1,55 @@
+From 51c4e512c67353a9e2456cff678ef0a042ba4a98 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 11:53:35 +0800
+Subject: [PATCH 1/1] fixed ethernet management bug.
+
+---
+ redfish-core/lib/ethernet.hpp | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/ethernet.hpp b/redfish-core/lib/ethernet.hpp
+index 2fe4654a..bbf7601d 100644
+--- a/redfish-core/lib/ethernet.hpp
++++ b/redfish-core/lib/ethernet.hpp
+@@ -508,7 +508,7 @@ inline void
+                   boost::container::flat_set<IPv4AddressData>& ipv4Config)
+ {
+     const std::string ipv4PathStart =
+-        "/xyz/openbmc_project/network/" + ethifaceId + "/ipv4/";
++        "/xyz/openbmc_project/network/" + ethifaceId/*  + "/ipv4/" */;
+ 
+     // Since there might be several IPv4 configurations aligned with
+     // single ethernet interface, loop over all of them
+@@ -521,6 +521,29 @@ inline void
+             {
+                 if (interface.first == "xyz.openbmc_project.Network.IP")
+                 {
++                    bool isIpv6=false;
++                    for (const auto& property : interface.second)
++                    {
++                        if (property.first == "Type")
++                        {
++                            const std::string* type =
++                                std::get_if<std::string>(&property.second);
++                            if (type != nullptr)
++                            {
++                                if (* type == "xyz.openbmc_project.Network.IP.Protocol.IPv6")
++                                {
++                                    isIpv6 = true;
++                                }
++                            }
++
++                        }
++                    }
++
++                    if (isIpv6)
++                    {
++                        continue;
++                    }
++
+                     // Instance IPv4AddressData structure, and set as
+                     // appropriate
+                     std::pair<
+-- 
+2.25.1
+

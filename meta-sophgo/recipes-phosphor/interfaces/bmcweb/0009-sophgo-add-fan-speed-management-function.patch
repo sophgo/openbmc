@@ -1,0 +1,122 @@
+From 580a5f04f485e2c991d251989e16c7b2ad884196 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 11:50:24 +0800
+Subject: [PATCH 1/1] add fan speed management function.
+
+---
+ redfish-core/lib/systems.hpp | 57 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index 130248af..4dc75409 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -29,6 +29,7 @@
+ #include "utils/sw_utils.hpp"
+ #include "utils/time_utils.hpp"
+ 
++#include <sdbusplus/server.hpp>
+ #include <boost/container/flat_map.hpp>
+ #include <boost/system/error_code.hpp>
+ #include <sdbusplus/asio/property.hpp>
+@@ -38,6 +39,9 @@
+ #include <string_view>
+ #include <variant>
+ 
++#include <cstdio>
++#include <cstdlib>
++
+ namespace redfish
+ {
+ 
+@@ -1932,6 +1936,51 @@ inline void
+         dbus::utility::DbusVariantType(powerRestorPolicy));
+ }
+ 
++
++
++inline void getFanSpeed(const std::shared_ptr<bmcweb::AsyncResp>& aResp)
++{
++    {
++        BMCWEB_LOG_DEBUG << "Get fan speed control mode";
++
++        sdbusplus::asio::getProperty<std::string>(
++            *crow::connections::systemBus, "xyz.openbmc_project.FanControl",
++            "/xyz/openbmc_project/sophgo/fanControl",
++            "xyz.openbmc_project.Sophgo.FanControl", "ControlMode",
++            [aResp](const boost::system::error_code ec, const std::string& mode) {
++                if (ec)
++                {
++                    BMCWEB_LOG_DEBUG << "DBUS response error " << ec;
++                    return;
++                }
++
++                aResp->res.jsonValue["FanSpeed"] = mode;
++            });
++    }
++
++}
++
++inline void setFanSpeed(const std::shared_ptr<bmcweb::AsyncResp>& aResp, const std::string& fanSpeed)
++{
++    crow::connections::systemBus->async_method_call(
++        [aResp](const boost::system::error_code ec) {
++        if (ec)
++        {
++            messages::internalError(aResp->res);
++            return;
++        }
++        },
++        "xyz.openbmc_project.FanControl",
++        "/xyz/openbmc_project/sophgo/fanControl",
++        "org.freedesktop.DBus.Properties", "Set",
++        "xyz.openbmc_project.Sophgo.FanControl", "ControlMode",
++        dbus::utility::DbusVariantType(fanSpeed));
++}
++
++
++
++
++
+ #ifdef BMCWEB_ENABLE_REDFISH_PROVISIONING_FEATURE
+ /**
+  * @brief Retrieves provisioning status
+@@ -3196,6 +3245,7 @@ inline void requestRoutesSystems(App& app)
+         getPCIeDeviceList(asyncResp, "PCIeDevices");
+         getHostWatchdogTimer(asyncResp);
+         getPowerRestorePolicy(asyncResp);
++        getFanSpeed(asyncResp);
+         getAutomaticRetry(asyncResp);
+         getLastResetTime(asyncResp);
+ #ifdef BMCWEB_ENABLE_REDFISH_PROVISIONING_FEATURE
+@@ -3231,6 +3281,7 @@ inline void requestRoutesSystems(App& app)
+         std::optional<std::string> indicatorLed;
+         std::optional<std::string> assetTag;
+         std::optional<std::string> powerRestorePolicy;
++        std::optional<std::string> fanSpeed;
+         std::optional<std::string> powerMode;
+         std::optional<bool> wdtEnable;
+         std::optional<std::string> wdtTimeOutAction;
+@@ -3252,6 +3303,7 @@ inline void requestRoutesSystems(App& app)
+                         "LocationIndicatorActive", locationIndicatorActive,
+                         "AssetTag", assetTag,
+                         "PowerRestorePolicy", powerRestorePolicy,
++                        "FanSpeed", fanSpeed,
+                         "PowerMode", powerMode,
+                         "HostWatchdogTimer/FunctionEnabled", wdtEnable,
+                         "HostWatchdogTimer/TimeoutAction", wdtTimeOutAction,
+@@ -3317,6 +3369,11 @@ inline void requestRoutesSystems(App& app)
+             setPowerRestorePolicy(asyncResp, *powerRestorePolicy);
+         }
+ 
++        if (fanSpeed)
++        {
++            setFanSpeed(asyncResp, *fanSpeed);
++        }
++
+         if (powerMode)
+         {
+             setPowerMode(asyncResp, *powerMode);
+-- 
+2.25.1
+

