@@ -1,0 +1,635 @@
+From 0f69a995690c60ea8d9de70816cd10352f6df93a Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Tue, 13 Aug 2024 17:56:28 +0800
+Subject: [PATCH 1/1] update SOL UI.
+
+---
+ src/locales/en-US.json                        |  31 ++-
+ src/store/modules/GlobalStore.js              | 105 +++++--
+ src/store/modules/Operations/ControlStore.js  |  30 ++
+ .../SerialOverLan/SerialOverLanConsole.vue    | 258 ++++++++++++++++++
+ .../ServerPowerOperations.vue                 |  68 -----
+ 5 files changed, 386 insertions(+), 106 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index e619bbb..fa001b2 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -820,7 +820,29 @@
+         "disconnected": "Disconnected",
+         "openNewTab": "Open in new tab",
+         "status": "Status",
+-        "subTitle": "SOL console redirects the server's serial port output to this window."
++        "subTitle": "SOL console redirects the server's serial port output to this window.",
++        "selectSolPort":"SOL Port:",
++        "solPortC0U0": "CPU0_UART0",
++        "solPortC0U1": "CPU0_UART1",
++        "solPortC1U0": "CPU1_UART0",
++        "solPortC1U1": "CPU1_UART1",
++        "setPort": "Set port",
++        "sata1":"1",
++        "sata2":"\u00a0\u00a0\u00a02",
++        "fan1":"1",
++        "fan2":"\u00a0\u00a0\u00a02",
++        "fan3":"\u00a0\u00a0\u00a03",
++        "fan4":"\u00a0\u00a0\u00a04",
++        "fan5":"\u00a0\u00a0\u00a05",
++        "fan6":"\u00a0\u00a0\u00a06",
++        "fan7":"\u00a0\u00a0\u00a07",
++        "fan8":"\u00a0\u00a0\u00a08",
++        "fan9":"\u00a0\u00a0\u00a09",
++        "hdd1":"1",
++        "hdd2":"\u00a0\u00a0\u00a02",
++        "hdd3":"\u00a0\u00a0\u00a03",
++        "hdd4":"\u00a0\u00a0\u00a04",
++        "blank":"\u2002\u2002"
+     },
+     "pageServerPowerOperations": {
+         "currentStatus": "Current status",
+@@ -839,13 +861,6 @@
+         "rebootServer": "Reboot server",
+         "shutDown": "Shut down",
+         "shutdownServer": "Shutdown server",
+-        "serverCpldInfo":"CPLD Info",
+-        "serverCpuaPwState":"CPU A Power State:",
+-        "serverCpubPwState":"CPU B Power State:",
+-        "serverOcpuPwState":"CPU Other Power State:",
+-        "serverOtherPwState":"Other Power State:",
+-        "serverPsuState":"PSU State:",
+-        "serverEfuseState":"Efuse State:",
+         "bootSettings": {
+             "bootSettingsOverride": "Boot settings override",
+             "enableOneTimeBoot": "Enable one time boot",
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index fa2d644..bc3603d 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,12 +34,21 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
+-    cpuaPWStatus:'unreachable',
+-    cpubPWStatus:'unreachable',
+-    cpuoPWStatus:'unreachable',
+-    otherPWStatus:'unreachable',
+-    psuStatus:'unreachable',
+-    efusStatus:'unreachable',
++    sata1Status: null,
++    sata2Status: null,
++    hdd1Status: null,
++    hdd2Status: null,
++    hdd3Status: null,
++    hdd4Status: null,
++    fan1Status: null,
++    fan2Status: null,
++    fan3Status: null,
++    fan4Status: null,
++    fan5Status: null,
++    fan6Status: null,
++    fan7Status: null,
++    fan8Status: null,
++    fan9Status: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -52,12 +61,21 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
+-    cpuaPWStatus:  (state)  => state.cpuaPWStatus,
+-    cpubPWStatus:  (state)  => state.cpubPWStatus,
+-    cpuoPWStatus:  (state)  => state.cpuoPWStatus,
+-    otherPWStatus: (state)  => state.otherPWStatus,
+-    psuStatus:     (state)  => state.psuStatus,
+-    efusStatus:    (state)  => state.efusStatus,
++    sata1Status:   (state)  => state.sata1Status,
++    sata2Status:   (state)  => state.sata2Status,
++    hdd1Status:    (state)  => state.hdd1Status,
++    hdd2Status:    (state)  => state.hdd2Status,
++    hdd3Status:    (state)  => state.hdd3Status,
++    hdd4Status:    (state)  => state.hdd4Status,
++    fan1Status:    (state)  => state.fan1Status,
++    fan2Status:    (state)  => state.fan2Status,
++    fan3Status:    (state)  => state.fan3Status,
++    fan4Status:    (state)  => state.fan4Status,
++    fan5Status:    (state)  => state.fan5Status,
++    fan6Status:    (state)  => state.fan6Status,
++    fan7Status:    (state)  => state.fan7Status,
++    fan8Status:    (state)  => state.fan8Status,
++    fan9Status:    (state)  => state.fan9Status,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -72,12 +90,21 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
+-    setCpuaPWInfo: (state, cpuaPWInfo)  => (state.cpuaPWStatus  = cpuaPWInfo),
+-    setCpubPWInfo: (state, cpubPWInfo)  => (state.cpubPWStatus  = cpubPWInfo),
+-    setCpuoPWInfo: (state, cpuoPWInfo)  => (state.cpuoPWStatus  = cpuoPWInfo),
+-    setOtherPWInfo:(state, otherPWInfo) => (state.otherPWStatus = otherPWInfo),
+-    setPsuInfo:    (state, psuInfo)     => (state.psuStatus     = psuInfo),
+-    setEfusInfo:   (state, efusInfo)    => (state.efusStatus    = efusInfo),
++    setSata1Info:  (state, sata1Info)   => (state.sata1Status    = sata1Info),
++    setSata2Info:  (state, sata2Info)   => (state.sata2Status    = sata2Info),
++    setHdd1Info:  (state, hdd1Info)   => (state.hdd1Status      = hdd1Info),
++    setHdd2Info:  (state, hdd2Info)   => (state.hdd2Status    =  hdd2Info),
++    setHdd3Info:  (state, hdd3Info)   => (state.hdd3Status    =  hdd3Info),
++    setHdd4Info:  (state, hdd4Info)   => (state.hdd4Status    =  hdd4Info),
++    setFan1Info:  (state, fan1Info)   => (state.fan1Status    =  fan1Info),
++    setFan2Info:  (state, fan2Info)   => (state.fan2Status    =  fan2Info),
++    setFan3Info:  (state, fan3Info)   => (state.fan3Status    =  fan3Info),
++    setFan4Info:  (state, fan4Info)   => (state.fan4Status    =  fan4Info),
++    setFan5Info:  (state, fan5Info)   => (state.fan5Status    =  fan5Info),
++    setFan6Info:  (state, fan6Info)   => (state.fan6Status    =  fan6Info),
++    setFan7Info:  (state, fan7Info)   => (state.fan7Status    =  fan7Info),
++    setFan8Info:  (state, fan8Info)   => (state.fan8Status    =  fan8Info),
++    setFan9Info:  (state, fan9Info)   => (state.fan9Status    =  fan9Info),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -109,12 +136,21 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
+-              CpuaPWInfo,
+-              CpubPWInfo,
+-              CpuoPWInfo,
+-              OtherPWInfo,
+-              PsuInfo,
+-              EfusInfo,
++              Sata1Info,
++              Sata2Info,
++              Hdd1Info,
++              Hdd2Info,
++              Hdd3Info,
++              Hdd4Info,
++              Fan1Info,
++              Fan2Info,
++              Fan3Info,
++              Fan4Info,
++              Fan5Info,
++              Fan6Info,
++              Fan7Info,
++              Fan8Info,
++              Fan9Info,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -122,12 +158,21 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
+-            commit('setCpuaPWInfo', CpuaPWInfo);
+-            commit('setCpubPWInfo', CpubPWInfo);
+-            commit('setCpuoPWInfo', CpuoPWInfo);
+-            commit('setOtherPWInfo', OtherPWInfo);
+-            commit('setPsuInfo', PsuInfo);
+-            commit('setEfusInfo', EfusInfo);
++            commit('setSata1Info', Sata1Info);
++            commit('setSata2Info', Sata2Info);
++            commit('setHdd1Info',  Hdd1Info );
++            commit('setHdd2Info',  Hdd2Info );
++            commit('setHdd3Info',  Hdd3Info );
++            commit('setHdd4Info',  Hdd4Info );
++            commit('setFan1Info',  Fan1Info );
++            commit('setFan2Info',  Fan2Info );
++            commit('setFan3Info',  Fan3Info );
++            commit('setFan4Info',  Fan4Info );
++            commit('setFan5Info',  Fan5Info );
++            commit('setFan6Info',  Fan6Info );
++            commit('setFan7Info',  Fan7Info );
++            commit('setFan8Info',  Fan8Info );
++            commit('setFan9Info',  Fan9Info );
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/store/modules/Operations/ControlStore.js b/src/store/modules/Operations/ControlStore.js
+index 9b8bf73..7487a11 100644
+--- a/src/store/modules/Operations/ControlStore.js
++++ b/src/store/modules/Operations/ControlStore.js
+@@ -126,6 +126,36 @@ const ControlStore = {
+           commit('setOperationInProgress', false);
+         });
+     },
++
++    async setSolToPort0({ dispatch, commit }) {
++      const data = { SolPortType: 'port0' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort1({ dispatch, commit }) {
++      const data = { SolPortType: 'port1' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort2({ dispatch, commit }) {
++      const data = { SolPortType: 'port2' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort3({ dispatch, commit }) {
++      const data = { SolPortType: 'port3' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    serverSolPortChange({ commit }, data) {
++      commit('setOperationInProgress', true);
++      api
++        .post('/redfish/v1/Systems/system/Actions/ComputerSystem.ChangeSolPort', data)
++        .catch((error) => {
++          console.log(error);
++          commit('setOperationInProgress', false);
++        });
++    },
+   },
+ };
+ 
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 82637a4..5ea853a 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -39,6 +39,71 @@
+       </b-col>
+     </b-row>
+     <div id="terminal" ref="panel"></div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div>
++      <b-form novalidate @submit.prevent="setSolPort" :inline="true">
++        <b-button
++              variant="primary"
++              type="submit"
++              data-test-id="SerialOverLanConsole-button-setport"
++        >
++              {{ $t('pageSerialOverLan.setPort') }}
++        </b-button>
++        <dt>
++          {{ $t('pageSerialOverLan.blank') }}
++        </dt>
++        <b-form-group>
++            <b-form-radio-group id="radio-group" v-model="form.port" name="radio-group">
++                <b-form-radio value="port0">{{ $t('pageSerialOverLan.solPortC0U0') }}</b-form-radio>
++                <b-form-radio value="port1">{{ $t('pageSerialOverLan.solPortC0U1') }}</b-form-radio>
++                <b-form-radio value="port2" >{{ $t('pageSerialOverLan.solPortC1U0') }}</b-form-radio>
++                <b-form-radio value="port3">{{ $t('pageSerialOverLan.solPortC1U1') }}</b-form-radio>
++            </b-form-radio-group>
++         </b-form-group>
++      </b-form>
++    </div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div >
++      <dl>
++        <dt>
++          {{'SATA\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.sata1') }} <status-icon :status="sata1StatusIcon" />
++          {{ $t('pageSerialOverLan.sata2') }} <status-icon :status="sata2StatusIcon" />
++        </dt>
++      </dl>
++   </div>
++    <div >
++      <dl>
++        <dt>
++          {{'HDD\xa0\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.hdd1') }}  <status-icon :status="hdd1StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd2') }}  <status-icon :status="hdd2StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd3') }}  <status-icon :status="hdd3StatusIcon" />
++          {{ $t('pageSerialOverLan.hdd4') }}  <status-icon :status="hdd4StatusIcon" />
++        </dt>
++      </dl>
++   </div>
++    <div >
++      <dl>
++        <dt>
++          {{'FAN\xa0\xa0state:\xa0\xa0'}}
++          {{ $t('pageSerialOverLan.fan1') }} <status-icon :status="fan1StatusIcon" />
++          {{ $t('pageSerialOverLan.fan2') }} <status-icon :status="fan2StatusIcon" />
++          {{ $t('pageSerialOverLan.fan3') }} <status-icon :status="fan3StatusIcon" />
++          {{ $t('pageSerialOverLan.fan4') }} <status-icon :status="fan4StatusIcon" />
++          {{ $t('pageSerialOverLan.fan5') }} <status-icon :status="fan5StatusIcon" />
++          {{ $t('pageSerialOverLan.fan6') }} <status-icon :status="fan6StatusIcon" />
++          {{ $t('pageSerialOverLan.fan7') }} <status-icon :status="fan7StatusIcon" />
++          {{ $t('pageSerialOverLan.fan8') }} <status-icon :status="fan8StatusIcon" />
++          {{ $t('pageSerialOverLan.fan9') }} <status-icon :status="fan9StatusIcon" />
++        </dt>
++      </dl>
++    </div>
+   </div>
+ </template>
+ 
+@@ -63,22 +128,196 @@ export default {
+       type: Boolean,
+       default: true,
+     },
++    SolPortType: {
++      type: String,
++      default: null,
++    },
+   },
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      form: {
++        port: '',
++      },
+     };
+   },
+   computed: {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
++    sata1Status() {
++      return this.$store.getters['global/sata1Status'];
++    },
++    sata1StatusIcon() {
++      switch (this.sata1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++
++    sata2Status() {
++      return this.$store.getters['global/sata2Status'];
++    },
++    sata2StatusIcon() {
++      switch (this.sata2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd1Status() {
++      return this.$store.getters['global/hdd1Status'];
++    },
++    hdd1StatusIcon() {
++      switch (this.hdd1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd2Status() {
++      return this.$store.getters['global/hdd2Status'];
++    },
++    hdd2StatusIcon() {
++      switch (this.hdd2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd3Status() {
++      return this.$store.getters['global/hdd3Status'];
++    },
++    hdd3StatusIcon() {
++      switch (this.hdd3Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    hdd4Status() {
++      return this.$store.getters['global/hdd4Status'];
++    },
++    hdd4StatusIcon() {
++      switch (this.hdd4Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan1Status() {
++      return this.$store.getters['global/fan1Status'];
++    },
++    fan1StatusIcon() {
++      switch (this.fan1Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan2Status() {
++      return this.$store.getters['global/fan2Status'];
++    },
++    fan2StatusIcon() {
++      switch (this.fan2Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan3Status() {
++      return this.$store.getters['global/fan3Status'];
++    },
++    fan3StatusIcon() {
++      switch (this.fan3Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan4Status() {
++      return this.$store.getters['global/fan4Status'];
++    },
++    fan4StatusIcon() {
++      switch (this.fan4Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan5Status() {
++      return this.$store.getters['global/fan5Status'];
++    },
++    fan5StatusIcon() {
++      switch (this.fan5Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan6Status() {
++      return this.$store.getters['global/fan6Status'];
++    },
++    fan6StatusIcon() {
++      switch (this.fan6Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan7Status() {
++      return this.$store.getters['global/fan7Status'];
++    },
++    fan7StatusIcon() {
++      switch (this.fan7Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan8Status() {
++      return this.$store.getters['global/fan8Status'];
++    },
++    fan8StatusIcon() {
++      switch (this.fan8Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    fan9Status() {
++      return this.$store.getters['global/fan9Status'];
++    },
++    fan9StatusIcon() {
++      switch (this.fan9Status) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
+     connection() {
+       return this.serverStatus === 'off' ? false : true;
+     },
+     serverStatusIcon() {
+       return this.connection ? 'success' : 'danger';
+     },
++
+   },
+   created() {
+     this.$store.dispatch('global/getServerStatus');
+@@ -157,6 +396,25 @@ export default {
+         'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=600,height=550'
+       );
+     },
++    setSolPort() {
++      if (this.form.port === 'port0')
++      {
++        this.$store.dispatch('controls/setSolToPort0');
++      }
++      if (this.form.port === 'port1')
++      {
++        this.$store.dispatch('controls/setSolToPort1');
++      }
++      if (this.form.port === 'port2')
++      {
++        this.$store.dispatch('controls/setSolToPort2');
++      }
++      if (this.form.port === 'port3')
++      {
++        this.$store.dispatch('controls/setSolToPort3');
++      }
++
++    },
+   },
+ };
+ </script>
+diff --git a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+index 0c313a2..ba9ebce 100644
+--- a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
++++ b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+@@ -148,56 +148,6 @@
+         </page-section>
+       </b-col>
+     </b-row>
+-    <b-row>
+-      <b-col sm="8" md="6" xl="4">
+-        <page-section
+-          :section-title="$t('pageServerPowerOperations.serverCpldInfo')"
+-        >
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverCpuaPwState') }} {{ $t(cpuaPWStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverCpubPwState') }} {{ $t(cpubPWStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverOcpuPwState') }} {{ $t(cpuoPWStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverOtherPwState') }} {{ $t(otherPWStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverPsuState') }} {{ $t(psuStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-            <b-row>
+-              <b-col>
+-                <dl>
+-                  <dt>{{ $t('pageServerPowerOperations.serverEfuseState') }} {{ $t(efusStatus) }}</dt>
+-                </dl>
+-              </b-col>
+-            </b-row>
+-        </page-section>
+-      </b-col>
+-    </b-row>
+   </b-container>
+ </template>
+ 
+@@ -229,24 +179,6 @@ export default {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
+-    cpuaPWStatus() {
+-      return this.$store.getters['global/cpuaPWStatus'];
+-    },
+-    cpubPWStatus() {
+-      return this.$store.getters['global/cpubPWStatus'];
+-    },
+-    cpuoPWStatus() {
+-      return this.$store.getters['global/cpuoPWStatus'];
+-    },
+-    otherPWStatus() {
+-      return this.$store.getters['global/otherPWStatus'];
+-    },
+-    psuStatus() {
+-      return this.$store.getters['global/psuStatus'];
+-    },
+-    efusStatus() {
+-      return this.$store.getters['global/efusStatus'];
+-    },
+     isOperationInProgress() {
+       return this.$store.getters['controls/isOperationInProgress'];
+     },
+-- 
+2.25.1
+

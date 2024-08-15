@@ -1,0 +1,105 @@
+From 8ae00f9e4b73976cdf76eef1e7892ea3edf6a692 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Tue, 13 Aug 2024 18:12:18 +0800
+Subject: [PATCH 1/1] Add cpld firmware management UI.
+
+---
+ src/locales/en-US.json                     | 1 +
+ src/store/modules/GlobalStore.js           | 5 +++++
+ src/views/Operations/Firmware/Firmware.vue | 7 +++++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index fa001b2..3182424 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -326,6 +326,7 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
++        "sectionTitleCpldCards": "CPLD",
+         "sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index bc3603d..0af86af 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -49,6 +49,7 @@ const GlobalStore = {
+     fan7Status: null,
+     fan8Status: null,
+     fan9Status: null,
++    cpldVersion: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -76,6 +77,7 @@ const GlobalStore = {
+     fan7Status:    (state)  => state.fan7Status,
+     fan8Status:    (state)  => state.fan8Status,
+     fan9Status:    (state)  => state.fan9Status,
++    cpldVersion:   (state)  => state.cpldVersion,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -105,6 +107,7 @@ const GlobalStore = {
+     setFan7Info:  (state, fan7Info)   => (state.fan7Status    =  fan7Info),
+     setFan8Info:  (state, fan8Info)   => (state.fan8Status    =  fan8Info),
+     setFan9Info:  (state, fan9Info)   => (state.fan9Status    =  fan9Info),
++    setCpldInfo:  (state, cpldInfo)   => (state.cpldVersion   =  cpldInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -151,6 +154,7 @@ const GlobalStore = {
+               Fan7Info,
+               Fan8Info,
+               Fan9Info,
++              CpldInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -173,6 +177,7 @@ const GlobalStore = {
+             commit('setFan7Info',  Fan7Info );
+             commit('setFan8Info',  Fan8Info );
+             commit('setFan9Info',  Fan9Info );
++            commit('setCpldInfo',  CpldInfo );
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index a2acb9b..25f46ad 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -14,6 +14,10 @@
+ 
+         <!-- Host Firmware -->
+         <host-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- Cpld Firmware -->
++        <cpld-cards v-if="1" />
++
+       </b-col>
+     </b-row>
+ 
+@@ -39,9 +43,11 @@ import AlertsServerPower from './FirmwareAlertServerPower';
+ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
++import CpldCards from './FirmwareCardsCpld';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
++
+ import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
+ 
+ export default {
+@@ -51,6 +57,7 @@ export default {
+     BmcCards,
+     FormUpdate,
+     HostCards,
++    CpldCards,
+     PageSection,
+     PageTitle,
+   },
+-- 
+2.25.1
+

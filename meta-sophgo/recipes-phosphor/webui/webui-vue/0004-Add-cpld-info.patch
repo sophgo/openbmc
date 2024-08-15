@@ -1,0 +1,187 @@
+From bd09091cbad9583e5c5ea4911ac3fe8b3bb290c3 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Tue, 13 Aug 2024 17:47:53 +0800
+Subject: [PATCH 1/1] Add cpld info.
+
+---
+ src/locales/en-US.json                        |  7 ++
+ src/store/modules/GlobalStore.js              | 30 ++++++++
+ .../ServerPowerOperations.vue                 | 68 +++++++++++++++++++
+ 3 files changed, 105 insertions(+)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index ffb6a2e..e619bbb 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -839,6 +839,13 @@
+         "rebootServer": "Reboot server",
+         "shutDown": "Shut down",
+         "shutdownServer": "Shutdown server",
++        "serverCpldInfo":"CPLD Info",
++        "serverCpuaPwState":"CPU A Power State:",
++        "serverCpubPwState":"CPU B Power State:",
++        "serverOcpuPwState":"CPU Other Power State:",
++        "serverOtherPwState":"Other Power State:",
++        "serverPsuState":"PSU State:",
++        "serverEfuseState":"Efuse State:",
+         "bootSettings": {
+             "bootSettingsOverride": "Boot settings override",
+             "enableOneTimeBoot": "Enable one time boot",
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 95d7a08..fa2d644 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,6 +34,12 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
++    cpuaPWStatus:'unreachable',
++    cpubPWStatus:'unreachable',
++    cpuoPWStatus:'unreachable',
++    otherPWStatus:'unreachable',
++    psuStatus:'unreachable',
++    efusStatus:'unreachable',
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -46,6 +52,12 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
++    cpuaPWStatus:  (state)  => state.cpuaPWStatus,
++    cpubPWStatus:  (state)  => state.cpubPWStatus,
++    cpuoPWStatus:  (state)  => state.cpuoPWStatus,
++    otherPWStatus: (state)  => state.otherPWStatus,
++    psuStatus:     (state)  => state.psuStatus,
++    efusStatus:    (state)  => state.efusStatus,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -60,6 +72,12 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
++    setCpuaPWInfo: (state, cpuaPWInfo)  => (state.cpuaPWStatus  = cpuaPWInfo),
++    setCpubPWInfo: (state, cpubPWInfo)  => (state.cpubPWStatus  = cpubPWInfo),
++    setCpuoPWInfo: (state, cpuoPWInfo)  => (state.cpuoPWStatus  = cpuoPWInfo),
++    setOtherPWInfo:(state, otherPWInfo) => (state.otherPWStatus = otherPWInfo),
++    setPsuInfo:    (state, psuInfo)     => (state.psuStatus     = psuInfo),
++    setEfusInfo:   (state, efusInfo)    => (state.efusStatus    = efusInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -91,6 +109,12 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
++              CpuaPWInfo,
++              CpubPWInfo,
++              CpuoPWInfo,
++              OtherPWInfo,
++              PsuInfo,
++              EfusInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -98,6 +122,12 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
++            commit('setCpuaPWInfo', CpuaPWInfo);
++            commit('setCpubPWInfo', CpubPWInfo);
++            commit('setCpuoPWInfo', CpuoPWInfo);
++            commit('setOtherPWInfo', OtherPWInfo);
++            commit('setPsuInfo', PsuInfo);
++            commit('setEfusInfo', EfusInfo);
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+index ba9ebce..0c313a2 100644
+--- a/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
++++ b/src/views/Operations/ServerPowerOperations/ServerPowerOperations.vue
+@@ -148,6 +148,56 @@
+         </page-section>
+       </b-col>
+     </b-row>
++    <b-row>
++      <b-col sm="8" md="6" xl="4">
++        <page-section
++          :section-title="$t('pageServerPowerOperations.serverCpldInfo')"
++        >
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverCpuaPwState') }} {{ $t(cpuaPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverCpubPwState') }} {{ $t(cpubPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverOcpuPwState') }} {{ $t(cpuoPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverOtherPwState') }} {{ $t(otherPWStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverPsuState') }} {{ $t(psuStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++            <b-row>
++              <b-col>
++                <dl>
++                  <dt>{{ $t('pageServerPowerOperations.serverEfuseState') }} {{ $t(efusStatus) }}</dt>
++                </dl>
++              </b-col>
++            </b-row>
++        </page-section>
++      </b-col>
++    </b-row>
+   </b-container>
+ </template>
+ 
+@@ -179,6 +229,24 @@ export default {
+     serverStatus() {
+       return this.$store.getters['global/serverStatus'];
+     },
++    cpuaPWStatus() {
++      return this.$store.getters['global/cpuaPWStatus'];
++    },
++    cpubPWStatus() {
++      return this.$store.getters['global/cpubPWStatus'];
++    },
++    cpuoPWStatus() {
++      return this.$store.getters['global/cpuoPWStatus'];
++    },
++    otherPWStatus() {
++      return this.$store.getters['global/otherPWStatus'];
++    },
++    psuStatus() {
++      return this.$store.getters['global/psuStatus'];
++    },
++    efusStatus() {
++      return this.$store.getters['global/efusStatus'];
++    },
+     isOperationInProgress() {
+       return this.$store.getters['controls/isOperationInProgress'];
+     },
+-- 
+2.25.1
+

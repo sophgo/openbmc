@@ -1,0 +1,65 @@
+From 23eefc05862f33951e5d8eb2acf98bef6d37b576 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Tue, 13 Aug 2024 18:17:58 +0800
+Subject: [PATCH 1/1] enable subscribe.
+
+---
+ .env.intel                           |  2 +-
+ src/store/plugins/WebSocketPlugin.js | 18 +++++++++++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/.env.intel b/.env.intel
+index 5b2383d..21246b6 100644
+--- a/.env.intel
++++ b/.env.intel
+@@ -2,7 +2,7 @@ NODE_ENV=production
+ VUE_APP_ENV_NAME="intel"
+ VUE_APP_COMPANY_NAME="intel"
+ VUE_APP_GUI_NAME="BMC System Management"
+-VUE_APP_SUBSCRIBE_SOCKET_DISABLED="true"
++VUE_APP_SUBSCRIBE_SOCKET_DISABLED="false"
+ VUE_APP_SWITCH_TO_BACKUP_IMAGE_DISABLED="true"
+ VUE_APP_MODIFY_SSH_POLICY_DISABLED="true"
+ VUE_APP_VIRTUAL_MEDIA_LIST_ENABLED="true"
+diff --git a/src/store/plugins/WebSocketPlugin.js b/src/store/plugins/WebSocketPlugin.js
+index cbdc932..7dd15f4 100644
+--- a/src/store/plugins/WebSocketPlugin.js
++++ b/src/store/plugins/WebSocketPlugin.js
+@@ -10,10 +10,21 @@
+ const WebSocketPlugin = (store) => {
+   let ws;
+   const data = {
+-    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging'],
++    paths: [
++      '/xyz/openbmc_project/state/host0',
++      '/xyz/openbmc_project/logging',
++      '/xyz/openbmc_project/gpio/fan',
++      '/xyz/openbmc_project/gpio/hdd',
++      '/xyz/openbmc_project/gpio/sata',
++      '/xyz/openbmc_project/gpio/identifyLed'
++    ],
+     interfaces: [
+       'xyz.openbmc_project.State.Host',
+       'xyz.openbmc_project.Logging.Entry',
++      'xyz.openbmc_project.Gpio.Fan',
++      'xyz.openbmc_project.Gpio.Hdd',
++      'xyz.openbmc_project.Gpio.Sata',
++      'xyz.openbmc_project.Gpio.identifyLed',
+     ],
+   };
+ 
+@@ -41,6 +52,11 @@ const WebSocketPlugin = (store) => {
+         }
+       } else if (path === '/xyz/openbmc_project/logging') {
+         store.dispatch('eventLog/getEventLogData');
++      } else if ((path === '/xyz/openbmc_project/gpio/fan') ||
++                 (path === '/xyz/openbmc_project/gpio/hdd') ||
++                 (path === '/xyz/openbmc_project/gpio/sata')||
++                 (path === '/xyz/openbmc_project/gpio/identifyLed')) {
++        store.dispatch('global/getSystemInfo');
+       }
+     };
+   };
+-- 
+2.25.1
+

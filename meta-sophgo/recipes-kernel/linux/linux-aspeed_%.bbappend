@@ -3,20 +3,15 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGE_ARCH = "ast2600-sophgo"
 
-#################################################################################################################
-# Note:
-#       1. When using the devtool command:
-#          1.1 the following content needs to be masked
-#          1.2 Then manually patch it
-#          1.3 After development is completed, update all patch files.
-
-SRC_URI:append = " file://0000-sophgo-ssif_bmc.patch "
-SRC_URI:append = " file://0001-sophgo-gigadevice.patch "
-SRC_URI:append = " file://0002-sophgo-bmcdev-ipmiinterface.patch "
-SRC_URI:append = " file://0003-sophgo-lm90-add-ct7451.patch "
-#################################################################################################################
 
 
+SRC_URI:append = " file://0001-fix-ssif-polling-bug.patch "
+SRC_URI:append = " file://0002-add-ct7451-in-lm90-module.patch "
+SRC_URI:append = " file://0003-modify-bmc-pcie-device-class-code.patch "
+SRC_URI:append = " file://0004-gigadevice-add-gd25lb512me.patch "
+
+
+SRC_URI:append = " file://jtag_aspeed.cfg "
 
 
 SRC_URI += "file://aspeed-g6-sophgo.dtsi;subdir=git/arch/arm/boot/dts \
@@ -24,17 +19,6 @@ SRC_URI += "file://aspeed-g6-sophgo.dtsi;subdir=git/arch/arm/boot/dts \
             file://sophgo_defconfig;subdir=git/arch/arm/configs \
             "
 
-SRC_URI:append = " file://jtag_aspeed.cfg "
 
-# IMAGE_INSTALL:append = " kernel-module-jtag-aspeed-internal"
 
-#################################################################################################################
-# Note: For reference only
-#
-# KERNEL_DEVICETREE += "aspeed-ast2600-sophgo.dtb"
-# S = "${WORKDIR}"
-# SRC_URI += "file://aspeed-g6-sophgo.dtsi;subdir=../../../../../workspace/sources/linux-aspeed/arch/arm/boot/dts \
-#             file://aspeed-ast2600-sophgo.dts;subdir=../../../../../workspace/sources/linux-aspeed/arch/arm/boot/dts \
-#             file://sophgo_defconfig;subdir=../../../../../workspace/sources/linux-aspeed/arch/arm/configs \
-#             "
-#################################################################################################################
+
