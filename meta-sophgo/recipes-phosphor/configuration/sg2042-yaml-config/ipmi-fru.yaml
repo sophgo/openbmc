@@ -1,5 +1,5 @@
 0x01:
-  /xyz/openbmc_project/inventory/system/board/sg2042_board:
+  /xyz/openbmc_project/inventory/system/board/SG2042:
       entityID: 16
       entityInstance: 1
       interfaces:
