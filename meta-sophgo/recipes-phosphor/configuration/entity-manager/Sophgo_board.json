@@ -579,7 +579,7 @@
             }
         ],
         "Name": "SG2042",
-        "Probe": "TRUE",
+        "Probe": "xyz.openbmc_project.FruDevice({'PRODUCT_PRODUCT_NAME': '^SR0-2208A[0-3].*'})",
         "Type": "Board",
         "xyz.openbmc_project.Inventory.Decorator.Asset": {
             "Manufacturer": "$PRODUCT_MANUFACTURER",

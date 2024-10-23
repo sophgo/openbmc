@@ -11,7 +11,7 @@
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: 0
-    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP1
+    path: /xyz/openbmc_project/sensors/temperature/AIR_INLET_TEMP1
     rExp: 0
     readingType: readingData
     sensorNamePattern: nameLeaf
@@ -22,41 +22,65 @@
 2:
     <<: *TEMP_DEFAULTS
     entityInstance: 2
-    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP2
+    path: /xyz/openbmc_project/sensors/temperature/AIR_INLET_TEMP2
 3:
     <<: *TEMP_DEFAULTS
     entityInstance: 3
-    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP3
+    path: /xyz/openbmc_project/sensors/temperature/AIR_INLET_TEMP3
 4:
     <<: *TEMP_DEFAULTS
     entityInstance: 4
-    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP4
+    path: /xyz/openbmc_project/sensors/temperature/AIR_OUTLET_TEMP1
 5:
     <<: *TEMP_DEFAULTS
     entityInstance: 5
-    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP5
+    path: /xyz/openbmc_project/sensors/temperature/AIR_OUTLET_TEMP2
 6:
     <<: *TEMP_DEFAULTS
     entityInstance: 6
-    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU0_INNER
+    path: /xyz/openbmc_project/sensors/temperature/cpu0_junction_temp
 7:
     <<: *TEMP_DEFAULTS
     entityInstance: 7
-    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU0_OUTER
+    path: /xyz/openbmc_project/sensors/temperature/cpu0_ambient_temp
 8:
     <<: *TEMP_DEFAULTS
     entityInstance: 8
-    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU1_INNER
+    path: /xyz/openbmc_project/sensors/temperature/cpu1_junction_temp
 9:
     <<: *TEMP_DEFAULTS
     entityInstance: 9
-    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU1_OUTER
+    path: /xyz/openbmc_project/sensors/temperature/cpu1_ambient_temp
+10:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 10
+    path: /xyz/openbmc_project/sensors/temperature/switch0_ambient_temp
+11:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 11
+    path: /xyz/openbmc_project/sensors/temperature/switch0_junction_temp
+12:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 12
+    path: /xyz/openbmc_project/sensors/temperature/switch1_ambient_temp
+13:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 13
+    path: /xyz/openbmc_project/sensors/temperature/switch1_junction_temp
+14:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 14
+    path: /xyz/openbmc_project/sensors/temperature/NVMe_1_Temp
+15:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 15
+    path: /xyz/openbmc_project/sensors/temperature/NVMe_2_Temp
 
 
 
-10: &FAN_DEFAULTS
+16: &FAN_DEFAULTS
   entityID: 29
-  entityInstance: 13
+  entityInstance: 16
   sensorType: 4
   path: /xyz/openbmc_project/sensors/fan_tach/Fan2_tach
   sensorReadingType: 1
@@ -74,33 +98,33 @@
         Offsets:
           0x0:
             type: double
-11:
+17:
     <<: *FAN_DEFAULTS
-    entityInstance: 14
+    entityInstance: 17
     path: /xyz/openbmc_project/sensors/fan_tach/Fan4_tach
 
-12:
+18:
     <<: *FAN_DEFAULTS
-    entityInstance: 15
+    entityInstance: 18
     path: /xyz/openbmc_project/sensors/fan_tach/Fan6_tach
-13:
-    <<: *FAN_DEFAULTS
-    entityInstance: 16
-    path: /xyz/openbmc_project/sensors/fan_tach/Fan9_tach
 19:
     <<: *FAN_DEFAULTS
-    entityInstance: 22
-    path: /xyz/openbmc_project/sensors/fan_tach/PSU2_Fan_Speed_1
-
+    entityInstance: 19
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan9_tach
 20:
     <<: *FAN_DEFAULTS
-    entityInstance: 23
+    entityInstance: 20
+    path: /xyz/openbmc_project/sensors/fan_tach/PSU2_Fan_Speed_1
+
+21:
+    <<: *FAN_DEFAULTS
+    entityInstance: 21
     path: /xyz/openbmc_project/sensors/fan_tach/PSU1_Fan_Speed_1
 
 
-21: &VOLTAGE_DEFAULTS
+22: &VOLTAGE_DEFAULTS
   entityID: 0x13
-  entityInstance: 24
+  entityInstance: 22
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/PSU2_Input_Voltage
   sensorReadingType: 0x01
@@ -118,33 +142,33 @@
           0xFF:
             type: double
 
-22:
+23:
     <<: *VOLTAGE_DEFAULTS
-    entityInstance: 25
+    entityInstance: 23
     multiplierM: 18
     rExp: -2
     path: /xyz/openbmc_project/sensors/voltage/PSU1_Input_Voltage
 
-23:
+24:
     <<: *VOLTAGE_DEFAULTS
     entityInstance: 24
     multiplierM: 18
     rExp: -2
     path: /xyz/openbmc_project/sensors/voltage/PSU2_Output_Voltage
 
-24:
+25:
     <<: *VOLTAGE_DEFAULTS
-    entityInstance: 26
+    entityInstance: 25
     multiplierM: 18
     rExp: -2
     path: /xyz/openbmc_project/sensors/voltage/PSU1_Output_Voltage
 
 
-25: &power
+26: &power
     sensorType: 0x08
     path: /xyz/openbmc_project/sensors/power/PSU2_Input_Power
     entityID: 19
-    entityInstance: 27
+    entityInstance: 26
     sensorReadingType: 0x01
     multiplierM: 80
     offsetB: 0
@@ -160,9 +184,9 @@
             0xFF:
               type: double
 
-26:
+27:
     <<: *power
-    entityInstance: 28
+    entityInstance: 27
     multiplierM: 80
     rExp: -1
     path: /xyz/openbmc_project/sensors/power/PSU1_Input_Power
