@@ -1,0 +1,45 @@
+From d8b5fe34d37472d81ac9df68e02b7e31326389af Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Thu, 31 Oct 2024 11:26:04 +0800
+Subject: [PATCH 1/1] PSU: Delete pwm.
+
+---
+ src/PSUSensorMain.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index b5af176..6b93c6b 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -238,7 +238,7 @@ void checkEventLimits(
+     }
+ }
+ 
+-static void
++/* static void
+     checkPWMSensor(const fs::path& sensorPath, std::string& labelHead,
+                    const std::string& interfacePath,
+                    std::shared_ptr<sdbusplus::asio::connection>& dbusConnection,
+@@ -280,7 +280,7 @@ static void
+             name, pwmPathStr, dbusConnection, objectServer, objPath, "PSU");
+     }
+ }
+-
++ */
+ static void createSensorsCallback(
+     boost::asio::io_service& io, sdbusplus::asio::object_server& objectServer,
+     std::shared_ptr<sdbusplus::asio::connection>& dbusConnection,
+@@ -601,8 +601,8 @@ static void createSensorsCallback(
+                           << "\" label=\"" << labelHead << "\"\n";
+             }
+ 
+-            checkPWMSensor(sensorPath, labelHead, *interfacePath,
+-                           dbusConnection, objectServer, psuNames[0]);
++            // checkPWMSensor(sensorPath, labelHead, *interfacePath,
++            //                dbusConnection, objectServer, psuNames[0]);
+ 
+             if (!findLabels.empty())
+             {
+-- 
+2.25.1
+

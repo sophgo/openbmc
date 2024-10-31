@@ -61,6 +61,7 @@ RDEPENDS:${PN}-inband = " \
     phosphor-ipmi-ssif \
     phosphor-ipmi-bt \
     phosphor-ipmi-kcs \
+    phosphor-ipmi-blobs \
     "
 
 SUMMARY:${PN}-apps = "Open Source Applications for OpenBMC Image"
