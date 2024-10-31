@@ -135,7 +135,7 @@ do
 
 	flashcp -v $f /dev/$m
 
-	if[$? -eq 0];then
+	if [ $? -eq 0 ]; then
 		echo "Successfully updated ${f##*/}."
 	else
 		echo "Failed updated ${f##*/}, exit."
