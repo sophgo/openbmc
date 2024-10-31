@@ -15,6 +15,9 @@ IMAGE_INSTALL:append = " \
         kernel-module-jtag-aspeed-internal \
         kernel-module-bonding \
         sophgo-phytool \
+        phosphor-snmp \
+        net-snmp \
+        smbios-mdr \
         "
 
 IMAGE_INSTALL:append = " \

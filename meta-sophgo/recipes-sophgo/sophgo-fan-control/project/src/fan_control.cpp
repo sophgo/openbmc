@@ -107,7 +107,7 @@ double g_outputRpmPre = 0;
 double g_outputRpmCru = 0;
 std::string g_fanControlMode = "auto";
 double g_aicard_temp = -1;
-
+unsigned int g_max_pwm = 255;
 static constexpr auto platform = "/sys/devices/platform/";
 namespace fs = std::filesystem;
 
@@ -850,18 +850,19 @@ int writePwm(std::string writePath, double value)
     return res;
 }
 
+// value : PWM duty cycle,x%
 int writeAllFansPwm(double value)
 {
     for (const auto& [name, config] : g_fanDataMap) {
-        writePwm(config.writePath, value);
+        double pwm = percentageToActual(value, config.max);
+        writePwm(config.writePath, pwm);
     }
     return 0;
 }
 
 int writeDefaultPwm(void)
 {
-    double pwm = percentageToActual(g_def_fan_speed, PWM_MAX);
-    writeAllFansPwm(pwm);
+    writeAllFansPwm(g_def_fan_speed);
     return 0;
 }
 
@@ -894,7 +895,8 @@ void cycle_auto_fan_control (const boost::system::error_code& ec)
                 g_outputRpmCru = g_outputRpmPre;
             }
         }
-        writeAllFansPwm(percentageToActual(g_outputRpmCru, PWM_MAX));
+        // writeAllFansPwm(percentageToActual(g_outputRpmCru, PWM_MAX));
+        writeAllFansPwm(g_outputRpmCru);
         g_outputRpmPre = g_outputRpmCru;
     } else {
         std::cout << "3s test" << std::endl;
@@ -1010,11 +1012,11 @@ int setFanControlMode(std::string mode)
                 auto s2 = controlParamMap.find(s1->second);
                 if (s2 != controlParamMap.end()) {
                     std::cout << "s2= " << s2->second << std::endl;
-                    double pwm = percentageToActual(s2->second, PWM_MAX);
+                    // double pwm = percentageToActual(s2->second, PWM_MAX);
                     g_fanControlMode = mode;
-                    std::cout << "control mode = " << g_fanControlMode << "; pwm = " << pwm << std::endl;
+                    std::cout << "control mode = " << g_fanControlMode << "; pwm% = " << s2->second << std::endl;
                     cancel_auto_timer();
-                    writeAllFansPwm(pwm);
+                    writeAllFansPwm(s2->second);
                 } else {
                     return -1;
                 }

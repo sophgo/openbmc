@@ -1,0 +1,97 @@
+From 3ff6b43e5adc98e30f6f31e24f1913b46ce88858 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Thu, 31 Oct 2024 11:43:43 +0800
+Subject: [PATCH 1/1] chassis : add 0x3052 and 0x3053 cmd.
+
+---
+ chassishandler.cpp | 67 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index c2ed807..afed60d 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -1993,6 +1993,62 @@ ipmi::RspType<ipmi::message::Payload>
+     return ipmi::responseUnspecifiedError();
+ }
+ 
++
++
++ipmi::RspType<ipmi::message::Payload>
++    ipmiChassisGetSysBootsource(ipmi::Context::ptr ctx)
++{
++    ipmi::Cc rc;
++    ipmi::message::Payload response;
++    using namespace boot_options;
++
++    IpmiValue bootOption = ipmiDefault;
++
++    Source::Sources bootSource;
++    rc = getBootSource(ctx, bootSource);
++    if (rc != ipmi::ccSuccess)
++    {
++        return ipmi::response(rc);
++    }
++    bootOption = sourceDbusToIpmi.at(bootSource);
++    response.pack(uint8_t{bootOption}, uint8_t{}, uint8_t{}, uint8_t{}, uint8_t{}, uint8_t{});
++    return ipmi::responseSuccess(std::move(response));
++}
++
++
++ipmi::RspType<> ipmiChassisSetSysBootSource(ipmi::Context::ptr ctx, ipmi::message::Payload& data)
++{
++    using namespace boot_options;
++    ipmi::Cc rc;
++    uint8_t bootSource;
++    uint8_t data1;
++    uint8_t data2;
++    uint8_t data3;
++    uint8_t data4;
++    uint8_t data5;
++
++    std::cout << "set boot source "<< std::endl;
++
++    if (data.unpack(bootSource, data1, data2, data3,data4, data5) != 0 ||
++            !data.fullyUnpacked())
++    {
++        return ipmi::responseReqDataLenInvalid();
++    }
++
++    std::cout << "source : "
++              << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bootSource)
++              << std::endl;
++    auto sourceItr = sourceIpmiToDbus.find(bootSource);
++
++    rc = setBootSource(ctx, sourceItr->second);
++    if (rc != ipmi::ccSuccess)
++    {
++        return ipmi::response(rc);
++    }
++
++    return ipmi::responseSuccess();
++}
++
+ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+                                              uint7_t parameterSelector, bool,
+                                              ipmi::message::Payload& data)
+@@ -2370,6 +2426,17 @@ void register_netfn_chassis_functions()
+                           ipmi::Privilege::Operator,
+                           ipmiChassisGetSysBootOptions);
+ 
++    // <Get System Boot source>
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, 0x30,
++                          0x53,
++                          ipmi::Privilege::Operator,
++                          ipmiChassisGetSysBootsource);
++
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, 0x30,
++                          0x52,
++                          ipmi::Privilege::Operator,
++                          ipmiChassisSetSysBootSource);
++
+     // <Get Chassis Status>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnChassis,
+                           ipmi::chassis::cmdGetChassisStatus,
+-- 
+2.25.1
+
