@@ -229,10 +229,9 @@
         "Polarity" : "ActiveHigh"
     }
 ],
-  "timing_configs":{
-      "PowerPulseMs": 200,
-      "ForceOffPulseMs": 15000,
-      "ResetPulseMs": 500,
-      "LedSwitchOullMs": 300
+  "param_configs":{
+      "LedSwitchPullMs": 300,
+      "HostWdtTimeS":300,
+      "isWDTEnabled":true
     }
 }

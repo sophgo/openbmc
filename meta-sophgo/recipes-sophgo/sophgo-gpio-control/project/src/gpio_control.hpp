@@ -32,6 +32,15 @@ using dbusPropertiesList =
 
 
 
+
+
+
+void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn);
+static int loadConfigValues();
+void forcePowerRestart(const boost::system::error_code& ec);
+void set_wdt_timer(int sec);
+
+
 namespace dbus
 {
 

@@ -21,7 +21,12 @@ function echoerr() {
 	echo 1>&2 "ERROR: $@"
 }
 
-
+function disable_wdt() {
+	busctl set-property xyz.openbmc_project.Gpio /xyz/openbmc_project/gpio/wdtEnable xyz.openbmc_project.Gpio.wdtEnable wdtEnableState b false
+}
+function enable_wdt() {
+	busctl set-property xyz.openbmc_project.Gpio /xyz/openbmc_project/gpio/wdtEnable xyz.openbmc_project.Gpio.wdtEnable wdtEnableState b true
+}
 
 function flashSwitchToBmc() {
     gpioset 0 56=0
@@ -41,6 +46,8 @@ function flashSwitchToHost() {
 
 function  abnormal_exit() {
 	# rm -rf $imagePath
+	# open WDT
+	enable_wdt
 	flashSwitchToHost
 	exit 1
 }
@@ -91,6 +98,9 @@ function toobig() {
 }
 
 
+
+# close WDT
+disable_wdt
 
 cp $image $image0
 cp $image $image1
@@ -145,8 +155,11 @@ do
 done
 
 
+
 rm -rf $imagePath
 flashSwitchToHost
+#open WDT
+enable_wdt
 sleep 1
-# set dbus property to reboot host
+#set dbus property to reboot host
 busctl $dbus_set_method $dbus_name $dbus_path $dbus_inf $dbus_set_property $property_type $set_graceful_reboot

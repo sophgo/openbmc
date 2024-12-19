@@ -12,6 +12,7 @@
                 },
                 "Index": 8,
                 "Name": "Fan2_tach",
+                "PowerState": "On",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -24,18 +25,6 @@
                         "Name": "upper non critical",
                         "Severity": 0,
                         "Value": 14000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 3000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower non critical",
-                        "Severity": 0,
-                        "Value": 4000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -51,6 +40,7 @@
                 },
                 "Index": 10,
                 "Name": "Fan4_tach",
+                "PowerState": "On",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -63,18 +53,6 @@
                         "Name": "upper non critical",
                         "Severity": 0,
                         "Value": 14000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 3000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower non critical",
-                        "Severity": 0,
-                        "Value": 4000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -90,6 +68,7 @@
                 },
                 "Index": 12,
                 "Name": "Fan6_tach",
+                "PowerState": "On",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -102,18 +81,6 @@
                         "Name": "upper non critical",
                         "Severity": 0,
                         "Value": 14000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 3000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower non critical",
-                        "Severity": 0,
-                        "Value": 4000
                     }
                 ],
                 "Type": "AspeedFan"
@@ -129,6 +96,7 @@
                 },
                 "Index": 14,
                 "Name": "Fan9_tach",
+                "PowerState": "On",
                 "Thresholds": [
                     {
                         "Direction": "greater than",
@@ -141,18 +109,6 @@
                         "Name": "upper non critical",
                         "Severity": 0,
                         "Value": 14000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower critical",
-                        "Severity": 1,
-                        "Value": 3000
-                    },
-                    {
-                        "Direction": "less than",
-                        "Name": "lower non critical",
-                        "Severity": 0,
-                        "Value": 4000
                     }
                 ],
                 "Type": "AspeedFan"
