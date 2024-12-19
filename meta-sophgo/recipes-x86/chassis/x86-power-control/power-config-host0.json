@@ -68,13 +68,13 @@
         },
         {
             "Name": "SIOS5",
-            "LineName": "SIO_S5",
+            "LineName": "",
             "Type": "GPIO",
             "Polarity": "ActiveLow"
         }
     ],
     "timing_configs": {
-        "PowerPulseMs": 200,
+        "PowerPulseMs": 300,
         "ForceOffPulseMs": 15000,
         "ResetPulseMs": 500,
         "PowerCycleMs": 5000,

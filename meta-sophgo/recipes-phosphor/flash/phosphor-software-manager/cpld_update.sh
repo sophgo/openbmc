@@ -15,7 +15,14 @@ function uninstall_jtag_driver()
   modprobe -r jtag-aspeed-internal
 }
 
-
+function reset_cpld()
+{
+  gpioset 0 31=1
+  sleep 1
+  gpioset 0 31=0
+  usleep 30000
+  gpioset 0 31=1
+}
 
 echo "CPLD update $1"
 
@@ -39,6 +46,8 @@ done
 
 if [[ $output =~ Success! ]]; then
   echo "CPLD update successed!"
+  # reset cpld
+  reset_cpld
   systemctl restart sophgo-cpld-monitor.service
 else
   echo "CPLD update failed!"

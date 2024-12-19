@@ -10,6 +10,7 @@ SRC_URI += " \
            file://set-fan-rate@.service \
            file://power-control-test.sh \
            file://power-cycle-test.sh \
+           file://func-lib.sh \
            "
 
 
@@ -35,6 +36,8 @@ do_install () {
     install -m 0755 ${WORKDIR}/power-control-test.sh ${D}/${sbindir}
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/power-cycle-test.sh ${D}/${sbindir}
+    install -d ${D}/${sbindir}
+    install -m 0755 ${WORKDIR}/func-lib.sh ${D}/${sbindir}
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/set-fan-rate@.service ${D}${systemd_system_unitdir}

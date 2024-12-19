@@ -22,7 +22,7 @@
                     "temp1",
                     "temp2",
                     "temp3",
-                    "fan1_input"
+                    "fan1"
                 ],
                 "Name": "PSU$ADDRESS % 4 + 1",
                 "Thresholds": [
