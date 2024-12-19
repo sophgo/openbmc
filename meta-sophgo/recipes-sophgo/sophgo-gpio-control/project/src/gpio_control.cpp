@@ -60,9 +60,20 @@ std::shared_ptr<sdbusplus::asio::connection> conn;
 static std::string node = "0";
 static const std::string appName = "sophgo-gpio-control";
 
-std::atomic<int> first_wdt_event_flag(false);
+std::atomic<int> wdt_state(false);
+std::atomic<int> g_isWdtEnabled(true);
+bool isPxeBoot = false;
 
 #define WDT_DELAY 60
+
+namespace power
+{
+const static constexpr char* busname = "xyz.openbmc_project.State.Host";
+const static constexpr char* interface = "xyz.openbmc_project.State.Host";
+const static constexpr char* path = "/xyz/openbmc_project/state/host0";
+const static constexpr char* property = "CurrentHostState";
+} // namespace power
+
 
 namespace power_control
 {
@@ -72,6 +83,15 @@ const static constexpr char* interface = "xyz.openbmc_project.State.Host";
 const static constexpr char* property = "RequestedHostTransition";
 const static constexpr char* forceRestart = "xyz.openbmc_project.State.Host.Transition.ForceWarmReboot";
 } // namespace power_control
+
+
+namespace boot_service
+{
+const static constexpr char* busname = "xyz.openbmc_project.Settings";
+const static constexpr char* path = "/xyz/openbmc_project/control/host0/boot";
+const static constexpr char* interface = "xyz.openbmc_project.Control.Boot.Source";
+const static constexpr char* property = "BootSource";
+} // namespace boot_service
 
 namespace properties
 {
@@ -232,16 +252,16 @@ static std::shared_ptr<sdbusplus::asio::dbus_interface> cpuaFlashIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> cpubFlashIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> phyIrqIface;//作用未知
 static std::shared_ptr<sdbusplus::asio::dbus_interface> identifyLedIface;
+static std::shared_ptr<sdbusplus::asio::dbus_interface> wdtEnableIface;
 
 
 
 
 // LED flashing cycle
-boost::container::flat_map<std::string, int> TimerMap = {
-    {"PowerPulseMs",    200  },
-    {"ForceOffPulseMs", 15000},
-    {"ResetPulseMs",    500  },
-    {"LedSwitchPullMs", 300  }};
+boost::container::flat_map<std::string, int> ParamMap = {
+    {"LedSwitchPullMs", 300    },
+    {"HostWdtTimeS",    300    },
+    {"isWDTEnabled",    true   }};
 
 
 // Timers
@@ -338,6 +358,126 @@ enum class SetCpldPowerState
 };
 
 
+
+/*******************************************************************************
+ * monitor power state
+*/
+bool isPowerOn = false;
+static std::unique_ptr<sdbusplus::bus::match_t> powerMatch = nullptr;
+void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
+{
+    powerMatch = std::make_unique<sdbusplus::bus::match::match>(
+        static_cast<sdbusplus::bus::bus&>(*conn),
+        "type='signal',interface='" + std::string(properties::interface) +
+            "',path='" + std::string(power::path) + "',arg0='" +
+            std::string(power::interface) + "'",
+        [](sdbusplus::message::message& message) {
+            std::string objectName;
+            boost::container::flat_map<std::string, std::variant<std::string>>
+                values;
+            message.read(objectName, values);
+            auto findState = values.find(power::property);
+            if (findState != values.end())
+            {
+                isPowerOn = std::get<std::string>(findState->second).ends_with("Running");
+                if (isPowerOn) {
+                    std::cout << "power: off->on." << "\n";
+                    std::cout.flush();
+                    if ((ParamMap["isWDTEnabled"]) && (g_isWdtEnabled.load()) && (!isPxeBoot)) {
+                        std::cout << "Start wdt." << "\n";
+                        std::cout.flush();
+                        set_wdt_timer(ParamMap["HostWdtTimeS"]);
+                    } else {
+                        std::cout << "Wdt disabled." << "\n";
+                        std::cout.flush();
+                    }
+
+                } else {
+                    std::cout << "power: on->off." << "\n";
+                    std::cout.flush();
+                }
+            }
+        });
+    conn->async_method_call(
+        [](boost::system::error_code ec,
+           const std::variant<std::string>& state) {
+            if (ec)
+            {
+                std::cout << "power state get error" << "\n";
+                return;
+            }
+            isPowerOn = std::get<std::string>(state).ends_with("Running");
+            if (isPowerOn) {
+                std::cout << "power on 00  ." << "\n";
+                std::cout.flush();
+            } else {
+                std::cout << "power off 00." << "\n";
+                std::cout.flush();
+            }
+
+        },
+        power::busname, power::path, properties::interface, properties::get,
+        power::interface, power::property);
+
+}
+
+
+
+/*******************************************************************************
+ * monitor boot service
+*/
+static std::unique_ptr<sdbusplus::bus::match_t> bootSourceMatch = nullptr;
+void setupBootSourceMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
+{
+    bootSourceMatch = std::make_unique<sdbusplus::bus::match::match>(
+        static_cast<sdbusplus::bus::bus&>(*conn),
+        "type='signal',interface='" + std::string(properties::interface) +
+            "',path='" + std::string(boot_service::path) + "',arg0='" +
+            std::string(boot_service::interface) + "'",
+        [](sdbusplus::message::message& message) {
+            std::string objectName;
+            boost::container::flat_map<std::string, std::variant<std::string>>
+                values;
+            message.read(objectName, values);
+            auto findState = values.find(boot_service::property);
+            if (findState != values.end())
+            {
+                isPxeBoot = std::get<std::string>(findState->second).ends_with("Network");
+                if (isPxeBoot) {
+                    std::cout << "Pxe boot." << "\n";
+                    std::cout.flush();
+                } else {
+                    std::cout << "Not pxe boot." << "\n";
+                    std::cout.flush();
+                }
+            }
+        });
+    conn->async_method_call(
+        [](boost::system::error_code ec,
+           const std::variant<std::string>& state) {
+            if (ec)
+            {
+                std::cout << "power state get error" << "\n";
+                return;
+            }
+            isPxeBoot = std::get<std::string>(state).ends_with("Network");
+            if (isPxeBoot) {
+                std::cout << "Pxe boot-0." << "\n";
+                std::cout.flush();
+            } else {
+                std::cout << "Not pxe boot-0." << "\n";
+                std::cout.flush();
+            }
+        },
+        boot_service::busname, boot_service::path, properties::interface, properties::get,
+        boot_service::interface, boot_service::property);
+
+}
+
+
+
+
+
 static bool setGPIOOutput(const std::string& name, const int value,
                           gpiod::line& gpioLine)
 {
@@ -420,7 +560,7 @@ static int loadConfigValues()
         return -1;
     }
     auto gpios    = jsonData["gpio_configs"];
-    auto timers   = jsonData["timing_configs"];
+    auto params   = jsonData["param_configs"];
 
     ConfigData* tempGpioData;
 
@@ -535,11 +675,11 @@ static int loadConfigValues()
     }
 
      // read and store the timer values from json config to Timer Map
-    for (auto& [key, timerValue] : TimerMap)
+    for (auto& [key, paramValue] : ParamMap)
     {
-        if (timers.contains(key.c_str()))
+        if (params.contains(key.c_str()))
         {
-            timerValue = timers[key.c_str()];
+            paramValue = params[key.c_str()];
         }
     }
 
@@ -605,10 +745,10 @@ void forcePowerRestart(const boost::system::error_code& ec)
 {
 
     if (ec == boost::asio::error::operation_aborted) {
-        std::cout << "Wdt timer is canceled!" << std::endl;
+        std::cout << "Host access to OS, Wdt timer is canceled!" << std::endl;
         return;
     }
-
+    std::cout << "Host can not access to OS, Force reset!" << std::endl;
     conn->async_method_call(
         [](const boost::system::error_code ec) {
             if (ec)
@@ -617,7 +757,6 @@ void forcePowerRestart(const boost::system::error_code& ec)
                 return;
             }
             std::cout << "Force power off" << std::endl;
-            first_wdt_event_flag.store(false);
         },
         power_control::busname,
         power_control::path,
@@ -632,24 +771,27 @@ void forcePowerRestart(const boost::system::error_code& ec)
 
 void set_wdt_timer(int sec)
 {
+    std::cout << "Start Wdt timer." << std::endl;
     hostWdtTimer.expires_from_now( boost::posix_time::seconds(sec));
     hostWdtTimer.async_wait(forcePowerRestart);
+    wdt_state.store(true);
 }
 
 int cancel_auto_timer(void)
 {
     boost::system::error_code ec;
-    hostWdtTimer.cancel(ec);
-    // 检查是否发生错误
-    if (ec) {
-        // 处理错误
-        std::cerr << "Error on canceling the timer: " << ec.message() << std::endl;
-        return -1;
-    } else {
-        // 定时器取消成功
-        std::cout << "Wdt timer cancelled successfully." << std::endl;
-        return 0;
+    if ( wdt_state.load() )
+    {
+        hostWdtTimer.cancel(ec);
+        if (ec) {
+            std::cerr << "Error on canceling the timer: " << ec.message() << std::endl;
+            return -1;
+        } else {
+            std::cout << "Wdt timer cancelled." << std::endl;
+            return 0;
+        }
     }
+
 }
 
 
@@ -787,22 +929,13 @@ static void identifyLedStateHandler(bool state)
 
 static void hostWdtHandler(bool state)
 {
-#if 0
     if (state) {
-        if (first_wdt_event_flag.load()) {
-            //update timer
-            set_wdt_timer(WDT_DELAY);
-            std::cout << "Wdt signal" << std::endl;
-        } else {
-            first_wdt_event_flag.store(true);
-            //enable timer
-            set_wdt_timer(WDT_DELAY);
-            std::cout << "First wdt signal" << std::endl;
-        }
+        std::cout << "Wdt signal rising_edge!" << std::endl;
+    } else {
+        std::cout << "Wdt signal falling_edge!" << std::endl;
+        cancel_auto_timer();
     }
-#else
-    std::cout << "Wdt signal" << std::endl;
-#endif
+
 }
 
 enum class SolUartPort
@@ -877,7 +1010,7 @@ static int setGPIOOutputForMs(const ConfigData& config, const int value,
 
 static void switchIdentifyLed()
 {
-    setGPIOOutputForMs(identifyLedSetConfig, IdentifyLedSet::ON, TimerMap["LedSwitchPullMs"], identifyLedSetLine);
+    setGPIOOutputForMs(identifyLedSetConfig, IdentifyLedSet::ON, ParamMap["LedSwitchPullMs"], identifyLedSetLine);
 }
 
 #ifdef FLASH_CONTROL_VIA_DBUS
@@ -956,6 +1089,7 @@ int main(int argc, char* argv[])
     cpubFlashIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/cpubflash", "xyz.openbmc_project.Gpio.CpuB");
 #endif
     identifyLedIface = objectServer.add_interface("/xyz/openbmc_project/gpio/identifyLed", "xyz.openbmc_project.Gpio.identifyLed");
+    wdtEnableIface = objectServer.add_interface("/xyz/openbmc_project/gpio/wdtEnable", "xyz.openbmc_project.Gpio.wdtEnable");
 
     // Request GPIO events 初始化过程中先获取一次在位状态
     if (!requestGPIOEvents(sata1ExistConfig.lineName, sata1ExistHandler,
@@ -1186,7 +1320,18 @@ int main(int argc, char* argv[])
             return 1;
         });
 
-
+    wdtEnableIface->register_property("wdtEnableState",
+        bool(1),
+        [](const bool requested, bool& resp) {
+            if (!requested) {
+                cancel_auto_timer();
+                g_isWdtEnabled.store(false);
+            } else {
+                g_isWdtEnabled.store(true);
+            }
+            resp = requested;
+            return 1;
+        });
 
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->register_property(
@@ -1229,10 +1374,14 @@ int main(int argc, char* argv[])
     PSUPowerOnIface->initialize();
     solUartIface->initialize();
     identifyLedIface->initialize();
+    wdtEnableIface->initialize();
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->initialize();
     cpubFlashIface->initialize();
 #endif
+
+    setupPowerMatch(conn);
+    setupBootSourceMatch(conn);
 
     io.run();
 

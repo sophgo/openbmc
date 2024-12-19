@@ -13,6 +13,7 @@ SRC_URI += "file://0028-MCTP-Daemon-D-Bus-interface-definition.patch \
 
 
 do_create_Updating_dir() {
+    echo "---${WORKDIR}---${S}---${THISDIR}---${FILE}---${THISDIR}/${PN}---${CURRENT_FILE_DIR}---"
     install -d ${S}/gen/xyz/openbmc_project/Software/Updating
     cp ${WORKDIR}/Updating/meson.build ${S}/gen/xyz/openbmc_project/Software/Updating/
 }
