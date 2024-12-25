@@ -21,11 +21,76 @@ function echoerr() {
 	echo 1>&2 "ERROR: $@"
 }
 
+function is_powerOn()
+{
+    local l_output=$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState)
+    if [[ $l_output == *"xyz.openbmc_project.State.Host.HostState.Running"* ]]; then
+        echo "1"
+    else
+        echo "0"
+    fi
+}
+
+function is_fw_version_getting()
+{
+	local result=$(busctl get-property xyz.openbmc_project.Gpio /xyz/openbmc_project/gpio/fwVersion xyz.openbmc_project.Gpio.fwVersion versionGetingState)
+	local value=$(echo "$result" | awk '{print $2}')
+	if [[ "$value" == "true" ]]; then
+		echo "1"
+	else
+		echo "0"
+	fi
+}
+
+function setPowerOn()
+{
+    busctl set-property                             \
+        xyz.openbmc_project.State.Host              \
+	/xyz/openbmc_project/state/host0            \
+	xyz.openbmc_project.State.Host              \
+	RequestedHostTransition                     \
+	s                                           \
+	xyz.openbmc_project.State.Host.Transition.On
+}
+
 function disable_wdt() {
-	busctl set-property xyz.openbmc_project.Gpio /xyz/openbmc_project/gpio/wdtEnable xyz.openbmc_project.Gpio.wdtEnable wdtEnableState b false
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/wdtEnable \
+	xyz.openbmc_project.Gpio.wdtEnable \
+	wdtEnableState \
+	b \
+	false
 }
 function enable_wdt() {
-	busctl set-property xyz.openbmc_project.Gpio /xyz/openbmc_project/gpio/wdtEnable xyz.openbmc_project.Gpio.wdtEnable wdtEnableState b true
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/wdtEnable \
+	xyz.openbmc_project.Gpio.wdtEnable \
+	wdtEnableState \
+	b \
+	true
+}
+
+function disable_version_get()
+{
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionEnableState \
+	b \
+	false
+}
+function enable_version_get()
+{
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionEnableState \
+	b \
+	true
 }
 
 function flashSwitchToBmc() {
@@ -48,6 +113,7 @@ function  abnormal_exit() {
 	# rm -rf $imagePath
 	# open WDT
 	enable_wdt
+	enable_version_get
 	flashSwitchToHost
 	exit 1
 }
@@ -99,8 +165,20 @@ function toobig() {
 
 
 
+# Make sure the system is powered on
+while [ $(is_powerOn) = 0 ]; do
+	setPowerOn
+	sleep 10
+done
+
+# Avoid version acquisition
+while [ $(is_fw_version_getting) = 1 ]; do
+	sleep 5
+done
+
 # close WDT
 disable_wdt
+disable_version_get
 
 cp $image $image0
 cp $image $image1
@@ -160,6 +238,7 @@ rm -rf $imagePath
 flashSwitchToHost
 #open WDT
 enable_wdt
+enable_version_get
 sleep 1
 #set dbus property to reboot host
 busctl $dbus_set_method $dbus_name $dbus_path $dbus_inf $dbus_set_property $property_type $set_graceful_reboot

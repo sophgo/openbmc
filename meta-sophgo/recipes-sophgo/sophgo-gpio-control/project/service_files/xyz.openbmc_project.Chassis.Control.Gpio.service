@@ -1,7 +1,8 @@
 [Unit]
 Description=Sophgo Gpio Control
 ConditionPathExists=/usr/share/sophgo-gpio-control/gpio-config.json
-Before=xyz.openbmc_project.Chassis.Control.Power@.service
+# Before=xyz.openbmc_project.Chassis.Control.Power@.service
+After=xyz.openbmc_project.Chassis.Control.Power@.service
 
 [Service]
 Restart=always
