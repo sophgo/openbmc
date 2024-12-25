@@ -14,6 +14,16 @@
 #include <filesystem>
 #include <string_view>
 
+#include <sdbusplus/bus.hpp>
+
+
+#include <sdbusplus/message.hpp>
+#include <sdbusplus/asio/connection.hpp>
+#include <variant>
+#include <map>
+#include <vector>
+#include <string>
+
 namespace gpio_control
 {
 
@@ -30,16 +40,45 @@ using dbusPropertiesList =
                                std::variant<std::string, uint64_t>>;
 
 
+namespace MatchRules = sdbusplus::bus::match::rules;
 
 
+enum class CpuFlashPort
+{
+    FLASH_TO_HOST,
+    FLASH_TO_BMC,
+};
+enum class SolUartPort
+{
+    CPU0_UART0,
+    CPU0_UART1,
+    CPU1_UART0,
+    CPU1_UART1,
+};
 
+enum class wdtTimerCancelFlag
+{
+    INTOOS,
+    DBUS,
+    PXEBOOT,
+};
 
 
 void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn);
 static int loadConfigValues();
 void forcePowerRestart(const boost::system::error_code& ec);
 void set_wdt_timer(int sec);
+static void handleGetVersion(const boost::system::error_code& ec);
+int readMtdContent(const std::string &mtdDevice, char *buffer, ssize_t &bytesRead);
+int findMtdDevice(const std::string &label, std::string &mtdDevice);
+static void transitionCpuAFlashPort(CpuFlashPort port);
+static void transitionCpuBFlashPort(CpuFlashPort port);
 
+void set_wdt_timer(int sec);
+int cancel_wdt_timer(int flag);
+
+void set_version_timer(int sec);
+int cancel_version_timer(int flag);
 
 namespace dbus
 {

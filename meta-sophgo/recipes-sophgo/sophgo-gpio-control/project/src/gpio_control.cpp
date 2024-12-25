@@ -46,6 +46,9 @@
 
 #include <thread>
 
+
+
+
 extern "C"
 {
 #include <i2c/smbus.h>
@@ -60,11 +63,14 @@ std::shared_ptr<sdbusplus::asio::connection> conn;
 static std::string node = "0";
 static const std::string appName = "sophgo-gpio-control";
 
-std::atomic<int> wdt_state(false);
-std::atomic<int> g_isWdtEnabled(true);
+std::atomic<bool> wdt_state(false);
+std::atomic<bool> version_timer_state(false);
+std::atomic<bool> version_enable_flag(true);
+std::atomic<bool> g_isWdtEnabled(true);
 bool isPxeBoot = false;
 
 #define WDT_DELAY 60
+#define VERSION_BUFFER_SIZE 20
 
 namespace power
 {
@@ -92,6 +98,15 @@ const static constexpr char* path = "/xyz/openbmc_project/control/host0/boot";
 const static constexpr char* interface = "xyz.openbmc_project.Control.Boot.Source";
 const static constexpr char* property = "BootSource";
 } // namespace boot_service
+
+namespace bios_software
+{
+const static constexpr char* busname = "xyz.openbmc_project.Software.BMC.Updater";
+const static constexpr char* path = "/xyz/openbmc_project/software/bios_active";
+const static constexpr char* interface = "xyz.openbmc_project.Software.Version";
+const static constexpr char* property = "Version";
+} // namespace bios_software
+
 
 namespace properties
 {
@@ -253,20 +268,30 @@ static std::shared_ptr<sdbusplus::asio::dbus_interface> cpubFlashIface;//输出
 static std::shared_ptr<sdbusplus::asio::dbus_interface> phyIrqIface;//作用未知
 static std::shared_ptr<sdbusplus::asio::dbus_interface> identifyLedIface;
 static std::shared_ptr<sdbusplus::asio::dbus_interface> wdtEnableIface;
+static std::shared_ptr<sdbusplus::asio::dbus_interface> versionEnableIface;
 
 
 
 
-// LED flashing cycle
 boost::container::flat_map<std::string, int> ParamMap = {
-    {"LedSwitchPullMs", 300    },
-    {"HostWdtTimeS",    300    },
-    {"isWDTEnabled",    true   }};
+    {"LedSwitchPullMs",   300    },
+    {"HostWdtTimeS",      300    },
+    {"isWDTEnabled",      true   },
+    {"readVersionDelayS", 120    }};
 
 
+boost::container::flat_map<int, std::string> wdtTimerFlagMap = {
+    {0,      "INTO_OS"        },
+    {1,      "DBUS_INFO"      },
+    {2,      "POWER_OFF"      }};
+
+boost::container::flat_map<int, std::string> versionTimerFlagMap = {
+    {0,      "BIOS_UPDATE"    },
+    {1,      "POWER_OFF"      }};
 // Timers
 // Time holding GPIOs asserted
 static boost::asio::steady_timer gpioAssertTimer(io);
+static boost::asio::deadline_timer readVersionTimer(io);
 static boost::asio::deadline_timer hostWdtTimer(io);
 
 
@@ -383,18 +408,19 @@ void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
                 if (isPowerOn) {
                     std::cout << "power: off->on." << "\n";
                     std::cout.flush();
+                    // wdt
                     if ((ParamMap["isWDTEnabled"]) && (g_isWdtEnabled.load()) && (!isPxeBoot)) {
-                        std::cout << "Start wdt." << "\n";
-                        std::cout.flush();
                         set_wdt_timer(ParamMap["HostWdtTimeS"]);
-                    } else {
-                        std::cout << "Wdt disabled." << "\n";
-                        std::cout.flush();
                     }
+                    // read bios version
+                    if (version_enable_flag.load())
+                        set_version_timer(ParamMap["readVersionDelayS"]);
 
                 } else {
                     std::cout << "power: on->off." << "\n";
                     std::cout.flush();
+                    cancel_version_timer(1);
+                    cancel_wdt_timer(2);
                 }
             }
         });
@@ -472,6 +498,26 @@ void setupBootSourceMatch(const std::shared_ptr<sdbusplus::asio::connection>& co
         boot_service::busname, boot_service::path, properties::interface, properties::get,
         boot_service::interface, boot_service::property);
 
+}
+
+
+
+static std::unique_ptr<sdbusplus::bus::match_t> swUpdateMatch = nullptr;
+void softwareUpdateMatch(const std::shared_ptr<sdbusplus::asio::connection>& conn)
+{
+    swUpdateMatch = std::make_unique<sdbusplus::bus::match::match>(
+        static_cast<sdbusplus::bus::bus&>(*conn),
+        MatchRules::interfacesAdded() + MatchRules::path("/xyz/openbmc_project/software"),
+        [](sdbusplus::message::message& message) {
+            std::string interfaceName;
+            std::string objectPath;
+            message.read(objectPath, interfaceName);
+
+            if (interfaceName == "xyz.openbmc_project.Software.Version") {
+                std::cout << "Interface 'xyz.openbmc_project.Software.Version' added at path: " << objectPath << std::endl;
+            }
+        }
+    );
 }
 
 
@@ -745,7 +791,6 @@ void forcePowerRestart(const boost::system::error_code& ec)
 {
 
     if (ec == boost::asio::error::operation_aborted) {
-        std::cout << "Host access to OS, Wdt timer is canceled!" << std::endl;
         return;
     }
     std::cout << "Host can not access to OS, Force reset!" << std::endl;
@@ -771,27 +816,54 @@ void forcePowerRestart(const boost::system::error_code& ec)
 
 void set_wdt_timer(int sec)
 {
-    std::cout << "Start Wdt timer." << std::endl;
+    std::cout << "Start Wdt timer " << sec << std::endl;
     hostWdtTimer.expires_from_now( boost::posix_time::seconds(sec));
     hostWdtTimer.async_wait(forcePowerRestart);
     wdt_state.store(true);
 }
-
-int cancel_auto_timer(void)
+void set_version_timer(int sec)
+{
+    std::cout << "Start Version timer " << sec << std::endl;
+    readVersionTimer.expires_from_now( boost::posix_time::seconds(sec));
+    readVersionTimer.async_wait(handleGetVersion);
+    version_timer_state.store(true);
+}
+int cancel_wdt_timer(int flag)
 {
     boost::system::error_code ec;
-    if ( wdt_state.load() )
+    // std::cout << "wdt_state : " << wdt_state.load() << wdtTimerFlagMap[flag] <<std::endl;
+    if ( !wdt_state.load() )
     {
-        hostWdtTimer.cancel(ec);
-        if (ec) {
-            std::cerr << "Error on canceling the timer: " << ec.message() << std::endl;
-            return -1;
-        } else {
-            std::cout << "Wdt timer cancelled." << std::endl;
-            return 0;
-        }
+        return 0;
     }
+    wdt_state.store(false);
+    hostWdtTimer.cancel(ec);
+    if (ec) {
+        std::cerr << "Error on canceling the timer: " << ec.message() << std::endl;
+        return -1;
+    } else {
+        std::cout << "Wdt timer cancelled for : " << wdtTimerFlagMap[flag] <<std::endl;
+        return 0;
+    }
+}
 
+int cancel_version_timer(int flag)
+{
+    boost::system::error_code ec;
+    // std::cout << "version_timer_state : " << version_timer_state.load() << versionTimerFlagMap[flag] <<std::endl;
+    if ( !version_timer_state.load() )
+    {
+        return 0;
+    }
+    version_timer_state.store(false);
+    readVersionTimer.cancel(ec);
+    if (ec) {
+            std::cerr << "Error on canceling the version timer: " << ec.message() << std::endl;
+            return 0;
+    } else {
+        std::cout << "Version timer cancelled for : " << versionTimerFlagMap[flag] <<std::endl;
+        return 1;
+    }
 }
 
 
@@ -933,18 +1005,17 @@ static void hostWdtHandler(bool state)
         std::cout << "Wdt signal rising_edge!" << std::endl;
     } else {
         std::cout << "Wdt signal falling_edge!" << std::endl;
-        cancel_auto_timer();
+        cancel_wdt_timer(0);
     }
 
 }
 
-enum class SolUartPort
+
+static void versionGetHandler(bool state)
 {
-    CPU0_UART0,
-    CPU0_UART1,
-    CPU1_UART0,
-    CPU1_UART1,
-};
+    versionEnableIface->set_property("versionGetingState", state);
+}
+
 
 static void transitionSolUarttPort(SolUartPort port)
 {
@@ -972,11 +1043,7 @@ static void transitionSolUarttPort(SolUartPort port)
 }
 
 
-enum class CpuFlashPort
-{
-    FLASH_TO_HOST,
-    FLASH_TO_BMC,
-};
+
 
 static int setGPIOOutputForMs(const ConfigData& config, const int value,
                               const int durationMs,gpiod::line gpioLine)
@@ -1013,7 +1080,7 @@ static void switchIdentifyLed()
     setGPIOOutputForMs(identifyLedSetConfig, IdentifyLedSet::ON, ParamMap["LedSwitchPullMs"], identifyLedSetLine);
 }
 
-#ifdef FLASH_CONTROL_VIA_DBUS
+
 static void transitionCpuAFlashPort(CpuFlashPort port)
 {
     switch (port)
@@ -1046,11 +1113,137 @@ static void transitionCpuBFlashPort(CpuFlashPort port)
             break;
     }
 }
-#endif
+
+
+int findMtdDevice(const std::string &label, std::string &mtdDevice)
+{
+    std::ifstream mtdFile("/proc/mtd");
+    if (!mtdFile.is_open())
+    {
+        perror("ifstream");
+        return -1;
+    }
+
+    std::string line;
+    while (std::getline(mtdFile, line))
+    {
+        if (line.find(label) != std::string::npos)
+        {
+            char mtdName[VERSION_BUFFER_SIZE];
+            sscanf(line.c_str(), "%[^:]", mtdName);
+            mtdDevice = "/dev/";
+            mtdDevice += mtdName;
+            mtdFile.close();
+            return 0;
+        }
+    }
+
+    mtdFile.close();
+    return -1;
+}
+
+int readMtdContent(const std::string &mtdDevice, char *buffer, ssize_t &bytesRead)
+{
+    int fd = open(mtdDevice.c_str(), O_RDONLY);
+    if (fd < 0)
+    {
+        perror("open");
+        return -1;
+    }
+
+    lseek(fd, 0x0, SEEK_SET);
+    bytesRead = read(fd, buffer, VERSION_BUFFER_SIZE-1);
+    if (bytesRead < 0)
+    {
+        perror("read");
+        close(fd);
+        return -1;
+    }
+
+    close(fd);
+    return 0;
+}
+
+static void handleGetVersion(const boost::system::error_code& ec)
+{
+    if (ec == boost::asio::error::operation_aborted)
+        return;
+    if (!version_enable_flag.load())
+        return;
+    std::string label = "image-host1";
+    std::string mtdDevice;
+    char buffer[VERSION_BUFFER_SIZE];
+    int bytesRead = 0;
+    int i = 0;
+
+    versionGetHandler(true);
+    transitionCpuBFlashPort(gpio_control::CpuFlashPort::FLASH_TO_BMC);
+    sleep(1);
+    std::cout << "set the flash to bmc" <<std::endl;
+
+    std::string spi_path ="1e630000.spi";
+
+    std::string unbind_path="/sys/bus/platform/drivers/ASPEED_FMC_SPI/unbind";
+    std::ofstream unbind(unbind_path);
+    unbind << spi_path << std::endl;
+    unbind.close();
+
+    std::string bind_path="/sys/bus/platform/drivers/ASPEED_FMC_SPI/bind";
+    std::ofstream bind(bind_path);
+    bind << spi_path << std::endl;
+    bind.close();
+
+
+    if (!findMtdDevice(label, mtdDevice)) {
+        std::cout << "MTD device for label '" << label << "' is: " << mtdDevice << std::endl;
+        if (!readMtdContent(mtdDevice, buffer, bytesRead)) {
+            std::vector<std::string> hexValues;
+            std::ostringstream asciiString;
+            for(i = 0; i < bytesRead; i++)
+            {
+                char hexStr[4];
+                std::sprintf(hexStr, "%02x", static_cast<unsigned char>(buffer[i]));
+                hexValues.push_back(std::string(hexStr));
+                asciiString << buffer[i];
+            }
+            for (const auto& hex : hexValues)
+            {
+                std::cout << hex << " ";
+            }
+            std::cout << std::endl;
+
+            std::string temp=asciiString.str();
+            std::variant<std::string> valueVariant =std::string(temp);
+            std::cout << "buffer is "<< temp <<" buffer size is "<< bytesRead << std::endl;
+            gpio_control::conn->async_method_call([](const boost::system::error_code& ec){
+                if (ec)
+                {
+                    std::cout << "Failed to set property: " << ec.message() << std::endl;
+                    return;
+                }
+            },
+            bios_software::busname,
+            bios_software::path,
+            "org.freedesktop.DBus.Properties",
+            "Set",
+            bios_software::interface,
+            bios_software::property,
+            valueVariant);
+
+        } else {
+            std::cout << "Error: Could not read Mtd device content" << std::endl;
+        }
+    } else {
+        std::cout << "Error: Could not find MTD device for label " << label << std::endl;
+    }
+    transitionCpuAFlashPort(gpio_control::CpuFlashPort::FLASH_TO_HOST);
+    versionGetHandler(false);
+    return;
+}
+
+
 
 } // namespace gpio_control
-
-
 
 
 
@@ -1072,6 +1265,9 @@ int main(int argc, char* argv[])
         lg2::error(" MIssing gpio line name ...");
         return -1;
     }
+    version_timer_state.store(false);
+    wdt_state.store(false);
+
 
     // Request the dbus names
     conn = std::make_shared<sdbusplus::asio::connection>(io);
@@ -1088,8 +1284,9 @@ int main(int argc, char* argv[])
     cpuaFlashIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/cpuaflash", "xyz.openbmc_project.Gpio.CpuA");
     cpubFlashIface  = objectServer.add_interface("/xyz/openbmc_project/gpio/cpubflash", "xyz.openbmc_project.Gpio.CpuB");
 #endif
-    identifyLedIface = objectServer.add_interface("/xyz/openbmc_project/gpio/identifyLed", "xyz.openbmc_project.Gpio.identifyLed");
-    wdtEnableIface = objectServer.add_interface("/xyz/openbmc_project/gpio/wdtEnable", "xyz.openbmc_project.Gpio.wdtEnable");
+    identifyLedIface   = objectServer.add_interface("/xyz/openbmc_project/gpio/identifyLed", "xyz.openbmc_project.Gpio.identifyLed");
+    wdtEnableIface     = objectServer.add_interface("/xyz/openbmc_project/gpio/wdtEnable", "xyz.openbmc_project.Gpio.wdtEnable");
+    versionEnableIface = objectServer.add_interface("/xyz/openbmc_project/gpio/fwVersion", "xyz.openbmc_project.Gpio.fwVersion");
 
     // Request GPIO events 初始化过程中先获取一次在位状态
     if (!requestGPIOEvents(sata1ExistConfig.lineName, sata1ExistHandler,
@@ -1324,7 +1521,7 @@ int main(int argc, char* argv[])
         bool(1),
         [](const bool requested, bool& resp) {
             if (!requested) {
-                cancel_auto_timer();
+                cancel_wdt_timer(1);
                 g_isWdtEnabled.store(false);
             } else {
                 g_isWdtEnabled.store(true);
@@ -1332,6 +1529,20 @@ int main(int argc, char* argv[])
             resp = requested;
             return 1;
         });
+    versionEnableIface->register_property("versionEnableState",
+        bool(1),
+        [](const bool requested, bool& resp) {
+            if (!requested) {
+                cancel_version_timer(0);
+                version_enable_flag.store(false);
+            } else {
+                version_enable_flag.store(true);
+            }
+            resp = requested;
+            return 1;
+        });
+
+    versionEnableIface->register_property("versionGetingState",false);
 
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->register_property(
@@ -1375,6 +1586,7 @@ int main(int argc, char* argv[])
     solUartIface->initialize();
     identifyLedIface->initialize();
     wdtEnableIface->initialize();
+    versionEnableIface->initialize();
 #ifdef FLASH_CONTROL_VIA_DBUS
     cpuaFlashIface->initialize();
     cpubFlashIface->initialize();

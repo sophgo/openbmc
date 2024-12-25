@@ -232,6 +232,7 @@
   "param_configs":{
       "LedSwitchPullMs": 300,
       "HostWdtTimeS":300,
-      "isWDTEnabled":true
+      "isWDTEnabled":true,
+      "readVersionDelay":120
     }
 }
