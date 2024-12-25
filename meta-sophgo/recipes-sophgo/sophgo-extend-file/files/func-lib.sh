@@ -1,5 +1,32 @@
 #!/bin/bash
 
+function show_func_desc()
+{
+	echo "resetCpld			-reset cpld"
+	echo "probeJtag			-modprobe jtag driver"
+	echo "biosFlashSwitchToBmc      -switch bios flash spi interface to bmc"
+	echo "biosFlashSwitchToHost     -switch bios flash spi interface to host"
+	echo "biosFlashMtdCreat         -create bios mtd"
+	echo "disable_wdt               -disable wdt function"
+	echo "enable_wdt                -enable wdt function"
+	echo "is_wdtEnabled             -returns the enable status of wdt"
+	echo "is_powerOn                -returns power status"
+	echo "setPowerOn                -power on host"
+	echo "setPowerCycle             -power cycle"
+	echo "setPowerWarmReboot        -power warm reboot"
+	echo "setPowerForceReboot       -power force reboot"
+	echo "setPowerForceOff          -power force off"
+	echo "setPowerWarmOff           -power warm off"
+	echo "showSystemdServices       -Display a list of all systemd services"
+	echo "restartGpioService        -restart gpio control service"
+	echo "restartFanControlService  -restart fan control service"
+	echo "restartEntityService      -restart entity-manager service"
+	echo "getBootSource             -return boot source value"
+	echo "setBootPxeSource          -set pxe boot"
+	echo "setBootHddSource          -set hdd boot"
+	echo "setBootDefaultSource      -set default boot"
+}
+
 # cpld
 function resetCpld()
 {
@@ -180,7 +207,7 @@ function getBootSource()
 	BootSource
 }
 
-function getBootPxeSource()
+function setBootPxeSource()
 {
 	busctl set-property \
 	xyz.openbmc_project.Settings \
@@ -191,7 +218,7 @@ function getBootPxeSource()
 	xyz.openbmc_project.Control.Boot.Source.Sources.Network
 }
 
-function getBootHddSource()
+function setBootHddSource()
 {
 	busctl get-property \
 	xyz.openbmc_project.Settings \
@@ -255,4 +282,49 @@ function showNvmeDbus()
 	local dbus_name="xyz.openbmc_project.NVMeSensor"
 	echo "${dbus_name}:"
 	busctl tree ${dbus_name}
+}
+
+
+function showSophgoFru()
+{
+	cat /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a780.i2c-bus/i2c-14/14-0050/eeprom
+}
+
+function is_fw_version_getting()
+{
+	busctl get-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionGetingState
+}
+
+function is_version_get_enabled()
+{
+	busctl get-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionEnableState
+}
+
+function disable_version_get()
+{
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionEnableState \
+	b \
+	false
+}
+function enable_version_get()
+{
+	busctl set-property \
+	xyz.openbmc_project.Gpio \
+	/xyz/openbmc_project/gpio/fwVersion \
+	xyz.openbmc_project.Gpio.fwVersion \
+	versionEnableState \
+	b \
+	true
 }
