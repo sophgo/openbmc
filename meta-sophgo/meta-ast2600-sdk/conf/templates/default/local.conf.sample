@@ -88,3 +88,4 @@ require conf/machine/include/obmc-bsp-common.inc
 # ARCHIVER_MODE[src] = "original"
 # ARCHIVER_MODE[recipe] = "1"
 # COPYLEFT_LICENSE_INCLUDE = "*"
+CONNECTIVITY_CHECK_URIS = "https://www.example.com/"
