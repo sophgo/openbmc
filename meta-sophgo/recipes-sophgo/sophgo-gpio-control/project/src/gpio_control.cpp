@@ -1236,7 +1236,7 @@ static void handleGetVersion(const boost::system::error_code& ec)
     } else {
         std::cout << "Error: Could not find MTD device for label " << label << std::endl;
     }
-    transitionCpuAFlashPort(gpio_control::CpuFlashPort::FLASH_TO_HOST);
+    transitionCpuBFlashPort(gpio_control::CpuFlashPort::FLASH_TO_HOST);
     versionGetHandler(false);
     return;
 }
