@@ -1,0 +1,67 @@
+From 842472dec464c1463a08071a154c8409ef82356b Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Thu, 15 Aug 2024 11:26:57 +0800
+Subject: [PATCH 1/1] add SOL log export function.
+
+---
+ redfish-core/include/redfish.hpp |  1 +
+ redfish-core/lib/systems.hpp     | 33 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index a7b2af9f..66af1c63 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -170,6 +170,7 @@ class RedfishService
+         requestRoutesSystemActionsReset(app);
+         requestRoutesSystemActionsChangeSolPort(app);
+         requestRoutesSystemResetActionInfo(app);
++        requestRoutesSystemsSol(app);
+         requestRoutesBiosService(app);
+         requestRoutesBiosReset(app);
+ 
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index b4d3018c..2d2e6748 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -3378,4 +3378,37 @@ inline void requestRoutesSystemResetActionInfo(App& app)
+         asyncResp->res.jsonValue["Parameters"] = std::move(parameters);
+         });
+ }
++
++
++void handleSolLogsGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp) {
++    std::string filePath = "/var/log/obmc-console.log"; // 日志文件路径
++    std::ifstream logFile(filePath, std::ios::in | std::ios::binary);
++
++    if (logFile) {
++        std::ostringstream contents;
++        contents << logFile.rdbuf(); // 读取文件内容
++        logFile.close();
++
++        asyncResp->res.addHeader("Content-Type", "text/plain");
++        asyncResp->res.body() = contents.str();
++    } else {
++        // 文件打开失败，返回错误
++        messages::resourceNotFound(asyncResp->res, "Log file", filePath);
++    }
++}
++
++inline void requestRoutesSystemsSol(App& app) {
++    BMCWEB_ROUTE(app, "/sol/logs")
++        .privileges({}) // TODO: Set the correct privileges if needed
++        .methods(boost::beast::http::verb::get)(
++            [&app](const crow::Request& req,
++                   const std::shared_ptr<bmcweb::AsyncResp>& asyncResp) {
++                if (!redfish::setUpRedfishRoute(app, req, asyncResp)) {
++                    BMCWEB_LOG_ERROR << "setUpRedfishRoute error";
++                    return;
++                }
++                handleSolLogsGet(asyncResp);
++            });
++}
++
+ } // namespace redfish
+-- 
+2.25.1
+
