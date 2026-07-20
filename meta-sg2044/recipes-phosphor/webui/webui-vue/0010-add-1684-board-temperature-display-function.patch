@@ -1,0 +1,173 @@
+From 8f7183651143c82f1007a647b228f6c272431f24 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 18:01:00 +0800
+Subject: [PATCH 1/1] add 1684 board temperature display function.
+
+---
+ src/locales/en-US.json                       |  1 +
+ src/store/modules/GlobalStore.js             | 10 +++++
+ src/store/plugins/WebSocketPlugin.js         |  6 ++-
+ src/views/HardwareStatus/Sensors/Sensors.vue | 39 ++++++++++++++++++--
+ 4 files changed, 51 insertions(+), 5 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 47d96b7..6b9455c 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -837,6 +837,7 @@
+     "pageSensors": {
+         "exportFilePrefix": "sensors_",
+         "searchForSensors": "Search for sensors",
++        "1684X_Exist": "1684x",
+         "table": {
+             "currentValue": "Current value",
+             "lowerWarning": "Lower warning",
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 27c0e9d..2c42199 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -35,6 +35,8 @@ const GlobalStore = {
+     serialNumber: null,
+     serverStatus: 'unreachable',
+     cpldVersion: null,
++    sg1684xStatus:null,
++    sg1684xTmp:null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -48,6 +50,8 @@ const GlobalStore = {
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
+     cpldVersion:   (state)  => state.cpldVersion,
++    sg1684xStatus: (state)  => state.sg1684xStatus,
++    sg1684xTmp:    (state)  => state.sg1684xTmp,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -63,6 +67,8 @@ const GlobalStore = {
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
+     setCpldInfo:  (state, cpldInfo)   => (state.cpldVersion   =  cpldInfo),
++    setsg1684xInfo: (state, sg1684xInfo)   => (state.sg1684xStatus   =  sg1684xInfo),
++    setsg1684xTmpInfo: (state, sg1684xTmpInfo)   => (state.sg1684xTmp   =  sg1684xTmpInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -95,6 +101,8 @@ const GlobalStore = {
+               Model,
+               PowerState,
+               CpldInfo,
++              sg1684xInfo,
++              sg1684xTmpInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -103,6 +111,8 @@ const GlobalStore = {
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
+             commit('setCpldInfo',  CpldInfo );
++            commit('setsg1684xInfo', sg1684xInfo);
++            commit('setsg1684xTmpInfo', sg1684xTmpInfo);
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/store/plugins/WebSocketPlugin.js b/src/store/plugins/WebSocketPlugin.js
+index 48281c6..a518e2b 100644
+--- a/src/store/plugins/WebSocketPlugin.js
++++ b/src/store/plugins/WebSocketPlugin.js
+@@ -10,11 +10,12 @@
+ const WebSocketPlugin = (store) => {
+   let ws;
+   const data = {
+-    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging', '/xyz/openbmc_project/gpio/identifyLed'],
++    paths: ['/xyz/openbmc_project/state/host0', '/xyz/openbmc_project/logging', '/xyz/openbmc_project/gpio/identifyLed', '/xyz/openbmc_project/sensors/temperature/AiCard_Temp'],
+     interfaces: [
+       'xyz.openbmc_project.State.Host',
+       'xyz.openbmc_project.Logging.Entry',
+       'xyz.openbmc_project.Gpio.identifyLed',
++      'xyz.openbmc_project.Sensor.Value',
+     ],
+   };
+ 
+@@ -42,7 +43,8 @@ const WebSocketPlugin = (store) => {
+         }
+       } else if (path === '/xyz/openbmc_project/logging') {
+         store.dispatch('eventLog/getEventLogData');
+-      } else if (path === '/xyz/openbmc_project/gpio/identifyLed') {
++      } else if ((path === '/xyz/openbmc_project/gpio/identifyLed') ||
++                 (path === '/xyz/openbmc_project/sensors/temperature/AiCard_Temp')) {
+         store.dispatch('global/getSystemInfo');
+       }
+     };
+diff --git a/src/views/HardwareStatus/Sensors/Sensors.vue b/src/views/HardwareStatus/Sensors/Sensors.vue
+index 6329d9d..b632e94 100644
+--- a/src/views/HardwareStatus/Sensors/Sensors.vue
++++ b/src/views/HardwareStatus/Sensors/Sensors.vue
+@@ -1,7 +1,7 @@
+ <template>
+   <b-container fluid="xl">
+     <page-title />
+-    <b-row class="align-items-end">
++    <b-row class="align-items-end" style="display: flex;">
+       <b-col sm="6" md="5" xl="4">
+         <search
+           :placeholder="$t('pageSensors.searchForSensors')"
+@@ -10,13 +10,27 @@
+           @clear-search="onClearSearchInput"
+         />
+       </b-col>
+-      <b-col sm="3" md="3" xl="2">
++      <b-col sm="1" md="2" xl="3">
+         <table-cell-count
+           :filtered-items-count="filteredRows"
+           :total-number-of-cells="allSensors.length"
+         ></table-cell-count>
+       </b-col>
+-      <b-col sm="3" md="4" xl="6" class="text-right">
++      <b-col sm="2" md="3" xl="4" v-if="sg1684xStatusIcon === 'success'">
++        <dl>
++          <b-row>
++            <b-col sm="1" md="2" xl="3">
++              <dt style="margin-right: 1px;">
++                {{ $t('pageSensors.1684X_Exist') }}  <status-icon :status="sg1684xStatusIcon" />
++              </dt>
++            </b-col>
++            <b-col>
++              <span style="margin-left: 1px;">{{ get1684xtemperature }} °C</span>
++            </b-col>
++          </b-row>
++        </dl>
++      </b-col>
++      <b-col sm="3" md="2" xl="1" class="text-right" >
+         <table-filter :filters="tableFilters" @filter-change="onFilterChange" />
+       </b-col>
+     </b-row>
+@@ -219,6 +233,25 @@ export default {
+     filteredSensors() {
+       return this.getFilteredTableData(this.allSensors, this.activeFilters);
+     },
++
++    sg1684xStatus() {
++      return this.$store.getters['global/sg1684xStatus'];
++    },
++    sg1684xStatusIcon() {
++      switch (this.sg1684xStatus) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    sg1684xTmp() {
++      return this.$store.getters['global/sg1684xTmp'];
++    },
++    get1684xtemperature() {
++      return this.sg1684xTmp; // 返回温度值
++    }
++
+   },
+   created() {
+     this.startLoader();
+-- 
+2.25.1
+
