@@ -1,0 +1,8 @@
+{
+"deviceInfo":{
+    "bus": "i2c-12",
+    "addr": "0x68",
+    "compatible": "ds1307"
+  }
+
+}
