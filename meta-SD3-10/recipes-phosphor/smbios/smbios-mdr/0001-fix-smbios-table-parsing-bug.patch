@@ -1,0 +1,22 @@
+From 35908e7997ca32c190aed1c56ba7dff01e6c80ff Mon Sep 17 00:00:00 2001
+From: JianHang Wu <jianhang.wu@sophgo.com>
+Date: Fri, 24 Apr 2026 14:55:58 +0800
+Subject: [PATCH] fix smbios table parsing bug
+
+Signed-off-by: JianHang Wu <jianhang.wu@sophgo.com>
+---
+ src/mdrv2.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/mdrv2.cpp b/src/mdrv2.cpp
+index f8e2654..0b42baf 100644
+--- a/src/mdrv2.cpp
++++ b/src/mdrv2.cpp
+@@ -682,6 +682,7 @@ bool MDR_V2::agentSynchronizeData()
+             "Unsupported SMBIOS table version");
+         return false;
+     }
++    smbiosDir.dir[smbiosDirIndex].dataStorage += 24;
+ 
+     systemInfoUpdate();
+     smbiosDir.dir[smbiosDirIndex].common.dataVersion = mdr2SMBIOS.dirVer;

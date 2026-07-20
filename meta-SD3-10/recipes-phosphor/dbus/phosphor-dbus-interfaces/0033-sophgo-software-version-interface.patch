@@ -1,0 +1,11 @@
+diff --git a/yaml/xyz/openbmc_project/Software/Version.interface.yaml b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+index ee4d5ac..0979ef3 100644
+--- a/yaml/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -42,3 +42,6 @@ enumerations:
+           - name: PSU
+             description: >
+                 The version is a version for a PSU.
++          - name: Cpld
++            description: >
++                 The version is a version for Cpld.

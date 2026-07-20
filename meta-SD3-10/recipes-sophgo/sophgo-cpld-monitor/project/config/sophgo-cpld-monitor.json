@@ -1,0 +1,19 @@
+{
+    "timing_configs":{
+        "CpldReadCycle": 5
+    },
+    "i2c_dev":{
+        "deviceName"         : "/dev/i2c-11",
+        "deviceAddr"         : 87
+    },
+    "i2c_regmap":{
+        "hardWareVersionReg" : 0,
+        "cpldVersionReg"     : 1,
+        "softWareBuildMReg"  : 2,
+        "softWareBuildDReg"  : 3,
+        "CPUAPWStateReg"     : 4,
+        "PciePresent"        : 5,
+        "PSUStateReg"        : 8,
+        "EFUSStateReg"       : 9
+    }
+}

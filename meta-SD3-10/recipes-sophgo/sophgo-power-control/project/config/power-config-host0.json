@@ -1,0 +1,102 @@
+{
+  "gpio_configs":[
+    {
+        "Name" : "IdButton",
+        "LineName" : "ID_BUTTON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "NMIButton",
+        "LineName" : "NMI_BUTTON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "NMIOut",
+        "LineName" : "NMI_OUT",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "PostComplete",
+        "LineName" : "POST_COMPLETE",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "PowerButton",
+        "LineName" : "POWER_BUTTON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "PowerOk",
+        "LineName" : "PS_PWROK",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "PowerOut",
+        "LineName" : "POWER_OUT",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "ResetButton",
+        "LineName" : "RESET_BUTTON",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "ResetOut",
+        "LineName" : "RESET_OUT",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "SioOnControl",
+        "LineName" : "SIO_ONCONTROL",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "SioPowerGood",
+        "LineName" : "SIO_POWER_GOOD",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
+    },
+    {
+        "Name" : "SIOS5",
+        "LineName" : "SIO_S5",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
+    }
+],
+  "timing_configs":{
+      "PowerPulseMs": 200,
+      "ForceOffPulseMs": 15000,
+      "ResetPulseMs": 500,
+      "PowerCycleMs": 50,
+      "SioPowerGoodWatchdogMs": 1000,
+      "PsPowerOKWatchdogMs": 9000,
+      "GracefulPowerOffS": 900,
+      "WarmResetCheckMs": 500,
+      "PowerOffSaveMs": 7000,
+      "CpldReadCycle": 300
+    },
+
+    "i2c_config":{
+        "deviceName"       : "/dev/i2c-8",
+        "deviceAddr"       : 87,
+        "PWControlReg"     : 2,
+        "CPUAPWStateReg"   : 3,
+        "CPUBPWStateReg"   : 4,
+        "CPUOPWStateReg"   : 5,
+        "OPWStateReg"      : 6,
+        "PSUStateReg"      : 7,
+        "EFUSStateReg"     : 8,
+        "resetControlAReg" : 9,
+        "resetControlBReg" : 10
+    }
+}

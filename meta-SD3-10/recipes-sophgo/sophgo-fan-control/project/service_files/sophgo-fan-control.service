@@ -1,0 +1,14 @@
+[Unit]
+Description=Sophgo Fan Control
+ConditionPathExists=/usr/share/sophgo-fan-control/fan-config.json
+After=xyz.openbmc_project.Chassis.Control.Power@.service
+After=xyz.openbmc_project.hwmontempsensor.service
+After=xyz.openbmc_project.fansensor.service
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-fan-control
+
+[Install]
+WantedBy=sysinit.target

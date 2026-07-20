@@ -1,0 +1,11 @@
+[Unit]
+Description=Sophgo Fan Control
+ConditionPathExists=/usr/share/sophgo-riser-scan/riser-config.json
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-riser-scan
+
+[Install]
+WantedBy=sysinit.target

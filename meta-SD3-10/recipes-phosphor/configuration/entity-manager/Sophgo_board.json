@@ -1,0 +1,777 @@
+[
+    {
+        "Exposes": [
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 0",
+                    "PwmName":"Fan0_pwm",
+                    "Pwm": 0,
+                    "Tachs": 0
+                },
+                "Index": 0,
+                "Name": "Fan0_tach",
+                "PowerState": "On",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 1",
+                    "PwmName":"Fan1_pwm",
+                    "Pwm": 1,
+                    "Tachs": 1
+                },
+                "Index": 1,
+                "Name": "Fan1_tach",
+                "PowerState": "On",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 2",
+                    "PwmName":"Fan2_pwm",
+                    "Pwm": 2,
+                    "Tachs": 2
+                },
+                "Index": 2,
+                "Name": "Fan2_tach",
+                "PowerState": "On",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Connector": {
+                    "Name": "System Fan Connector 3",
+                    "PwmName":"Fan3_pwm",
+                    "Pwm": 3,
+                    "Tachs": 3
+                },
+                "Index": 3,
+                "Name": "Fan3_tach",
+                "PowerState": "On",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 15000
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 14000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 3000
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 4000
+                    }
+                ],
+                "Type": "AspeedFan"
+            },
+            {
+                "Address": "0x48",
+                "Bus": 5,
+                "Name": "Air_inlet_temp0",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x49",
+                "Bus": 5,
+                "Name": "Air_inlet_temp1",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4a",
+                "Bus": 5,
+                "Name": "Air_outlet_temp0",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4b",
+                "Bus": 5,
+                "Name": "Air_outlet_temp1",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 5,
+                "Name": "Air_outlet_temp2",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "LM75A"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 3,
+                "Name": "CPU_ambient_temp",
+                "Name1": "CPU_junction_temp",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "CT7451"
+            },
+            {
+                "Address": "0x4c",
+                "Bus": 2,
+                "Name": "Bmc_temp",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 1,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 1,
+                        "Severity": 1,
+                        "Value": 0
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 100
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Index": 2,
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Index": 2,
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "CT7451"
+            },
+            {
+                "Name": "VDD_12V",
+                "Type": "ADC",
+                "Index": 0,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in1_input",
+                "ScaleFactor": 0.1667,
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 15,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 13.2
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 12.6
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 10.8
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 11.4
+                    }
+                ]
+            },
+            {
+                "Name": "VDD_3V3",
+                "Type": "ADC",
+                "Index": 1,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in2_input",
+                "ScaleFactor": 0.5,
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 4,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 3.63
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 3.46
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 2.97
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 3.13
+                    }
+                ]
+            },
+            {
+                "Name": "VDDIO_1V2",
+                "Type": "ADC",
+                "Index": 2,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in3_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 1.5,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.32
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.08
+                    }
+                ]
+            },
+            {
+                "Name": "DDR_VDD2H",
+                "Type": "ADC",
+                "Index": 3,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in4_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 1.3,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.21
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0.99
+                    }
+                ]
+            },
+            {
+                "Name": "VPH_1V2",
+                "Type": "ADC",
+                "Index": 4,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in5_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 1.5,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.32
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.08
+                    }
+                ]
+            },
+            {
+                "Name": "DDR_VDD_1V8",
+                "Type": "ADC",
+                "Index": 5,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in6_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 2,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.98
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.62
+                    }
+                ]
+            },
+            {
+                "Name": "VDD_2V5",
+                "Type": "ADC",
+                "Index": 6,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in7_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 3,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 2.75
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 2.25
+                    }
+                ]
+            },
+            {
+                "Name": "VDD_1V8",
+                "Type": "ADC",
+                "Index": 7,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in8_input",
+                "PowerState": "On",
+                "MinValue": 0,
+                "MaxValue": 2,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.98
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.62
+                    }
+                ]
+            },
+            {
+                "Name": "VDD_3V3_RGM",
+                "Type": "ADC",
+                "Index": 8,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in9_input",
+                "ScaleFactor": 0.5,
+                "MinValue": 0,
+                "MaxValue": 4,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 3.63
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 2.97
+                    }
+                ]
+            },
+            {
+                "Name": "VCC_BMC_1V8",
+                "Type": "ADC",
+                "Index": 9,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in10_input",
+                "MinValue": 0,
+                "MaxValue": 2,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.98
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.62
+                    }
+                ]
+            },
+            {
+                "Name": "VCC_DDR_1V2",
+                "Type": "ADC",
+                "Index": 10,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in11_input",
+                "MinValue": 0,
+                "MaxValue": 1.5,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.32
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 1.08
+                    }
+                ]
+            },
+            {
+                "Name": "VCC_BMC_1V0",
+                "Type": "ADC",
+                "Index": 11,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in12_input",
+                "MinValue": 0,
+                "MaxValue": 1.2,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 1.1
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0.9
+                    }
+                ]
+            },
+            {
+                "Name": "VBAT",
+                "Type": "ADC",
+                "Index": 15,
+                "SysfsPath": "/sys/class/hwmon/hwmon12/in16_input",
+                "MinValue": 0,
+                "MaxValue": 3.6,
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 3.3
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 2.7
+                    }
+                ]
+            }
+        ],
+        "Name": "SD3-12",     
+        "Probe": "xyz.openbmc_project.FruDevice({'BUS': 6, 'ADDRESS': 80})",
+        "Type": "Board",                 
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Model": "$PRODUCT_PRODUCT_NAME",
+            "PartNumber": "$BOARD_PART_NUMBER",
+            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+        }
+    }
+]

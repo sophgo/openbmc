@@ -1,0 +1,32 @@
+From 3bb8950534ad2ddfcca8d2ac501cd6d89bc49616 Mon Sep 17 00:00:00 2001
+From: JianHang Wu <jianhang.wu@sophgo.com>
+Date: Fri, 24 Apr 2026 14:51:50 +0800
+Subject: [PATCH] add smbios blob to whitelist
+
+Signed-off-by: JianHang Wu <jianhang.wu@sophgo.com>
+---
+ host-ipmid-whitelist.conf | 1 +
+ ipmiwhitelist.cpp         | 5 +++++
+ 2 files changed, 6 insertions(+)
+ create mode 100644 ipmiwhitelist.cpp
+
+diff --git a/host-ipmid-whitelist.conf b/host-ipmid-whitelist.conf
+index 5397115..7afbaa9 100644
+--- a/host-ipmid-whitelist.conf
++++ b/host-ipmid-whitelist.conf
+@@ -48,3 +48,4 @@
+ 0x2C:0x06    //<Group Extension>:<Get Asset Tag>
+ 0x2C:0x07    //<Group Extension>:<Get Sensor Info>
+ 0x2C:0x10    //<Group Extension>:<Get Temperature Readings>
++0x2E:0x80    //<OEM>:<Get OEM Blob>
+diff --git a/ipmiwhitelist.cpp b/ipmiwhitelist.cpp
+new file mode 100644
+index 0000000..021f13e
+--- /dev/null
++++ b/ipmiwhitelist.cpp
+@@ -0,0 +1,5 @@
++#include <ipmiwhitelist.hpp>
++
++const std::vector<netfncmd_pair> whitelist = {
++
++};
