@@ -1,0 +1,29 @@
+From 783648b28066b490f3d0aae88b1135b2d19274ee Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Fri, 9 Aug 2024 16:28:31 +0800
+Subject: [PATCH 1/1] modify bmc pcie device class code.
+
+---
+ drivers/soc/aspeed/aspeed-bmc-dev.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/soc/aspeed/aspeed-bmc-dev.c b/drivers/soc/aspeed/aspeed-bmc-dev.c
+index 367bb050d99e..eaaeebce319f 100644
+--- a/drivers/soc/aspeed/aspeed-bmc-dev.c
++++ b/drivers/soc/aspeed/aspeed-bmc-dev.c
+@@ -315,7 +315,11 @@ static void aspeed_bmc_device_init(struct aspeed_bmc_device *bmc_device)
+ 			pcie_config_ctl);
+ 
+ 	/* update class code to others as it is a MFD device */
+-	regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
++	// regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
++	if (bmc_device->pcie2lpc)
++		regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0x08030000);
++	else
++		regmap_write(bmc_device->scu, ASPEED_SCU_BMC_DEV_CLASS, 0xff000000);
+ 
+ #ifdef SCU_TRIGGER_MSI
+ 	//SCUC24[17]: Enable PCI device 1 INTx/MSI from SCU560[15]. Will be added in next version
+-- 
+2.25.1
+

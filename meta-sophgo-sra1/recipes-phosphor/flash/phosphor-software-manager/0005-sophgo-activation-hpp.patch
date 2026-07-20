@@ -1,0 +1,14 @@
+diff --git a/activation.hpp b/activation.hpp
+index 94cc1bb..fe1962a 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -240,6 +240,9 @@ class Activation : public ActivationInherit, public Flash
+     void onFlashWriteSuccess();
+ 
+ #ifdef HOST_BIOS_UPGRADE
++    void svfWriteCpld();
++    void onStateChangesCpld(sdbusplus::message_t&);
++
+     /* @brief write to Host flash function */
+     void flashWriteHost();
+ 

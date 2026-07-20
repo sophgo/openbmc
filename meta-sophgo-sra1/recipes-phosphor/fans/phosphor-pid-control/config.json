@@ -1,0 +1,240 @@
+{
+    "sensors" : [
+		{
+            "name": "Fan1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan1",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_2",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan2",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan2",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_3",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan3",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan3",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_4",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan4",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan4",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_5",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan5",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan5",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_6",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan6",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan6",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_7",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan7",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan7",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_8",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+		{
+            "name": "Fan9",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan9",
+			"writePath": "/xyz/openbmc_project/control/fanpwm/Pwm_1",
+            "min": 0,
+            "max": 230,
+			"timeout": 4
+        },
+
+		{
+			"name": "temp1",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP1"
+		},
+		{
+			"name": "temp2",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP2"
+		},
+		{
+			"name": "temp3",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP3"
+		},
+		{
+			"name": "temp4",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP4"
+		},
+		{
+			"name": "temp5",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/LOCAL_TEMP5"
+		},
+		{
+			"name": "TEMP_CPU0_INNER",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_INNER"
+		},
+		{
+			"name": "temp7",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_CPU0_OUTER"
+		},
+		{
+			"name": "TEMP_CPU1_INNER",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_INNER"
+		},
+		{
+			"name": "temp8",
+			"type": "temp",
+			"readPath": "/xyz/openbmc_project/sensors/temperature/TEMP_CPU1_OUTER"
+		}
+    ],
+    "zones" : [
+        {
+            "id": 1,
+            "minThermalOutput": 4500.0,
+            "failsafePercent": 90.0,
+            "pids": [
+				{
+					"name": "TEMP_CPU0_INNER",
+					"type": "stepwise",
+					"inputs": ["TEMP_CPU0_INNER"],
+					"setpoint": 40,
+					"pid": {
+						"samplePeriod": 1,
+						"positiveHysteresis": 2.0,
+						"negativeHysteresis": 2.0,
+						"isCeiling": false,
+						"reading": {
+						  "0": 40,
+						  "1": 42,
+						  "2": 44,
+						  "3": 46,
+						  "4": 48,
+						  "5": 50,
+						  "6": 52
+						},
+						"output": {
+						  "0": 4000,
+						  "1": 5000,
+						  "2": 6000,
+						  "3": 7000,
+						  "4": 8000,
+						  "5": 9000,
+						  "6": 10000
+						}
+					}
+				},
+                {
+					"name": "Fan5-9",
+					"type": "stepwise",
+					"inputs": ["Fan6","Fan9"],
+					"setpoint": 6000,
+					"pid": {
+						"samplePeriod": 1,
+						"positiveHysteresis": 1000,
+						"negativeHysteresis": 1000,
+						"isCeiling": false,
+						"reading": {
+						  "0": 4000,
+						  "1": 5000,
+						  "2": 6000,
+						  "3": 7000,
+						  "4": 8000,
+						  "5": 9000,
+						  "6": 10000
+						},
+						"output": {
+						  "0": 26,
+						  "1": 32,
+						  "2": 39,
+						  "3": 45,
+						  "4": 52,
+						  "5": 58,
+						  "6": 64
+						}
+					}
+				}
+            ]
+        },
+        {
+            "id": 2,
+            "minThermalOutput": 4500.0,
+            "failsafePercent": 90.0,
+            "pids": [
+
+
+                {
+					"name": "Fan5-9",
+					"type": "fan",
+					"inputs": ["Fan6","Fan9"],
+					"setpoint": 4000,
+					"pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 1,
+                        "integralCoeff": 0.5,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 88.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                        }
+				},
+                {
+					"name": "TEMP_CPU1_INNER",
+					"type": "temp",
+					"inputs": ["TEMP_CPU1_INNER"],
+					"setpoint": 45,
+					"pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": 10,
+                        "integralCoeff": 0.5,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.010,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 4500.0,
+                        "outLim_max": 15500.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+
+				}
+            ]
+        }
+
+    ]
+}

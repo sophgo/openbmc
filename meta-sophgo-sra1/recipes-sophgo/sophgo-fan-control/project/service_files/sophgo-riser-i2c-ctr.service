@@ -1,0 +1,8 @@
+[Unit]
+Description=start riser card scan
+ConditionPathExists=/usr/sbin/sophgo-riser-i2c-scan.sh
+[Service]
+ExecStart=/bin/sh -c '/usr/sbin/sophgo-riser-i2c-scan.sh'
+
+[Install]
+WantedBy=sysinit.target

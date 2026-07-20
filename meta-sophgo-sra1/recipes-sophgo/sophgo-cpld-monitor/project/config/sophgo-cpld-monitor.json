@@ -1,0 +1,20 @@
+{
+    "timing_configs":{
+        "CpldReadCycle": 5
+    },
+    "i2c_dev":{
+        "deviceName"         : "/dev/i2c-7",
+        "deviceAddr"         : 87
+    },
+    "i2c_regmap":{
+        "hardWareVersionReg" : 0,
+        "cpldVersionReg"     : 1,
+        "softWareBuildMReg"  : 2,
+        "softWareBuildDReg"  : 3,
+        "CPUAPWStateReg"     : 4,
+        "CPUBPWStateReg"     : 5,
+        "OPWStateReg"        : 7,
+        "PSUStateReg"        : 8,
+        "EFUSStateReg"       : 9
+    }
+}
