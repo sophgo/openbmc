@@ -1,0 +1,7 @@
+- name: DoFlash
+  description: >
+      Shell script execution error for bios upgrading.
+- name: DoSvf
+  description: >
+      Shell script execution error for cpld upgrading.
+

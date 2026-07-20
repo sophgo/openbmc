@@ -1,0 +1,80 @@
+From bace4afd50c1f27509b1f32c8970ffe7419ff836 Mon Sep 17 00:00:00 2001
+From: JianHang Wu <jianhang.wu@sophgo.com>
+Date: Fri, 24 Apr 2026 15:25:07 +0800
+Subject: [PATCH] modify inventory webui
+
+Signed-off-by: JianHang Wu <jianhang.wu@sophgo.com>
+---
+ .../HardwareStatus/Inventory/Inventory.vue    | 32 +++++++++----------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/src/views/HardwareStatus/Inventory/Inventory.vue b/src/views/HardwareStatus/Inventory/Inventory.vue
+index fcdbf8d..8eff732 100644
+--- a/src/views/HardwareStatus/Inventory/Inventory.vue
++++ b/src/views/HardwareStatus/Inventory/Inventory.vue
+@@ -54,11 +54,11 @@ import ServiceIndicator from './InventoryServiceIndicator';
+ import TableSystem from './InventoryTableSystem';
+ import TablePowerSupplies from './InventoryTablePowerSupplies';
+ import TableDimmSlot from './InventoryTableDimmSlot';
+-import TableFans from './InventoryTableFans';
++// import TableFans from './InventoryTableFans';
+ import TableBmcManager from './InventoryTableBmcManager';
+ import TableChassis from './InventoryTableChassis';
+ import TableProcessors from './InventoryTableProcessors';
+-import TableAssembly from './InventoryTableAssembly';
++// import TableAssembly from './InventoryTableAssembly';
+ import LoadingBarMixin from '@/components/Mixins/LoadingBarMixin';
+ import PageSection from '@/components/Global/PageSection';
+ import JumpLink16 from '@carbon/icons-vue/es/jump-link/16';
+@@ -72,11 +72,11 @@ export default {
+     TableDimmSlot,
+     TablePowerSupplies,
+     TableSystem,
+-    TableFans,
++    // TableFans,
+     TableBmcManager,
+     TableChassis,
+     TableProcessors,
+-    TableAssembly,
++    // TableAssembly,
+     PageSection,
+     JumpLink: JumpLink16,
+   },
+@@ -114,12 +114,12 @@ export default {
+           href: '#dimms',
+           linkText: this.$t('pageInventory.dimmSlot'),
+         },
+-        {
+-          id: 'fans',
+-          dataRef: 'fans',
+-          href: '#fans',
+-          linkText: this.$t('pageInventory.fans'),
+-        },
++        //{
++        //  id: 'fans',
++        //  dataRef: 'fans',
++        //  href: '#fans',
++        //  linkText: this.$t('pageInventory.fans'),
++        //},
+         {
+           id: 'powerSupply',
+           dataRef: 'powerSupply',
+@@ -132,12 +132,12 @@ export default {
+           href: '#processors',
+           linkText: this.$t('pageInventory.processors'),
+         },
+-        {
+-          id: 'assembly',
+-          dataRef: 'assembly',
+-          href: '#assembly',
+-          linkText: this.$t('pageInventory.assemblies'),
+-        },
++        //{
++        //  id: 'assembly',
++        //  dataRef: 'assembly',
++        //  href: '#assembly',
++        //  linkText: this.$t('pageInventory.assemblies'),
++        //},
+       ],
+     };
+   },

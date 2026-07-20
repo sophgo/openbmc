@@ -1,0 +1,13 @@
+[Unit]
+Description=monitor cpld info
+ConditionPathExists=/usr/share/sophgo-cpld-monitor/sophgo-cpld-monitor.json
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-cpld-monitor
+Type=dbus
+BusName=xyz.openbmc_project.State.CPLD
+
+[Install]
+WantedBy=sysinit.target
