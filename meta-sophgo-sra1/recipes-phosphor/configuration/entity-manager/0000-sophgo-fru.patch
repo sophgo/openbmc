@@ -1,0 +1,13 @@
+diff --git a/src/fru_utils.cpp b/src/fru_utils.cpp
+index b168705..cbf3bd1 100644
+--- a/src/fru_utils.cpp
++++ b/src/fru_utils.cpp
+@@ -642,7 +642,7 @@ std::vector<uint8_t> readFRUContents(FRUReader& reader,
+ 
+     if (!findFRUHeader(reader, errorHelp, blockData, baseOffset))
+     {
+-        return {};
++        //return {};
+     }
+ 
+     std::vector<uint8_t> device;
