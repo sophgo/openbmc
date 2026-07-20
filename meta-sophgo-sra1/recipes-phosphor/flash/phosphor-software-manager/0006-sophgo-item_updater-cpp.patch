@@ -1,0 +1,51 @@
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 2fdbc31..3b16171 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -71,6 +71,7 @@ void ItemUpdater::createActivation(sdbusplus::message_t& msg)
+                     if (value == VersionPurpose::BMC ||
+ #ifdef HOST_BIOS_UPGRADE
+                         value == VersionPurpose::Host ||
++                        value == VersionPurpose::Cpld ||
+ #endif
+                         value == VersionPurpose::System)
+                     {
+@@ -843,6 +844,38 @@ bool ItemUpdater::checkImage(const std::string& filePath,
+ }
+ 
+ #ifdef HOST_BIOS_UPGRADE
++void ItemUpdater::createCPLDObject()
++{
++    std::string path = "/xyz/openbmc_project/software/cpld_active";
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        error("No version id found in object path {PATH}", "PATH", path);
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    auto versionId = path.substr(pos + 1);
++    auto version = "null";
++    AssociationList assocs = {};
++    cpldActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    cpldVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::Cpld, "", "",
++        std::vector<std::string>(),
++        std::bind(dummyErase, std::placeholders::_1), "");
++    cpldVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *cpldVersion);
++}
++
+ void ItemUpdater::createBIOSObject()
+ {
+     std::string path = BIOS_OBJPATH;

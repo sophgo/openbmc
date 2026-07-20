@@ -1,0 +1,33 @@
+diff --git a/activation.cpp b/activation.cpp
+index 122d85a..9fb6e7c 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -13,6 +13,7 @@
+ #include <sdbusplus/exception.hpp>
+ #include <xyz/openbmc_project/Common/error.hpp>
+ #include <xyz/openbmc_project/Software/Version/error.hpp>
++#include <xyz/openbmc_project/Software/Updating/error.hpp>
+ 
+ #ifdef WANT_SIGNATURE_VERIFY
+ #include "image_verify.hpp"
+@@ -466,6 +467,9 @@ void Activation::onStateChangesCpld(sdbusplus::message_t& msg)
+         {
+             // Set Activation value to Failed
+             activation(softwareServer::Activation::Activations::Failed);
++            using UpdatingShError = sdbusplus::xyz::openbmc_project::
++                Software::Updating::Error::DoSvf;
++            report<UpdatingShError>();
+ 
+             error("Cpld upgrade failed.");
+         }
+@@ -529,7 +533,9 @@ void Activation::onStateChangesBios(sdbusplus::message_t& msg)
+         {
+             // Set Activation value to Failed
+             activation(softwareServer::Activation::Activations::Failed);
+-
++            using UpdatingShError = sdbusplus::xyz::openbmc_project::
++                Software::Updating::Error::DoFlash;
++            report<UpdatingShError>();
+             error("Bios upgrade failed.");
+         }
+     }

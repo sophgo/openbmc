@@ -1,0 +1,50 @@
+diff --git a/ssifbridged.cpp b/ssifbridged.cpp
+index 9b74337..f41c87f 100644
+--- a/ssifbridged.cpp
++++ b/ssifbridged.cpp
+@@ -52,7 +52,7 @@ class SsifChannel
+   public:
+     static constexpr size_t ssifMessageSize = IPMI_SSIF_PAYLOAD_MAX +
+                                               sizeof(unsigned int);
+-    size_t sizeofLenField = sizeof(unsigned int);
++    size_t sizeofLenField = sizeof(unsigned char);
+     static constexpr uint8_t netFnShift = 2;
+     static constexpr uint8_t lunMask = (1 << netFnShift) - 1;
+ 
+@@ -144,6 +144,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
+ 
+     auto rawIter = xferBuffer.cbegin();
+     auto rawEnd = rawIter + rlen;
++    std::string rlenToLog = "rlen = " + std::to_string(rlen);
+     uint8_t netfn = rawIter[sizeofLenField] >> netFnShift;
+     uint8_t lun = rawIter[sizeofLenField] & lunMask;
+     uint8_t cmd = rawIter[sizeofLenField + 1];
+@@ -154,8 +155,8 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
+ 
+     if (verbose)
+     {
+-        unsigned int lenRecv;
+-        unsigned int *p = (unsigned int *) rawIter;
++        unsigned char lenRecv;
++        unsigned char *p = (unsigned char *) rawIter;
+         lenRecv = p[0];
+         std::string msgToLog = "Read ssif request message with"
+                 " len=" + std::to_string(lenRecv) +
+@@ -197,7 +198,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
+                            sizeof(cc));
+                 /* if dbusTimeout, just return and do not send any response
+                  * to let host continue with other commands, response here
+-                 * is potentionally make the response duplicated 
++                 * is potentionally make the response duplicated
+                  * */
+                 return;
+             }
+@@ -218,7 +219,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
+ 
+                 // write the response
+                 auto rspIter = rsp.begin();
+-                unsigned int *p = (unsigned int *) &rspIter[0];
++                unsigned char *p = (unsigned char *) &rspIter[0];
+                 *p = payload.size() + 3;
+                 rspIter[sizeofLenField] = (netfn << netFnShift) | (lun & lunMask);
+                 rspIter[sizeofLenField + 1] = cmd;

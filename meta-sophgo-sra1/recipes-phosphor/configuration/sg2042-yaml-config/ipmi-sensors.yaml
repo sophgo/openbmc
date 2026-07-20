@@ -1,0 +1,245 @@
+1: &TEMP_DEFAULTS
+    bExp: 0
+    entityID: 30
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: double
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: 0
+    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP1
+    rExp: 0
+    readingType: readingData
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+2:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 2
+    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP2
+3:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 3
+    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP3
+4:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 4
+    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP4
+5:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 5
+    path: /xyz/openbmc_project/sensors/temperature/LOCAL_TEMP5
+6:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 6
+    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU0_INNER
+7:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 7
+    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU0_OUTER
+8:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 8
+    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU1_INNER
+9:
+    <<: *TEMP_DEFAULTS
+    entityInstance: 9
+    path: /xyz/openbmc_project/sensors/temperature/TEMP_CPU1_OUTER
+
+
+
+10: &FAN_DEFAULTS
+  entityID: 29
+  entityInstance: 13
+  sensorType: 4
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+  sensorReadingType: 1
+  multiplierM: 100
+  offsetB: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+11:
+    <<: *FAN_DEFAULTS
+    entityInstance: 14
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+
+12:
+    <<: *FAN_DEFAULTS
+    entityInstance: 15
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan3
+13:
+    <<: *FAN_DEFAULTS
+    entityInstance: 16
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan4
+14:
+    <<: *FAN_DEFAULTS
+    entityInstance: 17
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan5
+15:
+    <<: *FAN_DEFAULTS
+    entityInstance: 18
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan6
+16:
+    <<: *FAN_DEFAULTS
+    entityInstance: 19
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan7
+# 17:
+#     <<: *FAN_DEFAULTS
+#     entityInstance: 20
+#     path: /xyz/openbmc_project/sensors/fan_tach/Fan8
+18:
+    <<: *FAN_DEFAULTS
+    entityInstance: 21
+    path: /xyz/openbmc_project/sensors/fan_tach/Fan9
+19:
+    <<: *FAN_DEFAULTS
+    entityInstance: 22
+    path: /xyz/openbmc_project/sensors/fan_tach/PSU2_Fan_Speed_1
+
+20:
+    <<: *FAN_DEFAULTS
+    entityInstance: 23
+    path: /xyz/openbmc_project/sensors/fan_tach/PSU1_Fan_Speed_1
+
+
+21: &VOLTAGE_DEFAULTS
+  entityID: 0x13
+  entityInstance: 24
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/PSU2_Input_Voltage
+  sensorReadingType: 0x01
+  multiplierM: 18
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  rExp: -2
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+22:
+    <<: *VOLTAGE_DEFAULTS
+    entityInstance: 25
+    multiplierM: 18
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/voltage/PSU1_Input_Voltage
+
+23:
+    <<: *VOLTAGE_DEFAULTS
+    entityInstance: 24
+    multiplierM: 18
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/voltage/PSU2_Output_Voltage
+
+24:
+    <<: *VOLTAGE_DEFAULTS
+    entityInstance: 26
+    multiplierM: 18
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/voltage/PSU1_Output_Voltage
+
+
+25: &power
+    sensorType: 0x08
+    path: /xyz/openbmc_project/sensors/power/PSU2_Input_Power
+    entityID: 19
+    entityInstance: 27
+    sensorReadingType: 0x01
+    multiplierM: 80
+    offsetB: 0
+    bExp: 0
+    unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+    rExp: -1
+    serviceInterface: org.freedesktop.DBus.Properties
+    readingType: readingData
+    interfaces:
+      xyz.openbmc_project.Sensor.Value:
+        Value:
+          Offsets:
+            0xFF:
+              type: double
+
+26:
+    <<: *power
+    entityInstance: 28
+    multiplierM: 80
+    rExp: -1
+    path: /xyz/openbmc_project/sensors/power/PSU1_Input_Power
+
+
+
+27:
+    <<: *power
+    entityInstance: 29
+    multiplierM: 80
+    rExp: -1
+    path: /xyz/openbmc_project/sensors/power/PSU2_Output_Power
+
+28:
+    <<: *power
+    entityInstance: 30
+    multiplierM: 80
+    rExp: -1
+    path: /xyz/openbmc_project/sensors/power/PSU1_Output_Power
+
+
+
+29: &current
+    sensorType: 0x03
+    path: /xyz/openbmc_project/sensors/current/PSU2_Input_Current
+    entityID: 19
+    entityInstance: 31
+    sensorReadingType: 0x01
+    multiplierM: 80
+    offsetB: 0
+    bExp: 0
+    unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+    rExp: 0
+    serviceInterface: org.freedesktop.DBus.Properties
+    readingType: readingData
+    interfaces:
+      xyz.openbmc_project.Sensor.Value:
+        Value:
+          Offsets:
+            0xFF:
+              type: double
+
+30:
+    <<: *current
+    entityInstance: 32
+    multiplierM: 80
+    path: /xyz/openbmc_project/sensors/current/PSU1_Input_Current
+
+31:
+    <<: *current
+    entityInstance: 33
+    multiplierM: 80
+    path: /xyz/openbmc_project/sensors/current/PSU2_Output_Current
+
+32:
+    <<: *current
+    entityInstance: 34
+    multiplierM: 80
+    path: /xyz/openbmc_project/sensors/current/PSU1_Output_Current
+
