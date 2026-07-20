@@ -1,0 +1,31 @@
+{
+  "bus":[
+    {
+        "name" : "riser_slot0",
+        "bus" : 8,
+        "chNum": 4,
+        "slaveAddr": 113
+    },
+    {
+        "name" : "riser_slot1",
+        "bus" : 9,
+        "chNum": 4,
+        "slaveAddr": 113
+    },
+    {
+        "name" : "riser_slot2",
+        "bus" : 10,
+        "chNum": 4,
+        "slaveAddr": 113
+    }
+],
+  "controlParams":{
+      "CycleTime": 3,
+      "DutyStep": 1,
+      "FanDefSpeed": 45,
+      "FanLowSpeed": 30,
+      "FanMediumSpeed": 65,
+      "FanHighSpeed": 100
+    }
+
+}

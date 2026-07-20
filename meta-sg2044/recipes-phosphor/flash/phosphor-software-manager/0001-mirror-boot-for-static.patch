@@ -1,0 +1,28 @@
+diff --git a/meson.build b/meson.build
+index a6ebcc4..5a44d63 100644
+--- a/meson.build
++++ b/meson.build
+@@ -127,6 +127,10 @@ if get_option('bmc-layout').contains('static')
+         'static/flash.cpp',
+         'static/item_updater_helper.cpp'
+     )
++
++    unit_files += [
++        'static/obmc-flash-bmc-mirroruboot.service.in'
++    ]
+ elif get_option('bmc-layout').contains('ubi')
+     image_updater_sources += files(
+         'ubi/flash.cpp',
+diff --git a/static/obmc-flash-bmc-mirroruboot.service.in b/static/obmc-flash-bmc-mirroruboot.service.in
+new file mode 100644
+index 0000000..8f0a58e
+--- /dev/null
++++ b/static/obmc-flash-bmc-mirroruboot.service.in
+@@ -0,0 +1,7 @@
++[Unit]
++Description=Copy uboot from the currently booted bmc chip to the alternate chip
++
++[Service]
++Type=oneshot
++RemainAfterExit=no
++ExecStart=/usr/bin/obmc-flash-bmc mirroruboot
