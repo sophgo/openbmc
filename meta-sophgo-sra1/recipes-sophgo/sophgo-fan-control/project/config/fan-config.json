@@ -1,0 +1,109 @@
+{
+  "fans":[
+    {
+        "name" : "Fan0",
+        "dbusName":"",
+        "readPath" : "/sys/devices/platform/ahb/ahb:apb/1e610000.pwm_tach/1e610000.pwm_tach:tach/hwmon/**/fan1_input",
+        "writePath" : "/sys/devices/platform/pwm-fan0/hwmon/**/pwm1",
+        "min" : 0,
+        "max" : 255
+    },
+    {
+        "name" : "Fan1",
+        "dbusName":"",
+        "readPath" : "/sys/devices/platform/ahb/ahb:apb/1e610000.pwm_tach/1e610000.pwm_tach:tach/hwmon/**/fan2_input",
+        "writePath" : "/sys/devices/platform/pwm-fan1/hwmon/**/pwm1",
+        "min" : 0,
+        "max" : 255
+    }
+],
+
+"temps":[
+    {
+        "name" : "BMC_Temp",
+        "dbusName": "",
+        "readPath" : "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a180.i2c-bus/i2c-2/2-004c/hwmon/**/temp2_input",
+        "minSetPoint" : 45,
+        "isInherent" : true,
+        "shutdownThreshold" : 75,
+        "fanFaultThreshold" : 70,
+        "input": {
+            "0": 48,
+            "1": 56,
+            "2": 65
+        },
+        "output": {
+            "0": 55,
+            "1": 75,
+            "2": 100
+        }
+    },
+    {
+        "name" : "CPU_Temp",
+        "dbusName": "",
+        "readPath" : "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a280.i2c-bus/i2c-4/4-004c/hwmon/**/temp2_input",
+        "minSetPoint" : 45,
+        "isInherent" : true,
+        "shutdownThreshold" : 100,
+        "fanFaultThreshold" : 80,
+        "input": {
+            "0": 48,
+            "1": 56,
+            "2": 65
+        },
+        "output": {
+            "0": 55,
+            "1": 75,
+            "2": 100
+        }
+    },
+    {
+        "name" : "SWITCH_Temp",
+        "dbusName": "",
+        "readPath" : "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a800.i2c-bus/i2c-15/15-004c/hwmon/**/temp2_input",
+        "minSetPoint" : 45,
+        "isInherent" : true,
+        "shutdownThreshold" : 100,
+        "fanFaultThreshold" : 80,
+        "input": {
+            "0": 72,
+            "1": 77,
+            "2": 82
+        },
+        "output": {
+            "0": 55,
+            "1": 75,
+            "2": 100
+        }
+    },
+    {
+        "name" : "NVME_Temp",
+        "dbusName": "xyz.openbmc_project.NVMeSensor",
+        "readPath" : "/xyz/openbmc_project/sensors/temperature/NVMe_Temp",
+        "minSetPoint" : 45,
+        "isInherent" : false,
+        "shutdownThreshold" : 100,
+        "fanFaultThreshold" : 80,
+        "input": {
+            "0": 71,
+            "1": 76,
+            "2": 81
+        },
+        "output": {
+            "0": 55,
+            "1": 75,
+            "2": 100
+        }
+    }
+],
+"controlParams":{
+    "CycleTime": 3,
+    "DutyStep": 1,
+    "FanDefSpeed": 45,
+    "FanLowSpeed": 30,
+    "FanMediumSpeed": 65,
+    "FanHighSpeed": 100,
+    "RedundantFanNum" :1
+  }
+
+}

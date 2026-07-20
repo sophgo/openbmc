@@ -1,0 +1,13 @@
+[Unit]
+Description=led control
+ConditionPathExists=/usr/sbin/sophgo-led-control.sh
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.fansensor.service
+After=xyz.openbmc_project.hwmontempsensor.service
+After=xyz.openbmc_project.psusensor.service
+After=xyz.openbmc_project.Chassis.Control.Power@0.service
+[Service]
+ExecStart=/bin/sh -c '/usr/sbin/sophgo-led-control.sh'
+
+[Install]
+WantedBy=sysinit.target
