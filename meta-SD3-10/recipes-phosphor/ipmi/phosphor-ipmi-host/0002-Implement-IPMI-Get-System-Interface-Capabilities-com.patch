@@ -1,0 +1,73 @@
+From b2bf7edeeb063e2072b69efc8d981e601aa8b746 Mon Sep 17 00:00:00 2001
+From: JianHang Wu <jianhang.wu@sophgo.com>
+Date: Wed, 29 Jul 2026 11:44:20 +0800
+Subject: [PATCH] Implement IPMI Get System Interface Capabilities command
+
+Add ipmiAppGetSystemInterfaceCapabilities() to handle NetFn App
+Cmd 0x57 (Get System Interface Capabilities) per IPMI 2.0 spec.
+
+- Support SSIF interface type (0h) with multi-part Middle transaction
+- Return SSIF capabilities 0x80 (10b << 6), 128-byte input/output size
+- Reject non-SSIF types or non-zero reserved bits with InvalidFieldRequest
+- Register handler at app::cmdGetSystemIfCapabilities with User privilege
+
+Signed-off-by: JianHang Wu <jianhang.wu@sophgo.com>
+Assisted-by: OpenClaw:DeepSeek-v4-pro
+---
+ apphandler.cpp | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index fe74bb0..facf873 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -844,6 +844,36 @@ auto ipmiAppGetBtCapabilities()
+                                  outputBufferSize, transactionTime, nrRetries);
+ }
+ 
++// <Get System Interface Capabilities> (NetFn App, Cmd 0x57)
++// IPMI 2.0 spec. Request Byte 1: [7:4] reserved, [3:0] System Interface Type
++//   0h = SSIF, 1h = KCS, 2h = SMIC. Only SSIF is supported here.
++// Response (SSIF):
++//   Byte 2: Reserved (00h)
++//   Byte 3: [7:6] Transaction support (10b = multi-part w/ Middle)
++//           [5:4] reserved, [3] PEC support (0b), [2:0] SSIF Version (000b)
++//   Byte 4: Input message size in bytes
++//   Byte 5: Output message size in bytes
++auto ipmiAppGetSystemInterfaceCapabilities(uint4_t reserved,
++                                           uint4_t sysIntfType)
++    -> ipmi::RspType<uint8_t, // Reserved
++                     uint8_t, // SSIF capabilities
++                     uint8_t, // Input message size
++                     uint8_t> // Output message size
++{
++    constexpr uint4_t ssif = 0;
++    constexpr uint8_t reservedByte = 0x00;
++    constexpr uint8_t ssifCapabilities = 0x80; // 10b << 6
++    constexpr uint8_t inputMessageSize = 128;
++    constexpr uint8_t outputMessageSize = 128;
++
++    if (reserved || sysIntfType != ssif)
++    {
++        return ipmi::responseInvalidFieldRequest();
++    }
++    return ipmi::responseSuccess(reservedByte, ssifCapabilities,
++                                 inputMessageSize, outputMessageSize);
++}
++
+ auto ipmiAppGetSystemGuid() -> ipmi::RspType<std::array<uint8_t, 16>>
+ {
+     static constexpr auto uuidInterface = "xyz.openbmc_project.Common.UUID";
+@@ -1738,6 +1768,12 @@ void register_netfn_app_functions()
+                           ipmi::app::cmdGetBtIfaceCapabilities,
+                           ipmi::Privilege::User, ipmiAppGetBtCapabilities);
+ 
++    // <Get System Interface Capabilities>
++    ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnApp,
++                          ipmi::app::cmdGetSystemIfCapabilities,
++                          ipmi::Privilege::User,
++                          ipmiAppGetSystemInterfaceCapabilities);
++
+     // <Reset Watchdog Timer>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnApp,
+                           ipmi::app::cmdResetWatchdogTimer,
