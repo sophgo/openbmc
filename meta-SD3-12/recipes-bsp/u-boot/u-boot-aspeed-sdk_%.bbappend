@@ -26,6 +26,6 @@ SRC_URI += " file://0001-u-boot-remove-PCIE1RC-from-ast2600_groups.patch \
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 # PACKAGE_ARCH = "ast2600-sophgo-capricorn"
-PACKAGE_ARCH = "SD3-10"
+PACKAGE_ARCH = "SD3-12"
 
 UBOOT_DEVICETREE = "ast2600-sophgo"
