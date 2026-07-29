@@ -21,7 +21,7 @@ Reference:
 ## Target the machine
 
 ```
-source setup SD3-10 [build_dir]
+source setup SD3-12 [build_dir]
 ```
 
 
