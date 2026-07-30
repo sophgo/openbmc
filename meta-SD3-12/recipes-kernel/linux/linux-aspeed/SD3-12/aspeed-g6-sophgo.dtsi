@@ -776,7 +776,7 @@
 				interrupt-controller;
 				gpio-line-names=
 				/* A 0~7*/"","","","","","","","",
-				/* B 0~7*/"","","SIO_POWER_GOOD","SIO_ONCONTROL","","","","",
+				/* B 0~7*/"MCU_POWER_OUT","","SIO_POWER_GOOD","SIO_ONCONTROL","","","","",
 				/* C 0~7*/"","","","","","","BMC_PWRGD","BMC_EMMC_RST",
 				/* D 0~7*/"","","","","RESET_OUT","","PS_PWROK","",
 				/* E 0~7*/"RESET_BUTTON","POWER_BUTTON","","PHY1_RGMII0_IRQ","","","","",
