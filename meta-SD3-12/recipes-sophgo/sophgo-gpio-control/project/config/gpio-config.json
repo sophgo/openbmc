@@ -47,6 +47,12 @@
         "LineName" : "RTC_SWITCH",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
+    },
+    {
+        "Name" : "mcuPowerOut",
+        "LineName" : "MCU_POWER_OUT",
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     }
 ],
   "timing_configs":{

@@ -64,6 +64,7 @@ static std::string node = "0";
 static const std::string appName = "sophgo-gpio-control";
 static boost::asio::deadline_timer readVersionTimer(io);
 static boost::asio::deadline_timer rtcSwitch(io);
+static boost::asio::deadline_timer mcuPowerOut(io);
 std::atomic<bool> version_enable_flag(true);
 std::atomic<bool> version_timer_state(false);
 
@@ -153,6 +154,7 @@ static ConfigData identifyLedGetConfig;
 static ConfigData identifyLedSetConfig;
 static ConfigData biosFlashSwitchConfig;
 static ConfigData rtcSwitchConfig;
+static ConfigData mcuPowerOutConfig;
 
 
 // map for storing list of gpio parameters whose config are to be read from sophgo
@@ -166,7 +168,8 @@ boost::container::flat_map<std::string, ConfigData*> powerSignalMap = {
     {"identifyLedGet",     &identifyLedGetConfig},
     {"identifyLedSet",     &identifyLedSetConfig},
     {"biosFlashSwitch",    &biosFlashSwitchConfig},
-    {"rtcSwitch",          &rtcSwitchConfig}};
+    {"rtcSwitch",          &rtcSwitchConfig},
+    {"mcuPowerOut",        &mcuPowerOutConfig}};
 
 
 
@@ -213,6 +216,7 @@ static gpiod::line identifyLedSetLine;
 
 static gpiod::line biosFlashSwitchLine;
 static gpiod::line RTCSwitchLine;
+static gpiod::line mcuPowerOutLine;
 
 
 
@@ -436,7 +440,8 @@ static int checkGpioLineName()
        (identifyLedGetConfig.lineName.empty())       || \
        (identifyLedSetConfig.lineName.empty())       || \
        (biosFlashSwitchConfig.lineName.empty())      || \
-       (rtcSwitchConfig.lineName.empty()))
+       (rtcSwitchConfig.lineName.empty())      || \
+       (mcuPowerOutConfig.lineName.empty()))
     {
         return -1;
     }
@@ -579,6 +584,18 @@ static void transitionRTC(BiosFlashMaster port)
             break;
         default:
             break;
+    }
+}
+
+static void transitionMcuPowerOut(bool powerOn)
+{
+    if (powerOn)
+    {
+        setGPIOOutput(mcuPowerOutConfig.lineName, !mcuPowerOutConfig.polarity, mcuPowerOutLine);
+    }
+    else
+    {
+        setGPIOOutput(mcuPowerOutConfig.lineName, mcuPowerOutConfig.polarity, mcuPowerOutLine);
     }
 }
 
@@ -806,10 +823,12 @@ static void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& 
                         set_version_timer(ParamMap["readVersionDelayS"]);
                     }
                     set_rtc_timer(ParamMap["changeRTCSwitch"]);
+                    transitionMcuPowerOut(true);
                 } else {
                     lg2::info("power: on->off.");
                     cancel_version_timer();
                     transitionRTC(BiosFlashMaster::BMC);
+                    transitionMcuPowerOut(false);
                 }
             }
         });
@@ -825,9 +844,11 @@ static void setupPowerMatch(const std::shared_ptr<sdbusplus::asio::connection>& 
             if (isPowerOn) {
                 lg2::info("power status: on.");
                 transitionRTC(BiosFlashMaster::HOST);
+                transitionMcuPowerOut(true);
             } else {
                 lg2::info("power status: off.");
                 transitionRTC(BiosFlashMaster::BMC);
+                transitionMcuPowerOut(false);
             }
 
         },
@@ -890,6 +911,10 @@ int main(int argc, char* argv[])
         return -1;
     }
     if(!setGPIOOutput(identifyLedSetConfig.lineName, IdentifyLedSet::OFF, identifyLedSetLine))
+    {
+        return -1;
+    }
+    if(!setGPIOOutput(mcuPowerOutConfig.lineName, mcuPowerOutConfig.polarity, mcuPowerOutLine))
     {
         return -1;
     }
