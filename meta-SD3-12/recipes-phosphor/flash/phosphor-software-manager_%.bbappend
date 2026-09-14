@@ -37,7 +37,7 @@ FILES:${PN}  += "${systemd_system_unitdir}/sophgo-cpld-update@.service"
 
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled"
 
-FILES:${PN} += "/lib/systemd/system/obmc-flash-host-bios@.service"
+FILES:${PN} += "${systemd_system_unitdir}/obmc-flash-host-bios@.service"
 
 FILES:${PN} += "/usr/sbin/bios_update.sh"
 FILES:${PN} += "/usr/sbin/cpld_update.sh"
