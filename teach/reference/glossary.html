@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux 驱动开发术语表</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+    <div class="lesson-container">
+        <div class="main-content">
+            <h1>Linux 驱动开发术语表</h1>
+            <p>驱动开发中的核心概念和术语速查。</p>
+
+            <h2>设备模型</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>总线</td><td>Bus</td><td>设备和驱动之间的"媒人"，负责匹配。如 i2c_bus_type、platform_bus_type</td></tr>
+                <tr><td>设备</td><td>Device</td><td>硬件的软件抽象。如 i2c_client、platform_device</td></tr>
+                <tr><td>驱动</td><td>Driver</td><td>操作设备的软件。如 i2c_driver、platform_driver</td></tr>
+                <tr><td>匹配</td><td>Match</td><td>总线判断设备和驱动是否兼容的过程</td></tr>
+                <tr><td>探测</td><td>Probe</td><td>匹配成功后调用的初始化函数</td></tr>
+                <tr><td>移除</td><td>Remove</td><td>设备拔出或驱动卸载时的清理函数</td></tr>
+            </table>
+
+            <h2>设备树</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>设备树</td><td>Device Tree (DT)</td><td>描述硬件拓扑的数据结构，ARM 平台的标准</td></tr>
+                <tr><td>节点</td><td>Node</td><td>设备树中的一个设备或总线</td></tr>
+                <tr><td>属性</td><td>Property</td><td>节点的键值对，如 compatible、reg</td></tr>
+                <tr><td>兼容</td><td>Compatible</td><td>设备与驱动匹配的标识字符串</td></tr>
+                <tr><td>寄存器</td><td>Reg</td><td>设备的地址或资源定义</td></tr>
+                <tr><td>绑定</td><td>Binding</td><td>设备树属性的官方文档规范</td></tr>
+            </table>
+
+            <h2>内存管理</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>物理连续内存</td><td>Physically contiguous</td><td>kmalloc 分配的内存，DMA 需要</td></tr>
+                <tr><td>虚拟连续内存</td><td>Virtually contiguous</td><td>vmalloc 分配的内存，大块内存使用</td></tr>
+                <tr><td>原子上下文</td><td>Atomic context</td><td>中断处理中，不能睡眠</td></tr>
+                <tr><td>进程上下文</td><td>Process context</td><td>可以睡眠的内核代码</td></tr>
+            </table>
+
+            <h2>并发控制</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>自旋锁</td><td>Spinlock</td><td>忙等待锁，用于短临界区</td></tr>
+                <tr><td>互斥锁</td><td>Mutex</td><td>可睡眠锁，用于长临界区</td></tr>
+                <tr><td>原子操作</td><td>Atomic</td><td>不可中断的操作</td></tr>
+                <tr><td>内存屏障</td><td>Memory barrier</td><td>保证内存访问顺序</td></tr>
+            </table>
+
+            <h2>中断</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>中断号</td><td>IRQ number</td><td>中断的全局编号</td></tr>
+                <tr><td>顶半部</td><td>Top half</td><td>中断处理函数，快速执行</td></tr>
+                <tr><td>底半部</td><td>Bottom half</td><td>延后处理，可睡眠</td></tr>
+                <tr><td>线程化中断</td><td>Threaded IRQ</td><td>在内核线程中处理中断</td></tr>
+            </table>
+
+            <h2>子系统</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>硬件监控</td><td>hwmon</td><td>温度、电压、风扇等传感器框架</td></tr>
+                <tr><td>输入设备</td><td>Input</td><td>键盘、鼠标、触摸屏框架</td></tr>
+                <tr><td>工业 I/O</td><td>IIO</td><td>ADC、DAC、加速度计框架</td></tr>
+                <tr><td>帧缓冲</td><td>Framebuffer</td><td>显示设备框架</td></tr>
+                <tr><td>脉冲宽度调制</td><td>PWM</td><td>背光、蜂鸣器控制</td></tr>
+            </table>
+
+            <h2>调试</h2>
+            <table>
+                <tr><th>术语</th><th>英文</th><th>解释</th></tr>
+                <tr><td>内核日志</td><td>Kernel log</td><td>dmesg 查看的内核消息</td></tr>
+                <tr><td>内核崩溃</td><td>Kernel panic</td><td>内核致命错误，系统停止</td></tr>
+                <tr><td>内核错误</td><td>Oops</td><td>内核非致命错误，可恢复</td></tr>
+                <tr><td>动态调试</td><td>Dynamic debug</td><td>运行时开关 printk</td></tr>
+            </table>
+
+            <div class="note">
+                本术语表会随着课程进展持续更新。遇到不熟悉的术语时，先查这里。
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <h3>快速导航</h3>
+            <ul>
+                <li><a href="#device-model">设备模型</a></li>
+                <li><a href="#device-tree">设备树</a></li>
+                <li><a href="#memory">内存管理</a></li>
+                <li><a href="#concurrency">并发控制</a></li>
+                <li><a href="#interrupt">中断</a></li>
+                <li><a href="#subsystem">子系统</a></li>
+                <li><a href="#debug">调试</a></li>
+            </ul>
+        </aside>
+    </div>
+</body>
+</html>

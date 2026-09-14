@@ -1,0 +1,1185 @@
+From 3c5c884936e9f254e0381b5b07b021f8139f7700 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Fri, 11 Sep 2026 15:37:19 +0800
+Subject: [PATCH 1/2] Add sophgo custom features to webui-vue
+
+- Use aspeed's novnc fork (jpg support) with webpack WebAssembly config
+- sophgo icons (sg2042 header logo, sophgo login logo), prettier off
+- CPLD version card on Firmware page
+- SOL port switching (UART0/UART1) + SOL log export on SOL console
+- Inventory: hide DIMM/fans/PSU/assembly tables
+- Fan speed control page (Settings > Fan speed)
+- Network: DHCP enable switch
+- 1684x board temperature display on Sensors page
+---
+ .eslintrc.js                                  |   3 +-
+ package.json                                  |   3 +-
+ src/assets/images/sg2042.svg                  |   6 +
+ src/assets/images/sophgo.svg                  |  49 ++++++++
+ src/components/AppHeader/AppHeader.vue        |   2 +-
+ .../AppNavigation/AppNavigationMixin.js       |   5 +
+ src/layouts/LoginLayout.vue                   |   2 +-
+ src/locales/en-US.json                        |  46 ++++++-
+ src/locales/ru-RU.json                        |   3 +-
+ src/router/routes.js                          |   9 ++
+ src/store/index.js                            |   2 +
+ src/store/modules/GlobalStore.js              |  16 +++
+ src/store/modules/Operations/ControlStore.js  |  22 ++++
+ src/store/modules/Settings/FanSpeedStore.js   |  44 +++++++
+ src/store/modules/Settings/NetworkStore.js    |  31 +++++
+ .../HardwareStatus/Inventory/Inventory.vue    |  64 +++++-----
+ src/views/HardwareStatus/Sensors/Sensors.vue  |  38 +++++-
+ src/views/Operations/Firmware/Firmware.vue    |   5 +
+ .../Operations/Firmware/FirmwareCardsCpld.vue |  65 ++++++++++
+ .../SerialOverLan/SerialOverLanConsole.vue    | 112 ++++++++++++++++++
+ src/views/Settings/FanSpeed/FanSpeed.vue      | 100 ++++++++++++++++
+ src/views/Settings/FanSpeed/index.js          |   2 +
+ .../Network/NetworkGlobalSettings.vue         |  46 ++++++-
+ vue.config.js                                 |   8 ++
+ 24 files changed, 634 insertions(+), 49 deletions(-)
+ create mode 100644 src/assets/images/sg2042.svg
+ create mode 100644 src/assets/images/sophgo.svg
+ create mode 100644 src/store/modules/Settings/FanSpeedStore.js
+ create mode 100644 src/views/Operations/Firmware/FirmwareCardsCpld.vue
+ create mode 100644 src/views/Settings/FanSpeed/FanSpeed.vue
+ create mode 100644 src/views/Settings/FanSpeed/index.js
+
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 78c0cd0..8505e3a 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -8,7 +8,8 @@ module.exports = {
+     'no-console': 'off',
+     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+     'prettier/prettier': [
+-      'error',
++      //'error',
++      'off',
+       {
+         singleQuote: true,
+       },
+diff --git a/package.json b/package.json
+index be2fb41..88e84d2 100644
+--- a/package.json
++++ b/package.json
+@@ -16,7 +16,7 @@
+     },
+     "dependencies": {
+         "@carbon/icons-vue": "10.28.0",
+-        "@novnc/novnc": "1.2.0",
++        "@novnc/novnc": "git+https://github.com:AspeedTech-BMC/noVNC.git#c133fc8",
+         "axios": "1.6.0",
+         "axios-cache-interceptor": "1.5.1",
+         "bootstrap": "4.6.0",
+@@ -52,6 +52,7 @@
+         "eslint-plugin-prettier": "5.1.3",
+         "eslint-plugin-vue": "9.22.0",
+         "lint-staged": "10.5.4",
++        "path-browserify": "^1.0.1",
+         "prettier": "3.2.5",
+         "sass": "1.32.8",
+         "sass-loader": "8.0.0",
+diff --git a/src/assets/images/sg2042.svg b/src/assets/images/sg2042.svg
+new file mode 100644
+index 0000000..ed07c53
+--- /dev/null
++++ b/src/assets/images/sg2042.svg
+@@ -0,0 +1,6 @@
++<svg width="150" height="32" xmlns="http://www.w3.org/2000/svg">
++ <g id="Layer_1">
++  <title>Layer 1</title>
++  <text xml:space="preserve" text-anchor="start" font-family="Noto Sans JP" font-size="24" id="svg_1" y="25" x="5" stroke-width="0" stroke="#e0e028" fill="#ffffff">SD3-12 BMC</text>
++ </g>
++</svg>
+\ No newline at end of file
+diff --git a/src/assets/images/sophgo.svg b/src/assets/images/sophgo.svg
+new file mode 100644
+index 0000000..4bd67c4
+--- /dev/null
++++ b/src/assets/images/sophgo.svg
+@@ -0,0 +1,49 @@
++<?xml version="1.0" standalone="no"?>
++<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
++ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
++<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
++ width="400.000000pt" height="400.000000pt" viewBox="0 0 400.000000 400.000000"
++ preserveAspectRatio="xMidYMid meet">
++
++<g transform="translate(0.000000,400.000000) scale(0.100000,-0.100000)"
++fill="#000000" stroke="none">
++<path d="M1845 3099 c-115 -198 -225 -388 -243 -422 -106 -200 -67 -446 97
++-607 55 -54 158 -120 187 -120 4 0 -11 16 -34 35 -24 22 -54 63 -74 102 -27
++56 -32 77 -32 137 0 123 69 232 182 288 68 34 197 33 266 -1 66 -33 122 -91
++155 -160 21 -46 26 -70 25 -131 -1 -93 -27 -154 -96 -223 -56 -56 -39 -56 54
++-1 158 96 258 290 244 474 -7 100 -34 172 -109 299 -35 58 -139 238 -232 399
++-93 160 -172 292 -175 292 -3 0 -99 -162 -215 -361z m243 -366 c-16 -2 -40 -2
++-55 0 -16 2 -3 4 27 4 30 0 43 -2 28 -4z m223 -80 c13 -16 12 -17 -3 -4 -17
++13 -22 21 -14 21 2 0 10 -8 17 -17z m-551 -57 c0 -2 -8 -10 -17 -17 -16 -13
++-17 -12 -4 4 13 16 21 21 21 13z m631 -23 c13 -16 12 -17 -3 -4 -10 7 -18 15
++-18 17 0 8 8 3 21 -13z m76 -270 c-2 -16 -4 -3 -4 27 0 30 2 43 4 28 2 -16 2
++-40 0 -55z m-810 0 c-2 -16 -4 -5 -4 22 0 28 2 40 4 28 2 -13 2 -35 0 -50z
++m800 -75 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13 3 -3 4 -12 1 -19z m-753 -84 c3
++-8 2 -12 -4 -9 -6 3 -10 10 -10 16 0 14 7 11 14 -7z m37 -61 c13 -16 12 -17
++-3 -4 -17 13 -22 21 -14 21 2 0 10 -8 17 -17z m629 -26 c0 -2 -10 -12 -22 -23
++l-23 -19 19 23 c18 21 26 27 26 19z"/>
++<path d="M543 1500 c-41 -25 -66 -74 -65 -128 1 -88 58 -132 173 -132 85 0
++135 -13 149 -40 17 -32 11 -70 -15 -95 -24 -24 -28 -25 -182 -25 l-157 0 39
++-41 40 -41 132 4 c114 3 135 6 159 24 70 52 92 130 56 201 -33 63 -61 76 -181
++83 -92 5 -106 8 -122 29 -24 30 -24 56 1 81 18 18 33 20 155 20 l136 0 -32 40
++-32 40 -111 0 c-92 0 -116 -3 -143 -20z"/>
++<path d="M1166 1505 c-99 -35 -168 -134 -169 -241 -2 -233 277 -348 442 -182
++50 49 71 102 71 179 0 181 -174 305 -344 244z m174 -85 c103 -53 126 -186 47
++-277 -57 -65 -135 -80 -214 -42 -132 64 -132 258 -1 322 46 23 120 21 168 -3z"/>
++<path d="M1655 1480 c38 -39 40 -40 111 -40 66 0 74 -2 93 -26 28 -35 26 -69
++-4 -99 -23 -23 -31 -25 -130 -25 l-105 0 0 -145 0 -145 40 0 40 0 0 105 0 105
++68 0 c107 0 170 46 186 136 9 47 -26 120 -73 151 -30 21 -46 23 -150 23 l-115
++0 39 -40z"/>
++<path d="M2060 1262 l0 -262 40 0 40 0 0 120 0 120 87 0 87 0 -34 35 c-30 31
++-39 35 -87 35 l-53 0 0 68 c0 66 -1 69 -40 107 l-40 39 0 -262z"/>
++<path d="M2400 1297 l0 -223 33 -32 c18 -18 36 -32 40 -32 4 0 7 115 7 255 l0
++255 -40 0 -40 0 0 -223z"/>
++<path d="M2755 1507 c-118 -46 -183 -146 -172 -267 6 -69 34 -127 83 -170 53
++-46 99 -63 174 -64 144 -1 254 110 253 254 0 75 -17 121 -64 175 -65 73 -187
++105 -274 72z m161 -86 c97 -44 131 -164 73 -258 -70 -113 -254 -102 -310 20
++-70 156 81 309 237 238z"/>
++<path d="M3540 1353 l0 -168 -163 163 c-89 89 -166 162 -170 162 -4 0 -7 -19
++-7 -43 0 -42 2 -45 210 -252 l210 -210 0 258 0 257 -40 0 -40 0 0 -167z"/>
++<path d="M3202 1160 l3 -155 38 -3 37 -3 0 118 0 119 -40 39 -41 40 3 -155z"/>
++</g>
++</svg>
+diff --git a/src/components/AppHeader/AppHeader.vue b/src/components/AppHeader/AppHeader.vue
+index 76c96c0..8e447d6 100644
+--- a/src/components/AppHeader/AppHeader.vue
++++ b/src/components/AppHeader/AppHeader.vue
+@@ -38,7 +38,7 @@
+             <img
+               svg-inline
+               class="header-logo"
+-              src="@/assets/images/logo-header.svg"
++              src="@/assets/images/sg2042.svg"
+               :alt="altLogo"
+             />
+           </b-navbar-brand>
+diff --git a/src/components/AppNavigation/AppNavigationMixin.js b/src/components/AppNavigation/AppNavigationMixin.js
+index b33b24b..d9c7350 100644
+--- a/src/components/AppNavigation/AppNavigationMixin.js
++++ b/src/components/AppNavigation/AppNavigationMixin.js
+@@ -126,6 +126,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.dateTime'),
+               route: '/settings/date-time',
+             },
++            {
++              id: 'fan-speed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+             {
+               id: 'network',
+               label: this.$t('appNavigation.network'),
+diff --git a/src/layouts/LoginLayout.vue b/src/layouts/LoginLayout.vue
+index dba1980..8f5c538 100644
+--- a/src/layouts/LoginLayout.vue
++++ b/src/layouts/LoginLayout.vue
+@@ -25,7 +25,7 @@
+           <img
+             svg-inline
+             height="60px"
+-            src="@/assets/images/built-on-openbmc-logo.svg"
++            src="@/assets/images/sophgo.svg"
+             alt="Built on OpenBMC"
+           />
+         </div>
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 8ba7ac9..73b0a02 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -132,7 +132,8 @@
+         "virtualMedia": "@:appPageTitle.virtualMedia",
+         "snmpAlerts": "@:appPageTitle.snmpAlerts",
+         "power": "@:appPageTitle.power",
+-        "keyClear": "@:appPageTitle.keyClear"
++        "keyClear": "@:appPageTitle.keyClear",
++        "fanSpeed": "Fan speed"
+     },
+     "appPageTitle": {
+         "changePassword": "Change password",
+@@ -162,7 +163,8 @@
+         "certificates": "Certificates",
+         "snmpAlerts": "SNMP Alerts",
+         "virtualMedia": "Virtual media",
+-        "keyClear": "Key clear"
++        "keyClear": "Key clear",
++        "fanSpeed":"Fan speed"
+     },
+     "pageChangePassword": {
+         "changePassword": "Change password",
+@@ -217,6 +219,38 @@
+             "successSaveDateTime": "Successfully saved date and time settings."
+         }
+     },
++    "pageFanSpeed": {
++        "alert": {
++            "message": "To change how date and time are displayed (either UTC or browser offset) throughout the application, visit ",
++            "link": "Profile Settings"
++        },
++        "description": " Control strategy for setting fan speed .",
++        "policiesLabel": {
++            "Manul":"Manul control policy",
++            "Auto":"Automatic control policy"
++        },
++        "form": {
++            "pwm": "Pwm",
++            "manual": "Manual",
++            "auto": "Auto"
++        },
++        "grade": {
++            "Low": "low",
++            "Medium": "medium",
++            "High": "high",
++            "Auto":"auto"
++        },
++        "gradeDesc": {
++            "Low": "Low speed",
++            "Medium": "Medium speed",
++            "High": "High speed",
++            "Auto":"Auto"
++        },
++        "toast": {
++            "errorSaveSettings": "Error saving pwm settings.",
++            "successSaveSettings": "Successfully saved pwm settings."
++        }
++    },
+     "pageDumps": {
+         "dumpsAvailableOnBmc": "Dumps available on BMC",
+         "initiateDump": "Initiate dump",
+@@ -332,6 +366,7 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
++        "sectionTitleCpldCards": "CPLD",
+         "sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
+@@ -846,6 +881,7 @@
+     "pageSensors": {
+         "exportFilePrefix": "sensors_",
+         "searchForSensors": "Search for sensors",
++        "1684X_Exist": "1684x",
+         "table": {
+             "currentValue": "Current value",
+             "lowerWarning": "Lower warning",
+@@ -864,7 +900,11 @@
+         "disconnected": "Disconnected",
+         "openNewTab": "Open in new tab",
+         "status": "Status",
+-        "subTitle": "SOL console redirects the server's serial port output to this window."
++        "subTitle": "SOL console redirects the server's serial port output to this window.",
++        "setPort": "Set port",
++        "solPortC0U0": "UART0",
++        "solPortC0U1": "UART1",
++        "blank":"\u2002\u2002"
+     },
+     "pageServerPowerOperations": {
+         "currentStatus": "Current status",
+diff --git a/src/locales/ru-RU.json b/src/locales/ru-RU.json
+index dcf7c59..6f174e5 100644
+--- a/src/locales/ru-RU.json
++++ b/src/locales/ru-RU.json
+@@ -132,7 +132,8 @@
+         "virtualMedia": "@:appPageTitle.virtualMedia",
+         "snmpAlerts": "@:appPageTitle.snmpAlerts",
+         "power": "@:appPageTitle.power",
+-        "keyClear": "@:appPageTitle.keyClear"
++        "keyClear": "@:appPageTitle.keyClear",
++        "fanSpeed": "@:appPageTitle.fanSpeed"
+     },
+     "appPageTitle": {
+         "changePassword": "Изменить пароль",
+diff --git a/src/router/routes.js b/src/router/routes.js
+index 5424cab..248ce1c 100644
+--- a/src/router/routes.js
++++ b/src/router/routes.js
+@@ -31,6 +31,7 @@ import VirtualMedia from '@/views/Operations/VirtualMedia';
+ import Power from '@/views/ResourceManagement/Power';
+ import SnmpAlerts from '@/views/Settings/SnmpAlerts';
+ import i18n from '@/i18n';
++import FanSpeed from '@/views/Settings/FanSpeed';
+ 
+ const roles = {
+   administrator: 'Administrator',
+@@ -190,6 +191,14 @@ const routes = [
+         meta: {
+           title: i18n.t('appPageTitle.dateTime'),
+         },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       },
+       {
+         path: '/settings/snmp-alerts',
+diff --git a/src/store/index.js b/src/store/index.js
+index 453e0f6..cb059ff 100644
+--- a/src/store/index.js
++++ b/src/store/index.js
+@@ -33,6 +33,7 @@ import KeyClearStore from './modules/Operations/KeyClearStore';
+ 
+ import DateTimeStore from './modules/Settings/DateTimeStore';
+ import VirtualMediaStore from './modules/Operations/VirtualMediaStore';
++import FanSpeedStore from './modules/Settings/FanSpeedStore';
+ 
+ Vue.use(Vuex);
+ 
+@@ -72,5 +73,6 @@ export default new Vuex.Store({
+     policies: PoliciesStore,
+     factoryReset: FactoryResetStore,
+     keyClear: KeyClearStore,
++    fanSpeed: FanSpeedStore,
+   },
+ });
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 036dc48..ecb714e 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,6 +34,9 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
++    cpldVersion: null,
++    sg1684xStatus: null,
++    sg1684xTmp: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -47,6 +50,9 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
++    cpldVersion: (state) => state.cpldVersion,
++    sg1684xStatus: (state) => state.sg1684xStatus,
++    sg1684xTmp: (state) => state.sg1684xTmp,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -62,6 +68,10 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
++    setCpldInfo: (state, cpldInfo) => (state.cpldVersion = cpldInfo),
++    setsg1684xInfo: (state, sg1684xInfo) => (state.sg1684xStatus = sg1684xInfo),
++    setsg1684xTmpInfo: (state, sg1684xTmpInfo) =>
++      (state.sg1684xTmp = sg1684xTmpInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -96,6 +106,9 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
++              CpldInfo,
++              sg1684xInfo,
++              sg1684xTmpInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -103,6 +116,9 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
++            commit('setCpldInfo', CpldInfo);
++            commit('setsg1684xInfo', sg1684xInfo);
++            commit('setsg1684xTmpInfo', sg1684xTmpInfo);
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/store/modules/Operations/ControlStore.js b/src/store/modules/Operations/ControlStore.js
+index e76063b..57885c1 100644
+--- a/src/store/modules/Operations/ControlStore.js
++++ b/src/store/modules/Operations/ControlStore.js
+@@ -126,6 +126,28 @@ const ControlStore = {
+           commit('setOperationInProgress', false);
+         });
+     },
++    async setSolToPort0({ dispatch, commit }) {
++      const data = { SolPortType: 'port0' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort1({ dispatch, commit }) {
++      const data = { SolPortType: 'port1' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    serverSolPortChange({ commit }, data) {
++      commit('setOperationInProgress', true);
++      api
++        .post(
++          '/redfish/v1/Systems/system/Actions/ComputerSystem.ChangeSolPort',
++          data
++        )
++        .catch((error) => {
++          console.log(error);
++          commit('setOperationInProgress', false);
++        });
++    },
+   },
+ };
+ 
+diff --git a/src/store/modules/Settings/FanSpeedStore.js b/src/store/modules/Settings/FanSpeedStore.js
+new file mode 100644
+index 0000000..6870fe1
+--- /dev/null
++++ b/src/store/modules/Settings/FanSpeedStore.js
+@@ -0,0 +1,44 @@
++import api from '@/store/api';
++import i18n from '@/i18n';
++
++const FanSpeedStore = {
++  namespaced: true,
++  state: {
++    fanSpeedPolicy: null,
++  },
++  getters: {
++    fanSpeedPolicy: (state) => state.fanSpeedPolicy,
++  },
++  mutations: {
++    setFanSpeedCurrentPolicy: (state, fanSpeedPolicy) =>
++      (state.fanSpeedPolicy = fanSpeedPolicy),
++  },
++  actions: {
++    async setFanSpeed(_, pwm) {
++      const data = { FanSpeed: pwm };
++
++      return await api
++        .patch('/redfish/v1/Systems/system', data)
++        .then(() => {
++          return i18n.t('pageFanSpeed.toast.successSaveSettings');
++        })
++        .catch((error) => {
++          console.log(error);
++          throw new Error(
++            i18n.t('pageFanSpeed.toast.errorSaveSettings')
++          );
++        });
++    },
++
++    async getFanSpeed({ commit }) {
++      return await api
++        .get('/redfish/v1/Systems/system')
++        .then(({ data: { FanSpeed } }) => {
++          commit('setFanSpeedCurrentPolicy', FanSpeed);
++        })
++        .catch((error) => console.log(error));
++    },
++  },
++};
++
++export default FanSpeedStore;
+diff --git a/src/store/modules/Settings/NetworkStore.js b/src/store/modules/Settings/NetworkStore.js
+index 9b01603..84caa78 100644
+--- a/src/store/modules/Settings/NetworkStore.js
++++ b/src/store/modules/Settings/NetworkStore.js
+@@ -48,10 +48,12 @@ const NetworkStore = {
+           useDnsEnabled: DHCPv4.UseDNSServers,
+           useDomainNameEnabled: DHCPv4.UseDomainName,
+           useNtpEnabled: DHCPv4.UseNTPServers,
++          dhcpEnabled: DHCPv4.DHCPEnabled,
+         };
+       });
+     },
+     setNtpState: (state, ntpState) => (state.ntpState = ntpState),
++    setDhcpState: (state, dhcpState) => (state.dhcpState = dhcpState),
+     setSelectedInterfaceId: (state, selectedInterfaceId) =>
+       (state.selectedInterfaceId = selectedInterfaceId),
+     setSelectedInterfaceIndex: (state, selectedInterfaceIndex) =>
+@@ -201,6 +203,35 @@ const NetworkStore = {
+           );
+         });
+     },
++    async saveDhcpState({ commit, state }, dhcpState) {
++      commit('setDhcpState', dhcpState);
++      const data = {
++        DHCPv4: {
++          DHCPEnabled: dhcpState,
++        },
++      };
++      // Saving to the first interface automatically updates DHCPv4 and DHCPv6
++      // on all interfaces
++      return api
++        .patch(
++          `/redfish/v1/Managers/bmc/EthernetInterfaces/${state.firstInterfaceId}`,
++          data
++        )
++        .then(() => {
++          return i18n.t('pageNetwork.toast.successSaveNetworkSettings', {
++            setting: i18n.t('pageNetwork.dhcp'),
++          });
++        })
++        .catch((error) => {
++          console.log(error);
++          commit('setDhcpState', !dhcpState);
++          throw new Error(
++            i18n.t('pageNetwork.toast.errorSaveNetworkSettings', {
++              setting: i18n.t('pageNetwork.dhcp'),
++            })
++          );
++        });
++    },
+     async setSelectedTabIndex({ commit }, tabIndex) {
+       commit('setSelectedInterfaceIndex', tabIndex);
+     },
+diff --git a/src/views/HardwareStatus/Inventory/Inventory.vue b/src/views/HardwareStatus/Inventory/Inventory.vue
+index d05e32e..aabdb45 100644
+--- a/src/views/HardwareStatus/Inventory/Inventory.vue
++++ b/src/views/HardwareStatus/Inventory/Inventory.vue
+@@ -52,13 +52,13 @@
+ import PageTitle from '@/components/Global/PageTitle';
+ import ServiceIndicator from './InventoryServiceIndicator';
+ import TableSystem from './InventoryTableSystem';
+-import TablePowerSupplies from './InventoryTablePowerSupplies';
+-import TableDimmSlot from './InventoryTableDimmSlot';
+-import TableFans from './InventoryTableFans';
++//import TablePowerSupplies from './InventoryTablePowerSupplies';
++//import TableDimmSlot from './InventoryTableDimmSlot';
++//import TableFans from './InventoryTableFans';
+ import TableBmcManager from './InventoryTableBmcManager';
+ import TableChassis from './InventoryTableChassis';
+ import TableProcessors from './InventoryTableProcessors';
+-import TableAssembly from './InventoryTableAssembly';
++//import TableAssembly from './InventoryTableAssembly';
+ import LoadingBarMixin from '@/components/Mixins/LoadingBarMixin';
+ import PageSection from '@/components/Global/PageSection';
+ import JumpLink16 from '@carbon/icons-vue/es/jump-link/16';
+@@ -69,14 +69,14 @@ export default {
+   components: {
+     PageTitle,
+     ServiceIndicator,
+-    TableDimmSlot,
+-    TablePowerSupplies,
++    //TableDimmSlot,
++    //TablePowerSupplies,
+     TableSystem,
+-    TableFans,
++    //TableFans,
+     TableBmcManager,
+     TableChassis,
+     TableProcessors,
+-    TableAssembly,
++    //TableAssembly,
+     PageSection,
+     JumpLink: JumpLink16,
+   },
+@@ -108,36 +108,36 @@ export default {
+           href: '#chassis',
+           linkText: this.$t('pageInventory.chassis'),
+         },
+-        {
+-          id: 'dimms',
+-          dataRef: 'dimms',
+-          href: '#dimms',
+-          linkText: this.$t('pageInventory.dimmSlot'),
+-        },
+-        {
+-          id: 'fans',
+-          dataRef: 'fans',
+-          href: '#fans',
+-          linkText: this.$t('pageInventory.fans'),
+-        },
+-        {
+-          id: 'powerSupply',
+-          dataRef: 'powerSupply',
+-          href: '#powerSupply',
+-          linkText: this.$t('pageInventory.powerSupplies'),
+-        },
++        //{
++//          id: 'dimms',
++//          dataRef: 'dimms',
++//          href: '#dimms',
++//          linkText: this.$t('pageInventory.dimmSlot'),
++//        },
++        //{
++//          id: 'fans',
++//          dataRef: 'fans',
++//          href: '#fans',
++//          linkText: this.$t('pageInventory.fans'),
++//        },
++        //{
++//          id: 'powerSupply',
++//          dataRef: 'powerSupply',
++//          href: '#powerSupply',
++//          linkText: this.$t('pageInventory.powerSupplies'),
++//        },
+         {
+           id: 'processors',
+           dataRef: 'processors',
+           href: '#processors',
+           linkText: this.$t('pageInventory.processors'),
+         },
+-        {
+-          id: 'assembly',
+-          dataRef: 'assembly',
+-          href: '#assembly',
+-          linkText: this.$t('pageInventory.assemblies'),
+-        },
++        //{
++//          id: 'assembly',
++//          dataRef: 'assembly',
++//          href: '#assembly',
++//          linkText: this.$t('pageInventory.assemblies'),
++//        },
+       ],
+     };
+   },
+diff --git a/src/views/HardwareStatus/Sensors/Sensors.vue b/src/views/HardwareStatus/Sensors/Sensors.vue
+index c4663a9..6df6861 100644
+--- a/src/views/HardwareStatus/Sensors/Sensors.vue
++++ b/src/views/HardwareStatus/Sensors/Sensors.vue
+@@ -1,7 +1,7 @@
+ <template>
+   <b-container fluid="xl">
+     <page-title />
+-    <b-row class="align-items-end">
++    <b-row class="align-items-end" style="display: flex;">
+       <b-col sm="6" md="5" xl="4">
+         <search
+           :placeholder="$t('pageSensors.searchForSensors')"
+@@ -10,13 +10,27 @@
+           @clear-search="onClearSearchInput"
+         />
+       </b-col>
+-      <b-col sm="3" md="3" xl="2">
++      <b-col sm="1" md="2" xl="3">
+         <table-cell-count
+           :filtered-items-count="filteredRows"
+           :total-number-of-cells="allSensors.length"
+         ></table-cell-count>
+       </b-col>
+-      <b-col sm="3" md="4" xl="6" class="text-right">
++      <b-col sm="2" md="3" xl="4" v-if="sg1684xStatusIcon === 'success'">
++        <dl>
++          <b-row>
++            <b-col sm="1" md="2" xl="3">
++              <dt style="margin-right: 1px;">
++                {{ $t('pageSensors.1684X_Exist') }}  <status-icon :status="sg1684xStatusIcon" />
++              </dt>
++            </b-col>
++            <b-col>
++              <span style="margin-left: 1px;">{{ get1684xtemperature }} °C</span>
++            </b-col>
++          </b-row>
++        </dl>
++      </b-col>
++      <b-col sm="3" md="2" xl="1" class="text-right" >
+         <table-filter :filters="tableFilters" @filter-change="onFilterChange" />
+       </b-col>
+     </b-row>
+@@ -223,6 +237,24 @@ export default {
+     filteredSensors() {
+       return this.getFilteredTableData(this.allSensors, this.activeFilters);
+     },
++
++    sg1684xStatus() {
++      return this.$store.getters['global/sg1684xStatus'];
++    },
++    sg1684xStatusIcon() {
++      switch (this.sg1684xStatus) {
++        case 'Exist':
++          return 'success';
++        default:
++          return 'secondary';
++      }
++    },
++    sg1684xTmp() {
++      return this.$store.getters['global/sg1684xTmp'];
++    },
++    get1684xtemperature() {
++      return this.sg1684xTmp;
++    },
+   },
+   created() {
+     this.startLoader();
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index 44a721a..0825d97 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -17,6 +17,9 @@
+ 
+         <!-- Host Firmware -->
+         <host-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- Cpld Firmware -->
++        <cpld-cards v-if="1" />
+       </b-col>
+     </b-row>
+ 
+@@ -42,6 +45,7 @@ import AlertsServerPower from './FirmwareAlertServerPower';
+ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
++import CpldCards from './FirmwareCardsCpld';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
+@@ -54,6 +58,7 @@ export default {
+     BmcCards,
+     FormUpdate,
+     HostCards,
++    CpldCards,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Operations/Firmware/FirmwareCardsCpld.vue b/src/views/Operations/Firmware/FirmwareCardsCpld.vue
+new file mode 100644
+index 0000000..dd1e950
+--- /dev/null
++++ b/src/views/Operations/Firmware/FirmwareCardsCpld.vue
+@@ -0,0 +1,65 @@
++<template>
++  <page-section :section-title="$t('pageFirmware.sectionTitleCpldCards')">
++    <b-card-group deck>
++      <!-- Running image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleRunning') }}
++          </p>
++        </template>
++        <dl class="mb-0">
++          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++          <dd class="mb-0">{{ runningVersion }}</dd>
++        </dl>
++      </b-card>
++
++      <!-- Backup image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleBackup') }}
++          </p>
++        </template>
++        <dl class="mb-0">
++          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++          <dd class="mb-0">
++            {{ backupVersion }}
++          </dd>
++        </dl>
++      </b-card>
++    </b-card-group>
++  </page-section>
++</template>
++
++<script>
++import PageSection from '@/components/Global/PageSection';
++
++export default {
++  components: { PageSection },
++  computed: {
++    // running() {
++    //   return this.$store.getters['firmware/activeCpldFirmware'];
++    // },
++    // runningVersion() {
++    //   return this.running?.version || '--';
++    // },
++    backup() {
++      return this.$store.getters['firmware/backupHostFirmware'];
++    },
++    runningVersion() {
++      return this.$store.getters['global/cpldVersion'];
++    },
++    backupVersion() {
++      // return this.backup?.version || '--';
++      return '--';
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.page-section {
++  margin-top: -$spacer * 1.5;
++}
++</style>
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index ca81385..4fd655c 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -63,10 +63,18 @@ export default {
+       type: Boolean,
+       default: true,
+     },
++    SolPortType: {
++      type: String,
++      default: null,
++    },
+   },
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      form: {
++        port: '',
++      },
++      logContent: '',
+     };
+   },
+   computed: {
+@@ -156,6 +164,39 @@ export default {
+         'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=600,height=550',
+       );
+     },
++    setSolPort() {
++      if (this.form.port === 'port0')
++      {
++        this.$store.dispatch('controls/setSolToPort0');
++      }
++      if (this.form.port === 'port1')
++      {
++        this.$store.dispatch('controls/setSolToPort1');
++      }
++    },
++    async fetchLogFile() {
++      try {
++        const response = await axios.get('/sol/logs');
++        this.logContent = response.data;
++      } catch (error) {
++        console.error('Error fetching log file:', error);
++        this.logContent = 'Failed to load log file.';
++      }
++    },
++    downloadLogFile() {
++      const blob = new Blob([this.logContent], { type: 'text/plain' });
++      const url = URL.createObjectURL(blob);
++      const link = document.createElement('a');
++      link.href = url;
++      link.download = 'sol-log.txt';
++      document.body.appendChild(link);
++      link.click();
++      document.body.removeChild(link);
++      URL.revokeObjectURL(url);
++    },
++    clearLogContent() {
++      this.logContent = '';
++    },
+   },
+ };
+ </script>
+@@ -172,3 +213,74 @@ export default {
+   margin: 1.5%;
+ }
+ </style>
++
++<style scoped>
++
++.container {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  padding-left: 0;
++  padding-right: 0;
++  height: 200px;
++  border: 2px solid #c8c2c2;
++  width: 100%;
++}
++
++.button-container {
++  display: flex;
++  flex-direction: column;
++  justify-content: space-between;
++  padding-left: 0;
++  margin-left: 0px;
++  margin-right: 0px;
++  height: 100%;
++  background-color: #f2eeee;
++}
++
++.button-container button {
++  padding: 5px 16px;
++  margin-left: 0;
++  color: #fff;
++  background-color: #2d60e5;
++  border-color: #d9dadc;
++  border-radius: 4px;
++  margin-left: 10px;
++  margin-right: 10px;
++}
++
++.button-container button:first-child {
++  margin-top: 10px;
++}
++
++.button-container button:last-child {
++  margin-bottom: 10px;
++}
++
++.textarea-container {
++  flex-grow: 1;
++  flex-direction: column;
++  justify-content: space-between;
++  flex-grow: 1;
++  width: 100%;
++  height: 100%;
++}
++.log-content {
++  width: 100%;
++  box-sizing: border-box;
++  resize: none;
++  background-color: #19273c;
++  color: white;
++  height: 100%;
++}
++
++.bold-black-label {
++  margin-bottom: 5px;
++  color: #353333;
++  font-size: 20px;
++}
++
++.spacer {
++  flex-grow: 1;
++}
++</style>
+diff --git a/src/views/Settings/FanSpeed/FanSpeed.vue b/src/views/Settings/FanSpeed/FanSpeed.vue
+new file mode 100644
+index 0000000..1aa28e8
+--- /dev/null
++++ b/src/views/Settings/FanSpeed/FanSpeed.vue
+@@ -0,0 +1,100 @@
++<template>
++  <b-container fluid="xl">
++    <page-title :description="$t('pageFanSpeed.description')" />
++
++    <b-row>
++      <b-col sm="8" md="6" xl="12">
++        <b-form-group :label="$t('pageFanSpeed.policiesLabel.Manul')">
++          <b-form-radio-group
++            v-model="currentFanSpeedControlPolicy"
++            name="fanspeed-control-policy"
++          >
++          <b-form-radio value="low">{{ $t('pageFanSpeed.gradeDesc.Low') }}</b-form-radio>
++          <b-form-radio value="medium">{{ $t('pageFanSpeed.gradeDesc.Medium') }}</b-form-radio>
++          <b-form-radio value="high">{{ $t('pageFanSpeed.gradeDesc.High') }}</b-form-radio>
++          </b-form-radio-group>
++        </b-form-group>
++      </b-col>
++    </b-row>
++
++    <b-row>
++      <b-col sm="8" md="6" xl="12">
++        <b-form-group :label="$t('pageFanSpeed.policiesLabel.Auto')">
++          <b-form-radio-group
++            v-model="currentFanSpeedControlPolicy"
++            name="fanspeed-control-policy"
++          >
++          <b-form-radio value="auto">{{ $t('pageFanSpeed.gradeDesc.Auto') }}</b-form-radio>
++          </b-form-radio-group>
++        </b-form-group>
++      </b-col>
++    </b-row>
++
++    <b-button variant="primary" type="submit" @click="submitForm">
++      {{ $t('global.action.saveSettings') }}
++    </b-button>
++  </b-container>
++</template>
++
++<script>
++import PageTitle from '@/components/Global/PageTitle';
++import BVToastMixin from '@/components/Mixins/BVToastMixin';
++import LocalTimezoneLabelMixin from '@/components/Mixins/LocalTimezoneLabelMixin';
++import VuelidateMixin from '@/components/Mixins/VuelidateMixin.js';
++import LoadingBarMixin from '@/components/Mixins/LoadingBarMixin';
++
++export default {
++  name: 'FanSpeed',
++  components: { PageTitle },
++  mixins: [
++    BVToastMixin,
++    LoadingBarMixin,
++    LocalTimezoneLabelMixin,
++    VuelidateMixin,
++  ],
++  beforeRouteLeave(to, from, next) {
++    this.hideLoader();
++    next();
++  },
++  data() {
++    return {
++      policyValue: null,
++    };
++  },
++
++  computed: {
++    currentFanSpeedControlPolicy: {
++      get() {
++        return this.$store.getters['fanSpeed/fanSpeedPolicy'];
++      },
++      set(policy) {
++        this.policyValue = policy;
++      },
++    },
++  },
++  created() {
++    this.startLoader();
++    this.renderFanSpeedSettings();
++  },
++  methods: {
++    renderFanSpeedSettings() {
++      Promise.all([
++        this.$store.dispatch('fanSpeed/getFanSpeed'),
++      ]).finally(() => {
++        this.endLoader();
++      });
++    },
++    submitForm() {
++      this.startLoader();
++      this.$store
++      .dispatch(
++        'fanSpeed/setFanSpeed',
++        this.policyValue
++      )
++      .finally(() => {
++          this.renderFanSpeedSettings();
++      });
++    },
++  },
++};
++</script>
+diff --git a/src/views/Settings/FanSpeed/index.js b/src/views/Settings/FanSpeed/index.js
+new file mode 100644
+index 0000000..5b1c28d
+--- /dev/null
++++ b/src/views/Settings/FanSpeed/index.js
+@@ -0,0 +1,2 @@
++import FanSpeed from './FanSpeed.vue';
++export default FanSpeed;
+diff --git a/src/views/Settings/Network/NetworkGlobalSettings.vue b/src/views/Settings/Network/NetworkGlobalSettings.vue
+index 3028767..b17a99e 100644
+--- a/src/views/Settings/Network/NetworkGlobalSettings.vue
++++ b/src/views/Settings/Network/NetworkGlobalSettings.vue
+@@ -3,8 +3,8 @@
+     v-if="firstInterface"
+     :section-title="$t('pageNetwork.networkSettings')"
+   >
+-    <b-row>
+-      <b-col md="3">
++    <b-row no-gutters>
++      <b-col md="2">
+         <dl>
+           <dt>
+             {{ $t('pageNetwork.hostname') }}
+@@ -15,7 +15,7 @@
+           <dd>{{ dataFormatter(firstInterface.hostname) }}</dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useDomainName') }}</dt>
+           <dd>
+@@ -34,7 +34,7 @@
+           </dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useDns') }}</dt>
+           <dd>
+@@ -53,7 +53,7 @@
+           </dd>
+         </dl>
+       </b-col>
+-      <b-col md="3">
++      <b-col md="2">
+         <dl>
+           <dt>{{ $t('pageNetwork.useNtp') }}</dt>
+           <dd>
+@@ -72,7 +72,26 @@
+           </dd>
+         </dl>
+       </b-col>
+-    </b-row>
++          <b-col md="2">
++        <dl>
++          <dt>{{ $t('pageNetwork.dhcp') }}</dt>
++          <dd>
++            <b-form-checkbox
++              id="dhcpSwitch"
++              v-model="dhcpState"
++              data-test-id="networkSettings-switch-dhcp"
++              switch
++              @change="changeDhcpState"
++            >
++              <span v-if="dhcpState">
++                {{ $t('global.status.enabled') }}
++              </span>
++              <span v-else>{{ $t('global.status.disabled') }}</span>
++            </b-form-checkbox>
++          </dd>
++        </dl>
++      </b-col>
++</b-row>
+   </page-section>
+ </template>
+ 
+@@ -125,6 +144,15 @@ export default {
+         return newValue;
+       },
+     },
++    dhcpState: {
++      get() {
++        return this.$store.getters['network/globalNetworkSettings'][0]
++          .dhcpEnabled;
++      },
++      set(newValue) {
++        return newValue;
++      },
++    },
+   },
+   created() {
+     this.$store.dispatch('network/getEthernetData').finally(() => {
+@@ -153,6 +181,12 @@ export default {
+         .then((message) => this.successToast(message))
+         .catch(({ message }) => this.errorToast(message));
+     },
++    changeDhcpState(state) {
++      this.$store
++        .dispatch('network/saveDhcpState', state)
++        .then((message) => this.successToast(message))
++        .catch(({ message }) => this.errorToast(message));
++    },
+     initSettingsModal() {
+       this.$bvModal.show('modal-hostname');
+     },
+diff --git a/vue.config.js b/vue.config.js
+index 38b4be9..59dc222 100644
+--- a/vue.config.js
++++ b/vue.config.js
+@@ -114,6 +114,11 @@ module.exports = {
+       }
+     }
+ 
++    config.resolve.fallback = {
++      fs: false,
++      path: require.resolve('path-browserify'),
++    };
++
+     if (process.env.NODE_ENV === 'production') {
+       config.plugins.push(
+         new CompressionPlugin({
+@@ -121,6 +126,9 @@ module.exports = {
+         }),
+       );
+     }
++    config.experiments = {
++      asyncWebAssembly: true,
++    };
+ 
+     config.performance = {
+       hints: 'warning',
+-- 
+2.34.1
+

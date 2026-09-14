@@ -2,7 +2,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG = " \
     adcsensor \
-    intelcpusensor \
     exitairtempsensor \
     fansensor \
     hwmontempsensor \

@@ -1,3 +1,12 @@
+From: sophgo <sophgo@sophgo.com>
+Date: Thu, 11 Sep 2026 00:00:00 +0800
+Subject: [PATCH] avahi: mask ip addr 192.168.0.45
+
+Skip publishing RRs for the address 192.168.0.45 on interfaces.
+
+Upstream-Status: Inappropriate [sophgo specific workaround]
+Signed-off-by: sophgo <sophgo@sophgo.com>
+---
 diff --git a/avahi-core/iface.c b/avahi-core/iface.c
 index a68a4b9..e76f409 100644
 --- a/avahi-core/iface.c
