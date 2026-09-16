@@ -1,0 +1,60 @@
+From cd0e20308c7a024c1e80cbb35e0abea59f49ee36 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Tue, 15 Sep 2026 10:57:21 +0800
+Subject: [PATCH] Add TMP451/CT7451 sensor types, disable PSU PWM sensor
+
+Upstream-Status: Inappropriate [sophgo specific]
+---
+ src/HwmonTempMain.cpp | 2 ++
+ src/PSUSensorMain.cpp | 8 ++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
+index 7444965..272c923 100644
+--- a/src/HwmonTempMain.cpp
++++ b/src/HwmonTempMain.cpp
+@@ -95,6 +95,8 @@ static const I2CDeviceTypeMap sensorTypes{
+     {"TMP464", I2CDeviceType{"tmp464", true}},
+     {"TMP75", I2CDeviceType{"tmp75", true}},
+     {"W83773G", I2CDeviceType{"w83773g", true}},
++    {"TMP451", I2CDeviceType{"tmp451", true}},
++    {"CT7451", I2CDeviceType{"ct7451", true}},
+ };
+ 
+ static struct SensorParams
+diff --git a/src/PSUSensorMain.cpp b/src/PSUSensorMain.cpp
+index 85ca833..4ac06ff 100644
+--- a/src/PSUSensorMain.cpp
++++ b/src/PSUSensorMain.cpp
+@@ -263,7 +263,7 @@ void checkEventLimits(const std::string& sensorPathStr,
+     }
+ }
+ 
+-static void
++/* static void
+     checkPWMSensor(const fs::path& sensorPath, std::string& labelHead,
+                    const std::string& interfacePath,
+                    std::shared_ptr<sdbusplus::asio::connection>& dbusConnection,
+@@ -305,7 +305,7 @@ static void
+             name, pwmPathStr, dbusConnection, objectServer, objPath, "PSU");
+     }
+ }
+-
++ */
+ static void createSensorsCallback(
+     boost::asio::io_context& io, sdbusplus::asio::object_server& objectServer,
+     std::shared_ptr<sdbusplus::asio::connection>& dbusConnection,
+@@ -644,8 +644,8 @@ static void createSensorsCallback(
+                     labelHead.insert(0, "max");
+                 }
+ 
+-                checkPWMSensor(sensorPath, labelHead, *interfacePath,
+-                               dbusConnection, objectServer, psuNames[0]);
++                // checkPWMSensor(sensorPath, labelHead, *interfacePath,
++                //                dbusConnection, objectServer, psuNames[0]);
+             }
+             else if (devType == DevTypes::IIO)
+             {
+-- 
+2.34.1
+

@@ -9,10 +9,6 @@
 #      install -m 0444 ${WORKDIR}/ethanolx-chassis.json ${D}/usr/share/entity-manager/configurations
 # }
 FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
-SRC_URI:append = " file://0000-sophgo-fru.patch "
-SRC_URI:append = " file://0001-sophgo-fru-utils-hpp-readFRUContents.patch "
-SRC_URI:append = " file://0002-sophgo-fru-device-readFRUContents.patch "
-SRC_URI:append = " file://0003-sophgo-fru-utils-cpp-readFRUContents.patch "
 
 
 SRC_URI += " \

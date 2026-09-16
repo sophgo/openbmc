@@ -1,0 +1,359 @@
+From d7e30122a95c66d9312a9f90e2ac8a95f1a4f6b7 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Tue, 15 Sep 2026 11:29:22 +0800
+Subject: [PATCH] Add aspeed jpeg format control and frame drop avoidance
+
+- Add -m option for jpeg compression format (0: standard, 1: aspeed)
+- Replace lastFrameIndex with buffersDone deque to avoid frame drops
+- Support V4L2_PIX_FMT_AJPG pixel format
+
+Upstream-Status: Inappropriate [sophgo specific]
+---
+ ikvm_args.cpp    | 11 ++++++++--
+ ikvm_args.hpp    |  6 ++++++
+ ikvm_manager.cpp |  2 +-
+ ikvm_server.cpp  | 20 +++++++++++++++++-
+ ikvm_video.cpp   | 54 +++++++++++++++++++++++++++++++++++++-----------
+ ikvm_video.hpp   | 32 +++++++++++++++++++++++++---
+ 6 files changed, 106 insertions(+), 19 deletions(-)
+
+diff --git a/ikvm_args.cpp b/ikvm_args.cpp
+index 681a9f8..296f6e5 100644
+--- a/ikvm_args.cpp
++++ b/ikvm_args.cpp
+@@ -8,12 +8,13 @@
+ namespace ikvm
+ {
+ Args::Args(int argc, char* argv[]) :
+-    frameRate(30), subsampling(0), calcFrameCRC{false}, commandLine(argc, argv)
++    frameRate(30), subsampling(0), format(0), calcFrameCRC{false}, commandLine(argc, argv)
+ {
+     int option;
+-    const char* opts = "f:s:h:k:p:u:v:c";
++    const char* opts = "f:s:m:h:k:p:u:v:c";
+     struct option lopts[] = {{"frameRate", 1, 0, 'f'},
+                              {"subsampling", 1, 0, 's'},
++                             {"format", 1, 0, 'm'},
+                              {"help", 0, 0, 'h'},
+                              {"keyboard", 1, 0, 'k'},
+                              {"mouse", 1, 0, 'p'},
+@@ -36,6 +37,11 @@ Args::Args(int argc, char* argv[]) :
+                 if (subsampling < 0 || subsampling > 1)
+                     subsampling = 0;
+                 break;
++            case 'm':
++                format = (int)strtol(optarg, NULL, 0);
++                if (format < 0 || format > 1)
++                    format = 0;
++                break;
+             case 'h':
+                 printUsage();
+                 exit(0);
+@@ -65,6 +71,7 @@ void Args::printUsage()
+     fprintf(stderr, "Usage: obmc-ikvm [options]\n");
+     fprintf(stderr, "-f frame rate          try this frame rate\n");
+     fprintf(stderr, "-s subsampling         try this subsampling\n");
++    fprintf(stderr, "-m format              0: standard jpeg, 1: aspeed jpeg\n");
+     fprintf(stderr, "-h, --help             show this message and exit\n");
+     fprintf(stderr, "-k device              HID keyboard gadget device\n");
+     fprintf(stderr, "-p device              HID mouse gadget device\n");
+diff --git a/ikvm_args.hpp b/ikvm_args.hpp
+index 089c700..2680b9b 100644
+--- a/ikvm_args.hpp
++++ b/ikvm_args.hpp
+@@ -77,6 +77,11 @@ class Args
+     {
+         return subsampling;
+     }
++    inline int getFormat() const
++    {
++        return format;
++    }
++
+ 
+     /*
+      * @brief Get the path to the USB keyboard device
+@@ -139,6 +144,7 @@ class Args
+     int frameRate;
+     /* @brief Desired subsampling (0: 444, 1: 420) */
+     int subsampling;
++    int format;
+     /* @brief Path to the USB keyboard device */
+     std::string keyboardPath;
+     /* @brief Path to the USB mouse device */
+diff --git a/ikvm_manager.cpp b/ikvm_manager.cpp
+index b283b87..ae6e984 100644
+--- a/ikvm_manager.cpp
++++ b/ikvm_manager.cpp
+@@ -8,7 +8,7 @@ Manager::Manager(const Args& args) :
+     continueExecuting(true), serverDone(false), videoDone(true),
+     input(args.getKeyboardPath(), args.getPointerPath(), args.getUdcName()),
+     video(args.getVideoPath(), input, args.getFrameRate(),
+-          args.getSubsampling()),
++          args.getSubsampling(), args.getFormat()),
+     server(args, input, video)
+ {}
+ 
+diff --git a/ikvm_server.cpp b/ikvm_server.cpp
+index 6a6cd06..71ac9ca 100644
+--- a/ikvm_server.cpp
++++ b/ikvm_server.cpp
+@@ -94,7 +94,16 @@ void Server::run()
+ 
+ void Server::sendFrame()
+ {
+-    char* data = video.getData();
++    static int frameCount = 0;
++    frameCount++;
++
++    if (video.buffersDone.empty())
++    {
++        return;
++    }
++
++    auto i = video.buffersDone.front();
++    char* data = video.getData(i);
+     rfbClientIteratorPtr it;
+     rfbClientPtr cl;
+     int64_t frame_crc = -1;
+@@ -172,6 +181,14 @@ void Server::sendFrame()
+                 cl->tightEncoding = rfbEncodingTight;
+                 rfbSendTightHeader(cl, 0, 0, video.getWidth(),
+                                    video.getHeight());
++                if (video.getFormat() == 1)
++                {
++                    cl->updateBuf[cl->ublen++] = (char)(0);
++                    cl->updateBuf[cl->ublen++] = (char)(frameCount >> 24 & 0xff);
++                    cl->updateBuf[cl->ublen++] = (char)(frameCount >> 16 & 0xff);
++                    cl->updateBuf[cl->ublen++] = (char)(frameCount >> 8 & 0xff);
++                    cl->updateBuf[cl->ublen++] = (char)(frameCount & 0xff);
++                }
+                 cl->updateBuf[cl->ublen++] = (char)(rfbTightJpeg << 4);
+                 rfbSendCompressedDataTight(cl, data, video.getFrameSize());
+                 if (cl->enableLastRectEncoding)
+@@ -187,6 +204,7 @@ void Server::sendFrame()
+     }
+ 
+     rfbReleaseClientIterator(it);
++    video.popData();
+ }
+ 
+ void Server::clientFramebufferUpdateRequest(
+diff --git a/ikvm_video.cpp b/ikvm_video.cpp
+index 3445715..1426f02 100644
+--- a/ikvm_video.cpp
++++ b/ikvm_video.cpp
+@@ -30,10 +30,11 @@ using namespace phosphor::logging;
+ using namespace sdbusplus::xyz::openbmc_project::Common::File::Error;
+ using namespace sdbusplus::xyz::openbmc_project::Common::Device::Error;
+ 
+-Video::Video(const std::string& p, Input& input, int fr, int sub) :
++Video::Video(const std::string& p, Input& input, int fr, int sub,
++             int fmt) :
+     resizeAfterOpen(false), timingsError(false), fd(-1), frameRate(fr),
+     lastFrameIndex(-1), height(600), width(800), subSampling(sub), input(input),
+-    path(p), pixelformat(V4L2_PIX_FMT_JPEG)
++    path(p), pixelformat(V4L2_PIX_FMT_JPEG), format(fmt)
+ {}
+ 
+ Video::~Video()
+@@ -43,12 +44,30 @@ Video::~Video()
+ 
+ char* Video::getData()
+ {
+-    if (lastFrameIndex >= 0)
++    if (buffersDone.empty())
+     {
+-        return (char*)buffers[lastFrameIndex].data;
++        return nullptr;
+     }
+ 
+-    return nullptr;
++    return (char*)buffers[buffersDone.front()].data;
++}
++
++char* Video::getData(unsigned int i)
++{
++    if (i >= buffers.size())
++    {
++        return nullptr;
++    }
++
++    return (char*)buffers[i].data;
++}
++
++void Video::popData()
++{
++    if (!buffersDone.empty())
++    {
++        buffersDone.pop_front();
++    }
+ }
+ 
+ void Video::getFrame()
+@@ -92,9 +111,9 @@ void Video::getFrame()
+ 
+                 if (!(buf.flags & V4L2_BUF_FLAG_ERROR))
+                 {
+-                    lastFrameIndex = buf.index;
+-                    buffers[lastFrameIndex].payload = buf.bytesused;
+-                    break;
++                    buffers[buf.index].payload = buf.bytesused;
++                    buffers[buf.index].sequence = buf.sequence;
++                    buffersDone.push_back(buf.index);
+                 }
+                 else
+                 {
+@@ -108,7 +127,16 @@ void Video::getFrame()
+ 
+     for (unsigned int i = 0; i < buffers.size(); ++i)
+     {
+-        if (i == (unsigned int)lastFrameIndex)
++        bool inDone = false;
++        for (auto idx : buffersDone)
++        {
++            if (idx == i)
++            {
++                inDone = true;
++                break;
++            }
++        }
++        if (inDone)
+         {
+             continue;
+         }
+@@ -183,7 +211,7 @@ bool Video::needsResize()
+                 xyz::openbmc_project::Common::File::Open::PATH(path.c_str()));
+         }
+ 
+-        lastFrameIndex = -1;
++        buffersDone.clear();
+         return true;
+     }
+ 
+@@ -459,7 +487,9 @@ void Video::start()
+     width = fmt.fmt.pix.width;
+     pixelformat = fmt.fmt.pix.pixelformat;
+ 
+-    if (pixelformat != V4L2_PIX_FMT_RGB24 && pixelformat != V4L2_PIX_FMT_JPEG)
++    if (pixelformat != V4L2_PIX_FMT_RGB24 &&
++        pixelformat != V4L2_PIX_FMT_JPEG &&
++        pixelformat != V4L2_PIX_FMT_AJPG)
+     {
+         log<level::ERR>("Pixel Format not supported",
+                         entry("PIXELFORMAT=%d", pixelformat));
+@@ -484,7 +514,7 @@ void Video::stop()
+         return;
+     }
+ 
+-    lastFrameIndex = -1;
++    buffersDone.clear();
+ 
+     rc = ioctl(fd, VIDIOC_STREAMOFF, &type);
+     if (rc)
+diff --git a/ikvm_video.hpp b/ikvm_video.hpp
+index 15bbb0b..bed956c 100644
+--- a/ikvm_video.hpp
++++ b/ikvm_video.hpp
+@@ -5,6 +5,7 @@
+ #include <mutex>
+ #include <string>
+ #include <vector>
++#include <deque>
+ 
+ namespace ikvm
+ {
+@@ -23,7 +24,8 @@ class Video
+      * @param[in] input - Reference to the Input object
+      * @param[in] fr    - desired frame rate of the video
+      */
+-    Video(const std::string& p, Input& input, int fr = 30, int sub = 0);
++    Video(const std::string& p, Input& input, int fr = 30, int sub = 0,
++          int fmt = 0);
+     ~Video();
+     Video(const Video&) = default;
+     Video& operator=(const Video&) = default;
+@@ -36,6 +38,8 @@ class Video
+      * @return Pointer to the video frame data
+      */
+     char* getData();
++    char* getData(unsigned int i);
++    void popData();
+     /* @brief Performs read to grab latest video frame */
+     void getFrame();
+     /*
+@@ -73,7 +77,11 @@ class Video
+      */
+     inline size_t getFrameSize() const
+     {
+-        return buffers[lastFrameIndex].payload;
++        if (buffersDone.empty())
++        {
++            return 0;
++        }
++        return buffers[buffersDone.front()].payload;
+     }
+     /*
+      * @brief Gets the height of the video frame
+@@ -88,10 +96,22 @@ class Video
+      * @brief Gets the pixel format  of the video frame
+      *
+      * @return Value of the pixel format of video frame */
++    inline uint32_t getSequence() const
++    {
++        if (buffersDone.empty())
++        {
++            return 0;
++        }
++        return buffers[buffersDone.front()].sequence;
++    }
+     inline uint32_t getPixelformat() const
+     {
+         return pixelformat;
+     }
++    inline int getFormat() const
++    {
++        return format;
++    }
+     /*
+      * @brief Gets the width of the video frame
+      *
+@@ -135,7 +155,8 @@ class Video
+      */
+     struct Buffer
+     {
+-        Buffer() : data(nullptr), queued(false), payload(0), size(0) {}
++        Buffer() : data(nullptr), queued(false), payload(0), size(0),
++                   sequence(0) {}
+         ~Buffer() = default;
+         Buffer(const Buffer&) = default;
+         Buffer& operator=(const Buffer&) = default;
+@@ -146,6 +167,7 @@ class Video
+         bool queued;
+         size_t payload;
+         size_t size;
++        uint32_t sequence;
+     };
+ 
+     /*
+@@ -161,6 +183,9 @@ class Video
+     int frameRate;
+     /* @brief Buffer index for the last video frame */
+     int lastFrameIndex;
++  public:
++    std::deque<unsigned int> buffersDone;
++  private:
+     /* @brief Height in pixels of the video frame */
+     size_t height;
+     /* @brief Width in pixels of the video frame */
+@@ -176,6 +201,7 @@ class Video
+ 
+     /* @brief Pixel Format  */
+     uint32_t pixelformat;
++    int format;
+ };
+ 
+ } // namespace ikvm
+-- 
+2.34.1
+
