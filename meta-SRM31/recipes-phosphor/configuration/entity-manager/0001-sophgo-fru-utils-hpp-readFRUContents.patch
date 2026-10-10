@@ -1,0 +1,13 @@
+diff --git a/include/fru_utils.hpp b/include/fru_utils.hpp
+index e2c6a54..a583786 100644
+--- a/include/fru_utils.hpp
++++ b/include/fru_utils.hpp
+@@ -156,7 +156,7 @@ bool findFRUHeader(FRUReader& reader, const std::string& errorHelp,
+ /// \param reader the FRUReader to read via
+ /// \param errorHelp and a helper string for failures
+ /// \return the FRU contents from the file
+-std::vector<uint8_t> readFRUContents(FRUReader& reader,
++std::vector<uint8_t> readFRUContents(int bus, int slave_addr, FRUReader& reader,
+                                      const std::string& errorHelp);
+ 
+ /// \brief Validate an IPMI FRU common header

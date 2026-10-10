@@ -1,0 +1,220 @@
+From 82780be7ccb305fe7dfe4a423fd8525a94aadde7 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 17:40:06 +0800
+Subject: [PATCH 1/1] add cpld version and sol port switching.
+
+---
+ src/locales/en-US.json                        |  7 +++-
+ src/store/modules/GlobalStore.js              |  5 +++
+ src/store/modules/Operations/ControlStore.js  | 19 +++++++++
+ src/views/Operations/Firmware/Firmware.vue    |  7 ++++
+ .../SerialOverLan/SerialOverLanConsole.vue    | 41 +++++++++++++++++++
+ 5 files changed, 78 insertions(+), 1 deletion(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index ffb6a2e..02b5abb 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -326,6 +326,7 @@
+         "sectionTitleBmcCards": "BMC",
+         "sectionTitleBmcCardsCombined": "BMC and server",
+         "sectionTitleHostCards": "Host",
++        "sectionTitleCpldCards": "CPLD",
+         "sectionTitleUpdateFirmware": "Update firmware",
+         "alert": {
+             "operationInProgress": "Server power operation in progress.",
+@@ -820,7 +821,11 @@
+         "disconnected": "Disconnected",
+         "openNewTab": "Open in new tab",
+         "status": "Status",
+-        "subTitle": "SOL console redirects the server's serial port output to this window."
++        "subTitle": "SOL console redirects the server's serial port output to this window.",
++        "setPort": "Set port",
++        "solPortC0U0": "UART0",
++        "solPortC0U1": "UART1",
++        "blank":"\u2002\u2002"
+     },
+     "pageServerPowerOperations": {
+         "currentStatus": "Current status",
+diff --git a/src/store/modules/GlobalStore.js b/src/store/modules/GlobalStore.js
+index 95d7a08..27c0e9d 100644
+--- a/src/store/modules/GlobalStore.js
++++ b/src/store/modules/GlobalStore.js
+@@ -34,6 +34,7 @@ const GlobalStore = {
+     modelType: null,
+     serialNumber: null,
+     serverStatus: 'unreachable',
++    cpldVersion: null,
+     languagePreference: localStorage.getItem('storedLanguage') || 'en-US',
+     isUtcDisplay: localStorage.getItem('storedUtcDisplay')
+       ? JSON.parse(localStorage.getItem('storedUtcDisplay'))
+@@ -46,6 +47,7 @@ const GlobalStore = {
+     modelType: (state) => state.modelType,
+     serialNumber: (state) => state.serialNumber,
+     serverStatus: (state) => state.serverStatus,
++    cpldVersion:   (state)  => state.cpldVersion,
+     bmcTime: (state) => state.bmcTime,
+     languagePreference: (state) => state.languagePreference,
+     isUtcDisplay: (state) => state.isUtcDisplay,
+@@ -60,6 +62,7 @@ const GlobalStore = {
+     setBmcTime: (state, bmcTime) => (state.bmcTime = bmcTime),
+     setServerStatus: (state, serverState) =>
+       (state.serverStatus = serverStateMapper(serverState)),
++    setCpldInfo:  (state, cpldInfo)   => (state.cpldVersion   =  cpldInfo),
+     setLanguagePreference: (state, language) =>
+       (state.languagePreference = language),
+     setUsername: (state, username) => (state.username = username),
+@@ -91,6 +94,7 @@ const GlobalStore = {
+               AssetTag,
+               Model,
+               PowerState,
++              CpldInfo,
+               SerialNumber,
+               Status: { State } = {},
+             },
+@@ -98,6 +102,7 @@ const GlobalStore = {
+             commit('setAssetTag', AssetTag);
+             commit('setSerialNumber', SerialNumber);
+             commit('setModelType', Model);
++            commit('setCpldInfo',  CpldInfo );
+             if (State === 'Quiesced' || State === 'InTest') {
+               // OpenBMC's host state interface is mapped to 2 Redfish
+               // properties "Status""State" and "PowerState". Look first
+diff --git a/src/store/modules/Operations/ControlStore.js b/src/store/modules/Operations/ControlStore.js
+index 9b8bf73..ed46ea3 100644
+--- a/src/store/modules/Operations/ControlStore.js
++++ b/src/store/modules/Operations/ControlStore.js
+@@ -126,6 +126,25 @@ const ControlStore = {
+           commit('setOperationInProgress', false);
+         });
+     },
++    async setSolToPort0({ dispatch, commit }) {
++      const data = { SolPortType: 'port0' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    async setSolToPort1({ dispatch, commit }) {
++      const data = { SolPortType: 'port1' };
++      dispatch('serverSolPortChange', data);
++      commit('setOperationInProgress', false);
++    },
++    serverSolPortChange({ commit }, data) {
++      commit('setOperationInProgress', true);
++      api
++        .post('/redfish/v1/Systems/system/Actions/ComputerSystem.ChangeSolPort', data)
++        .catch((error) => {
++          console.log(error);
++          commit('setOperationInProgress', false);
++        });
++    },
+   },
+ };
+ 
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index a2acb9b..25f46ad 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -14,6 +14,10 @@
+ 
+         <!-- Host Firmware -->
+         <host-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- Cpld Firmware -->
++        <cpld-cards v-if="1" />
++
+       </b-col>
+     </b-row>
+ 
+@@ -39,9 +43,11 @@ import AlertsServerPower from './FirmwareAlertServerPower';
+ import BmcCards from './FirmwareCardsBmc';
+ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
++import CpldCards from './FirmwareCardsCpld';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+ 
++
+ import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
+ 
+ export default {
+@@ -51,6 +57,7 @@ export default {
+     BmcCards,
+     FormUpdate,
+     HostCards,
++    CpldCards,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 82637a4..78b641c 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -39,6 +39,29 @@
+       </b-col>
+     </b-row>
+     <div id="terminal" ref="panel"></div>
++    <div>
++      <dt>{{ $t('pageSerialOverLan.blank') }}</dt>
++    </div>
++    <div>
++      <b-form novalidate @submit.prevent="setSolPort" :inline="true">
++        <b-button
++              variant="primary"
++              type="submit"
++              data-test-id="SerialOverLanConsole-button-setport"
++        >
++              {{ $t('pageSerialOverLan.setPort') }}
++        </b-button>
++        <dt>
++          {{ $t('pageSerialOverLan.blank') }}
++        </dt>
++        <b-form-group>
++            <b-form-radio-group id="radio-group" v-model="form.port" name="radio-group">
++                <b-form-radio value="port0">{{ $t('pageSerialOverLan.solPortC0U0') }}</b-form-radio>
++                <b-form-radio value="port1">{{ $t('pageSerialOverLan.solPortC0U1') }}</b-form-radio>
++            </b-form-radio-group>
++        </b-form-group>
++      </b-form>
++    </div>
+   </div>
+ </template>
+ 
+@@ -63,10 +86,17 @@ export default {
+       type: Boolean,
+       default: true,
+     },
++    SolPortType: {
++      type: String,
++      default: null,
++    },
+   },
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      form: {
++        port: '',
++      },
+     };
+   },
+   computed: {
+@@ -157,6 +187,17 @@ export default {
+         'directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=600,height=550'
+       );
+     },
++
++    setSolPort() {
++      if (this.form.port === 'port0')
++      {
++        this.$store.dispatch('controls/setSolToPort0');
++      }
++      if (this.form.port === 'port1')
++      {
++        this.$store.dispatch('controls/setSolToPort1');
++      }
++    },
+   },
+ };
+ </script>
+-- 
+2.25.1
+

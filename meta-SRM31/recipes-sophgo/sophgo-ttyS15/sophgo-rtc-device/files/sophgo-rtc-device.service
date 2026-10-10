@@ -1,0 +1,10 @@
+[Unit]
+Description=start sophgo-rtc-dev upon first boot
+ConditionPathExists=/usr/bin/sophgo-rtc-dev
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/sophgo-rtc-dev
+
+[Install]
+WantedBy=sysinit.target

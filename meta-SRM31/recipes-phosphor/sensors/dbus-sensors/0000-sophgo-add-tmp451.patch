@@ -1,0 +1,12 @@
+diff --git a/src/HwmonTempMain.cpp b/src/HwmonTempMain.cpp
+index 7ac03a3..30d0075 100644
+--- a/src/HwmonTempMain.cpp
++++ b/src/HwmonTempMain.cpp
+@@ -75,6 +75,7 @@ static const I2CDeviceTypeMap sensorTypes{
+     {"TMP441", I2CDeviceType{"tmp441", true}},
+     {"TMP75", I2CDeviceType{"tmp75", true}},
+     {"W83773G", I2CDeviceType{"w83773g", true}},
++    {"TMP451", I2CDeviceType{"tmp451", true}},
+ };
+ 
+ static struct SensorParams

@@ -1,0 +1,7 @@
+[Unit]
+Description=cpld update %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/sh -c '/usr/sbin/cpld_update.sh %i'

@@ -1,0 +1,32 @@
+diff --git a/avahi-core/iface.c b/avahi-core/iface.c
+index a68a4b9..e76f409 100644
+--- a/avahi-core/iface.c
++++ b/avahi-core/iface.c
+@@ -42,6 +42,8 @@
+ #include "multicast-lookup.h"
+ #include "querier.h"
+
++
++
+ void avahi_interface_address_update_rrs(AvahiInterfaceAddress *a, int remove_rrs) {
+     AvahiInterfaceMonitor *m;
+
+@@ -108,9 +110,17 @@ void avahi_interface_update_rrs(AvahiInterface *i, int remove_rrs) {
+     AvahiInterfaceAddress *a;
+
+     assert(i);
++    char ip_addr[AVAHI_ADDRESS_STR_MAX];
++    char ip_cmp[]="192.168.0.45";
+
+-    for (a = i->addresses; a; a = a->address_next)
++    for (a = i->addresses; a; a = a->address_next) {
++        avahi_address_snprint(ip_addr, sizeof(ip_addr), &a->address);
++        if(!strcmp(ip_addr, ip_cmp)) {
++            continue;
++        }
+         avahi_interface_address_update_rrs(a, remove_rrs);
++    }
++
+ }
+
+ void avahi_hw_interface_update_rrs(AvahiHwInterface *hw, int remove_rrs) {

@@ -1,0 +1,22 @@
+diff --git a/src/fru_device.cpp b/src/fru_device.cpp
+index af1155e..35c99e7 100644
+--- a/src/fru_device.cpp
++++ b/src/fru_device.cpp
+@@ -292,7 +292,7 @@ static std::vector<uint8_t> processEeprom(int bus, int address)
+         return readFromEeprom(file, offset, length, outbuf);
+     };
+     FRUReader reader(std::move(readFunc));
+-    std::vector<uint8_t> device = readFRUContents(reader, errorMessage);
++    std::vector<uint8_t> device = readFRUContents(bus, address, reader, errorMessage);
+ 
+     close(file);
+     return device;
+@@ -465,7 +465,7 @@ int getBusFRUs(int file, int first, int last, int bus,
+             FRUReader reader(std::move(readFunc));
+             std::string errorMessage =
+                 "bus " + std::to_string(bus) + " address " + std::to_string(ii);
+-            std::vector<uint8_t> device = readFRUContents(reader, errorMessage);
++            std::vector<uint8_t> device = readFRUContents(bus, ii, reader, errorMessage);
+             if (device.empty())
+             {
+                 continue;

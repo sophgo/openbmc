@@ -1,0 +1,46 @@
+From 32ea7b2f182e6abccc659a0ae74b27bed8f60454 Mon Sep 17 00:00:00 2001
+From: JianHang Wu <jianhang.wu@sophgo.com>
+Date: Fri, 24 Apr 2026 14:41:45 +0800
+Subject: [PATCH] delete post complete gpio
+
+Signed-off-by: JianHang Wu <jianhang.wu@sophgo.com>
+---
+ src/power_control.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/power_control.cpp b/src/power_control.cpp
+index 6229251..2f9e798 100644
+--- a/src/power_control.cpp
++++ b/src/power_control.cpp
+@@ -2727,6 +2727,7 @@ int main(int argc, char* argv[])
+         hostMiscHandler);
+ #endif
+ 
++#if 0
+     // Request POST_COMPLETE GPIO events
+     if (postCompleteConfig.type == ConfigType::GPIO)
+     {
+@@ -2748,6 +2749,7 @@ int main(int argc, char* argv[])
+             "postComplete name should be configured from json config file");
+         return -1;
+     }
++#endif
+ 
+     // initialize NMI_OUT GPIO.
+     if (!nmiOutConfig.lineName.empty())
+@@ -3304,6 +3306,7 @@ int main(int argc, char* argv[])
+     // Get the initial OS state based on POST complete
+     //      0: Asserted, OS state is "Standby" (ready to boot)
+     //      1: De-Asserted, OS state is "Inactive"
++#if 0
+     OperatingSystemStateStage osState;
+     if (postCompleteConfig.type == ConfigType::GPIO)
+     {
+@@ -3321,6 +3324,7 @@ int main(int argc, char* argv[])
+     osIface->register_property(
+         "OperatingSystemState",
+         std::string(getOperatingSystemStateStage(osState)));
++#endif
+ 
+     osIface->initialize();
+ 

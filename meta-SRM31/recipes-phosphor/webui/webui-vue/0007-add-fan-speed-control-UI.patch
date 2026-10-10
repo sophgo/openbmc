@@ -1,0 +1,230 @@
+From afe8c90577c4996185756c84d8d93172b762db1f Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Wed, 14 Aug 2024 17:52:44 +0800
+Subject: [PATCH 1/1] add fan speed control UI.
+
+---
+ .../AppNavigation/AppNavigationMixin.js       |  5 +++
+ src/env/components/AppNavigation/ibm.js       |  5 +++
+ src/env/components/AppNavigation/intel.js     |  5 +++
+ src/env/router/ibm.js                         |  8 ++++
+ src/env/router/intel.js                       |  8 ++++
+ src/locales/en-US.json                        | 38 ++++++++++++++++++-
+ src/locales/ru-RU.json                        |  3 +-
+ src/router/routes.js                          |  9 +++++
+ src/store/index.js                            |  2 +
+ 9 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/src/components/AppNavigation/AppNavigationMixin.js b/src/components/AppNavigation/AppNavigationMixin.js
+index bbbbb1e..2a2e5f7 100644
+--- a/src/components/AppNavigation/AppNavigationMixin.js
++++ b/src/components/AppNavigation/AppNavigationMixin.js
+@@ -118,6 +118,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.dateTime'),
+               route: '/settings/date-time',
+             },
++            {
++              id: 'fan-speed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+             {
+               id: 'network',
+               label: this.$t('appNavigation.network'),
+diff --git a/src/env/components/AppNavigation/ibm.js b/src/env/components/AppNavigation/ibm.js
+index ed84e17..8a5e3cc 100644
+--- a/src/env/components/AppNavigation/ibm.js
++++ b/src/env/components/AppNavigation/ibm.js
+@@ -92,6 +92,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.powerRestorePolicy'),
+               route: '/settings/power-restore-policy',
+             },
++            {
++              id: 'fanspeed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+           ],
+         },
+         {
+diff --git a/src/env/components/AppNavigation/intel.js b/src/env/components/AppNavigation/intel.js
+index 3fe0ad1..88108af 100644
+--- a/src/env/components/AppNavigation/intel.js
++++ b/src/env/components/AppNavigation/intel.js
+@@ -113,6 +113,11 @@ const AppNavigationMixin = {
+               label: this.$t('appNavigation.network'),
+               route: '/settings/network',
+             },
++            {
++              id: 'fanspeed',
++              label: this.$t('appNavigation.fanSpeed'),
++              route: '/settings/fan-speed',
++            },
+           ],
+         },
+         {
+diff --git a/src/env/router/ibm.js b/src/env/router/ibm.js
+index 0ccf90b..6a58ca0 100644
+--- a/src/env/router/ibm.js
++++ b/src/env/router/ibm.js
+@@ -183,6 +183,14 @@ const routes = [
+           title: i18n.t('appPageTitle.dateTime'),
+         },
+       },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       {
+         path: '/operations/firmware',
+         name: 'firmware',
+diff --git a/src/env/router/intel.js b/src/env/router/intel.js
+index fd8ed77..a4c5240 100644
+--- a/src/env/router/intel.js
++++ b/src/env/router/intel.js
+@@ -171,6 +171,14 @@ const routes = [
+           title: i18n.t('appPageTitle.dateTime'),
+         },
+       },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       {
+         path: '/operations/kvm',
+         name: 'kvm',
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 02b5abb..47d96b7 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -128,7 +128,8 @@
+         "certificates": "@:appPageTitle.certificates",
+         "virtualMedia": "@:appPageTitle.virtualMedia",
+         "power": "@:appPageTitle.power",
+-        "keyClear": "@:appPageTitle.keyClear"
++        "keyClear": "@:appPageTitle.keyClear",
++        "fanSpeed": "Fan speed"
+     },
+     "appPageTitle": {
+         "changePassword": "Change password",
+@@ -157,7 +158,8 @@
+         "serverPowerOperations": "Server power operations",
+         "certificates": "Certificates",
+         "virtualMedia": "Virtual media",
+-        "keyClear": "Key clear"
++        "keyClear": "Key clear",
++        "fanSpeed":"Fan speed"
+     },
+     "pageChangePassword": {
+         "changePassword": "Change password",
+@@ -211,6 +213,38 @@
+             "successSaveDateTime": "Successfully saved date and time settings."
+         }
+     },
++    "pageFanSpeed": {
++        "alert": {
++            "message": "To change how date and time are displayed (either UTC or browser offset) throughout the application, visit ",
++            "link": "Profile Settings"
++        },
++        "description": " Control strategy for setting fan speed .",
++        "policiesLabel": {
++            "Manul":"Manul control policy",
++            "Auto":"Automatic control policy"
++        },
++        "form": {
++            "pwm": "Pwm",
++            "manual": "Manual",
++            "auto": "Auto"
++        },
++        "grade": {
++            "Low": "low",
++            "Medium": "medium",
++            "High": "high",
++            "Auto":"auto"
++        },
++        "gradeDesc": {
++            "Low": "Low speed",
++            "Medium": "Medium speed",
++            "High": "High speed",
++            "Auto":"Auto"
++        },
++        "toast": {
++            "errorSaveSettings": "Error saving pwm settings.",
++            "successSaveSettings": "Successfully saved pwm settings."
++        }
++    },
+     "pageDumps": {
+         "dumpsAvailableOnBmc": "Dumps available on BMC",
+         "initiateDump": "Initiate dump",
+diff --git a/src/locales/ru-RU.json b/src/locales/ru-RU.json
+index 8993b82..ef1f29d 100644
+--- a/src/locales/ru-RU.json
++++ b/src/locales/ru-RU.json
+@@ -128,7 +128,8 @@
+         "certificates": "@:appPageTitle.certificates",
+         "virtualMedia": "@:appPageTitle.virtualMedia",
+         "power": "@:appPageTitle.power",
+-        "keyClear": "@:appPageTitle.keyClear"
++        "keyClear": "@:appPageTitle.keyClear",
++        "fanSpeed": "@:appPageTitle.fanSpeed"
+     },
+     "appPageTitle": {
+         "changePassword": "Изменить пароль",
+diff --git a/src/router/routes.js b/src/router/routes.js
+index 3cbdabc..596b6d4 100644
+--- a/src/router/routes.js
++++ b/src/router/routes.js
+@@ -30,6 +30,7 @@ import Certificates from '@/views/SecurityAndAccess/Certificates';
+ import VirtualMedia from '@/views/Operations/VirtualMedia';
+ import Power from '@/views/ResourceManagement/Power';
+ import i18n from '@/i18n';
++import FanSpeed from '@/views/Settings/FanSpeed';
+ 
+ const routes = [
+   {
+@@ -183,6 +184,14 @@ const routes = [
+           title: i18n.t('appPageTitle.dateTime'),
+         },
+       },
++      {
++        path: '/settings/fan-speed',
++        name: 'fan-speed',
++        component: FanSpeed,
++        meta: {
++          title: i18n.t('appPageTitle.fanSpeed'),
++        },
++      },
+       {
+         path: '/operations/factory-reset',
+         name: 'factory-reset',
+diff --git a/src/store/index.js b/src/store/index.js
+index ba248c5..4e647da 100644
+--- a/src/store/index.js
++++ b/src/store/index.js
+@@ -32,6 +32,7 @@ import KeyClearStore from './modules/Operations/KeyClearStore';
+ import WebSocketPlugin from './plugins/WebSocketPlugin';
+ import DateTimeStore from './modules/Settings/DateTimeStore';
+ import VirtualMediaStore from './modules/Operations/VirtualMediaStore';
++import FanSpeedStore from './modules/Settings/FanSpeedStore';
+ 
+ Vue.use(Vuex);
+ 
+@@ -69,6 +70,7 @@ export default new Vuex.Store({
+     policies: PoliciesStore,
+     factoryReset: FactoryResetStore,
+     keyClear: KeyClearStore,
++    fanSpeed:FanSpeedStore,
+   },
+   plugins: [WebSocketPlugin],
+ });
+-- 
+2.25.1
+

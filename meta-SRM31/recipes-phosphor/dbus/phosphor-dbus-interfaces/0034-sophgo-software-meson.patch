@@ -1,0 +1,23 @@
+diff --git a/gen/xyz/openbmc_project/Software/meson.build b/gen/xyz/openbmc_project/Software/meson.build
+index ace2bcb..36c6878 100644
+--- a/gen/xyz/openbmc_project/Software/meson.build
++++ b/gen/xyz/openbmc_project/Software/meson.build
+@@ -149,3 +149,17 @@ generated_others += custom_target(
+     ],
+ )
+ 
++subdir('Updating')
++generated_others += custom_target(
++    'xyz/openbmc_project/Software/Updating__markdown'.underscorify(),
++    input: [ '../../../../yaml/xyz/openbmc_project/Software/Updating.errors.yaml',  ],
++    output: [ 'Updating.md' ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../yaml',
++        'xyz/openbmc_project/Software/Updating',
++    ],
++)
+\ No newline at end of file

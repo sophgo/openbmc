@@ -1,0 +1,10 @@
+diff --git a/obmc-flash-host-bios@.service.in b/obmc-flash-host-bios@.service.in
+index 13a01af..761dde9 100644
+--- a/obmc-flash-host-bios@.service.in
++++ b/obmc-flash-host-bios@.service.in
+@@ -4,4 +4,4 @@ Description=Flash Host Bios image %I to Host
+ [Service]
+ Type=oneshot
+ RemainAfterExit=no
+-ExecStart=echo Please add custom command for flashing image /tmp/image/%i
++ExecStart=/bin/sh -c '/usr/sbin/bios_update.sh /tmp/images/%i'
