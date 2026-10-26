@@ -2,15 +2,15 @@ diff --git a/item_updater.hpp b/item_updater.hpp
 index c50d9de..8a30322 100644
 --- a/item_updater.hpp
 +++ b/item_updater.hpp
-@@ -67,6 +67,7 @@ class ItemUpdater : public ItemUpdaterInherit
+@@ -89,6 +89,7 @@ class ItemUpdater : public ItemUpdaterInherit
          restoreFieldModeStatus();
  #ifdef HOST_BIOS_UPGRADE
          createBIOSObject();
 +        createCPLDObject();
  #endif
-         emit_object_added();
-     };
-@@ -278,6 +279,11 @@ class ItemUpdater : public ItemUpdaterInherit
+ 
+         if (minimum_ship_level::enabled())
+@@ -312,6 +313,11 @@ class ItemUpdater : public ItemUpdaterInherit
    public:
      /** @brief Persistent Version D-Bus object for BIOS */
      std::unique_ptr<VersionClass> biosVersion;
