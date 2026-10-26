@@ -33,3 +33,12 @@ DEPENDS += " \
 
 FILES:${PN} += "${systemd_system_unitdir}/xyz.openbmc_project.mctpd@.service"
 FILES:${PN} += "/usr/share/mctp/mctp_config.json"
+
+do_install:append() {
+    if [ -d ${D}/lib/systemd/system ] && [ "${systemd_system_unitdir}" != "/lib/systemd/system" ]; then
+        install -d ${D}${systemd_system_unitdir}
+        mv ${D}/lib/systemd/system/*.service ${D}${systemd_system_unitdir}/ 2>/dev/null || true
+        rm -rf ${D}/lib/systemd
+        rmdir ${D}/lib 2>/dev/null || true
+    fi
+}

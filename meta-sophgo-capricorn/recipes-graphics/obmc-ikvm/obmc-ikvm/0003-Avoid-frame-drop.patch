@@ -1,51 +1,33 @@
-From bf4a29f2fa40f08e30d26dfb3b011c92eadb80cb Mon Sep 17 00:00:00 2001
-From: Steven Lee <steven_lee@aspeedtech.com>
-Date: Mon, 6 Feb 2023 18:08:36 +0800
-Subject: [PATCH] Avoid frame drop
+From a5bdcd4ea4be344f4401c0f54e2336caf9b51ad5 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Thu, 10 Sep 2026 19:00:45 +0800
+Subject: [PATCH 2/2] Avoid frame drop
 
-For standard jpeg, frame-drop is OK. Just send the latest frame
-to the client is fine. But for aspeed jpeg, frame-drop will lead
-to video broken because aspeed jpeg isn't full frame compression.
-
-There are 2 condition will lead to frame-drop:
-1. more than 1 buf return in getFrame().
-   To fix this problem, we add deque, buffersDone, to replace
-   lastFrameIndex. In this way, we can track all done buf.
-2. client is busy without new update request.
-   To fix this problem, we will try to deliver all done buf to
-   clients in sendFrame()
-
-The policy lastFrameIndex works:
-lastFrameIndex will be updated in getFrame to point to the lastest
-buf. Other buf done will be queue back to driver immediatelly. All
-other functions, getData/getFrameSize, use it to know which buf's
-data should be retrieved.
-
-New policy is:
-Record all done buf in getFrame(). Send all done buf to clients in
-sendFrame and then queue back to driver.
-
-Signed-off-by: Jammy Huang <jammy_huang@aspeedtech.com>
 ---
- ikvm_server.cpp | 46 +++++++++++----------------
- ikvm_video.cpp  | 84 ++++++++++++++++++++++++++++++++-----------------
- ikvm_video.hpp  | 34 ++++++++++++++++++--
- 3 files changed, 105 insertions(+), 59 deletions(-)
+ ikvm_server.cpp |  98 +++++++++++++++++++++++++----------------------
+ ikvm_video.cpp  | 100 ++++++++++++++++++++++++++++++++++--------------
+ ikvm_video.hpp  |  53 +++++++++++++++++++++++--
+ 3 files changed, 173 insertions(+), 78 deletions(-)
 
 diff --git a/ikvm_server.cpp b/ikvm_server.cpp
-index 67dfb5b..9ad260d 100644
+index 6a6cd06..9dc2e66 100644
 --- a/ikvm_server.cpp
 +++ b/ikvm_server.cpp
-@@ -9,6 +9,7 @@
+@@ -9,6 +9,9 @@
+ #include <phosphor-logging/log.hpp>
  #include <xyz/openbmc_project/Common/error.hpp>
  
- #define        rfbEncodingAspeed   18
-+#define ROUND_DOWN(x,r) ((x) & ~((r) - 1))
- 
++#define rfbEncodingAspeed 18
++#define ROUND_DOWN(x, r) ((x) & ~((r) - 1))
++
  namespace ikvm
  {
-@@ -99,7 +100,7 @@ void Server::sendFrame()
-     uint32_t frameCount = 0;
+ 
+@@ -95,9 +98,10 @@ void Server::run()
+ void Server::sendFrame()
+ {
+     char* data = video.getData();
++    uint32_t frameCount = 0;
      rfbClientIteratorPtr it;
      rfbClientPtr cl;
 -    int64_t frame_crc = -1;
@@ -53,7 +35,7 @@ index 67dfb5b..9ad260d 100644
  
      if (!data || pendingResize)
      {
-@@ -112,6 +113,7 @@ void Server::sendFrame()
+@@ -110,6 +114,7 @@ void Server::sendFrame()
      {
          ClientData* cd = (ClientData*)cl->clientData;
          rfbFramebufferUpdateMsg* fu = (rfbFramebufferUpdateMsg*)cl->updateBuf;
@@ -61,7 +43,7 @@ index 67dfb5b..9ad260d 100644
  
          if (!cd)
          {
-@@ -129,26 +131,8 @@ void Server::sendFrame()
+@@ -127,26 +132,8 @@ void Server::sendFrame()
              continue;
          }
  
@@ -71,9 +53,9 @@ index 67dfb5b..9ad260d 100644
 -            {
 -                /* JFIF header contains some varying data so skip it for
 -                 * checksum calculation */
--                frame_crc =
--                    boost::crc<32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true,
--                               true>(data + 0x30, video.getFrameSize() - 0x30);
+-                frame_crc = boost::crc<32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF,
+-                                       true, true>(data + 0x30,
+-                                                   video.getFrameSize() - 0x30);
 -            }
 -
 -            if (cd->last_crc == frame_crc)
@@ -89,83 +71,103 @@ index 67dfb5b..9ad260d 100644
  
          if (cl->enableLastRectEncoding)
          {
-@@ -163,11 +147,12 @@ void Server::sendFrame()
-         cl->ublen = sz_rfbFramebufferUpdateMsg;
-         rfbSendUpdateBuf(cl);
+@@ -157,36 +144,57 @@ void Server::sendFrame()
+             fu->nRects = Swap16IfLE(1);
+         }
  
--        cl->tightEncoding = rfbEncodingAspeed;
--        rfbSendTightHeader(cl, 0, 0, video.getWidth(), video.getHeight());
--
-         if (video.getFormat() == 1)
-         {
+-        switch (video.getPixelformat())
++        fu->type = rfbFramebufferUpdate;
++        cl->ublen = sz_rfbFramebufferUpdateMsg;
++        rfbSendUpdateBuf(cl);
++
++        if (video.getFormat() == 1)
++        {
 +            cl->tightEncoding = rfbEncodingAspeed;
-+            rfbSendTightHeader(cl, 0, 0, video.getWidth(), video.getHeight());
++            rfbSendTightHeader(cl, 0, 0, video.getWidth(),
++                               video.getHeight());
 +
 +            frameCount = video.getFrameCount(i);
-             cl->updateBuf[cl->ublen++] = (char)(0);
-             cl->updateBuf[cl->ublen++] = (char)(frameCount >> 24 & 0xff);
-             cl->updateBuf[cl->ublen++] = (char)(frameCount >> 16 & 0xff);
-@@ -176,11 +161,14 @@ void Server::sendFrame()
-             cl->updateBuf[cl->ublen++] = (char)(video.getSubsampling());
-             cl->updateBuf[cl->ublen++] = (char)(0x00); // the value of quality if changed
-         }
--        else if (video.getFormat() == 0)
-+        else
-         {
-+            cl->tightEncoding = rfbEncodingTight;
-+            rfbSendTightHeader(cl, 0, 0, video.getWidth(), video.getHeight());
++            cl->updateBuf[cl->ublen++] = (char)(0);
++            cl->updateBuf[cl->ublen++] = (char)(frameCount >> 24 & 0xff);
++            cl->updateBuf[cl->ublen++] = (char)(frameCount >> 16 & 0xff);
++            cl->updateBuf[cl->ublen++] = (char)(frameCount >> 8 & 0xff);
++            cl->updateBuf[cl->ublen++] = (char)(frameCount & 0xff);
++            cl->updateBuf[cl->ublen++] = (char)(video.getSubsampling());
 +
-             cl->updateBuf[cl->ublen++] = (char)(rfbTightJpeg << 4);
-         }
--        rfbSendCompressedDataTight(cl, data, video.getFrameSize());
-+        rfbSendCompressedDataTight(cl, data, video.getFrameSize(i));
- 
-         if (cl->enableLastRectEncoding)
++            rfbSendCompressedDataTight(cl, data, video.getFrameSize(i));
++        }
++        else if (video.getFormat() == 2)
++        {
++            v4l2_rect r = video.getBoundingBox(i);
++
++            cl->tightEncoding = rfbEncodingTight;
++            rfbSendTightHeader(cl, r.left, r.top, r.width, r.height);
++            cl->updateBuf[cl->ublen++] = (char)(rfbTightJpeg << 4);
++            rfbSendCompressedDataTight(cl, data, video.getFrameSize(i));
++        }
++        else
++        {
++            cl->tightEncoding = rfbEncodingTight;
++            rfbSendTightHeader(cl, 0, 0, video.getWidth(),
++                               video.getHeight());
++            cl->updateBuf[cl->ublen++] = (char)(rfbTightJpeg << 4);
++            rfbSendCompressedDataTight(cl, data, video.getFrameSize(i));
++        }
++
++        if (cl->enableLastRectEncoding)
          {
-@@ -191,6 +179,9 @@ void Server::sendFrame()
+-            case V4L2_PIX_FMT_RGB24:
+-                framebuffer.assign(data, data + video.getFrameSize());
+-                rfbMarkRectAsModified(server, 0, 0, video.getWidth(),
+-                                      video.getHeight());
+-                break;
+-
+-            case V4L2_PIX_FMT_JPEG:
+-                fu->type = rfbFramebufferUpdate;
+-                cl->ublen = sz_rfbFramebufferUpdateMsg;
+-                rfbSendUpdateBuf(cl);
+-                cl->tightEncoding = rfbEncodingTight;
+-                rfbSendTightHeader(cl, 0, 0, video.getWidth(),
+-                                   video.getHeight());
+-                cl->updateBuf[cl->ublen++] = (char)(rfbTightJpeg << 4);
+-                rfbSendCompressedDataTight(cl, data, video.getFrameSize());
+-                if (cl->enableLastRectEncoding)
+-                {
+-                    rfbSendLastRectMarker(cl);
+-                }
+-                rfbSendUpdateBuf(cl);
+-                break;
+-
+-            default:
+-                break;
++            rfbSendLastRectMarker(cl);
+         }
++        rfbSendUpdateBuf(cl);
      }
  
      rfbReleaseClientIterator(it);
 +
 +    if (frame_sent)
++    {
 +        video.releaseFrames();
++    }
  }
  
  void Server::clientFramebufferUpdateRequest(
-@@ -227,7 +218,7 @@ enum rfbNewClientAction Server::newClient(rfbClientPtr cl)
-     Server* server = (Server*)cl->screen->screenData;
- 
-     cl->clientData =
--        new ClientData(server->video.getFrameRate(), &server->input);
-+        new ClientData(ROUND_DOWN(server->video.getFrameRate(), 8), &server->input);
-     cl->clientGoneHook = clientGone;
-     cl->clientFramebufferUpdateRequestHook = clientFramebufferUpdateRequest;
-     if (!server->numClients++)
-@@ -264,8 +255,9 @@ void Server::doResize()
-             continue;
-         }
- 
-+        // let skipFrame round-down per interval of aspeed's I frame
-         // delay video updates to give the client time to resize
--        cd->skipFrame = video.getFrameRate();
-+        cd->skipFrame = ROUND_DOWN(video.getFrameRate(), 8);
-     }
- 
-     rfbReleaseClientIterator(it);
 diff --git a/ikvm_video.cpp b/ikvm_video.cpp
-index c75ffc0..ffe1149 100644
+index bc17b51..7a2f355 100644
 --- a/ikvm_video.cpp
 +++ b/ikvm_video.cpp
-@@ -34,7 +34,7 @@ using namespace sdbusplus::xyz::openbmc_project::Common::Device::Error;
+@@ -35,7 +35,7 @@ using namespace sdbusplus::xyz::openbmc_project::Common::Device::Error;
  
  Video::Video(const std::string& p, Input& input, int fr, int sub, int fmt) :
      resizeAfterOpen(false), timingsError(false), fd(-1), frameRate(fr),
--    lastFrameIndex(-1), height(600), width(800), subSampling(sub),
-+    height(600), width(800), subSampling(sub),
-     format(fmt), input(input), path(p)
+-    lastFrameIndex(-1), height(600), width(800), subSampling(sub), format(fmt),
++    height(600), width(800), subSampling(sub), format(fmt),
+     input(input), path(p), pixelformat(V4L2_PIX_FMT_JPEG)
  {}
  
-@@ -45,12 +45,21 @@ Video::~Video()
+@@ -46,12 +46,22 @@ Video::~Video()
  
  char* Video::getData()
  {
@@ -186,11 +188,20 @@ index c75ffc0..ffe1149 100644
 +    {
 +        return nullptr;
 +    }
++
 +    return (char*)buffers[i].data;
  }
  
  void Video::getFrame()
-@@ -66,6 +75,12 @@ void Video::getFrame()
+@@ -61,12 +71,20 @@ void Video::getFrame()
+     v4l2_buffer buf;
+     fd_set fds;
+     timeval tv;
++    v4l2_selection comp = {.type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
++                           .target = V4L2_SEL_TGT_CROP_DEFAULT};
+ 
+     if (fd < 0)
+     {
          return;
      }
  
@@ -203,7 +214,7 @@ index c75ffc0..ffe1149 100644
      FD_ZERO(&fds);
      FD_SET(fd, &fds);
  
-@@ -94,48 +109,59 @@ void Video::getFrame()
+@@ -95,48 +113,72 @@ void Video::getFrame()
  
                  if (!(buf.flags & V4L2_BUF_FLAG_ERROR))
                  {
@@ -212,6 +223,20 @@ index c75ffc0..ffe1149 100644
 -                    break;
 +                    buffers[buf.index].payload = buf.bytesused;
 +                    buffers[buf.index].sequence = buf.sequence;
++                    if (format == 2)
++                    {
++                        rc = ioctl(fd, VIDIOC_G_SELECTION, &comp);
++                        if (rc)
++                        {
++                            log<level::ERR>("Failed to get selection box",
++                                            entry("ERROR=%s", strerror(errno)));
++                            comp.r.left = 0;
++                            comp.r.top = 0;
++                            comp.r.width = width;
++                            comp.r.height = height;
++                        }
++                        buffers[buf.index].box = comp.r;
++                    }
 +                    buffersDone.push_back(buf.index);
                  }
                  else
@@ -225,13 +250,13 @@ index c75ffc0..ffe1149 100644
  
      fcntl(fd, F_SETFL, fd_flags);
 +}
-+
+ 
+-    for (unsigned int i = 0; i < buffers.size(); ++i)
 +void Video::qbuf(int i)
 +{
 +    int rc;
 +    v4l2_buffer buf;
- 
--    for (unsigned int i = 0; i < buffers.size(); ++i)
++
 +    if (!buffers[i].queued)
      {
 -        if (i == (unsigned int)lastFrameIndex)
@@ -273,11 +298,10 @@ index c75ffc0..ffe1149 100644
  
 +void Video::releaseFrames()
 +{
-+    int i;
-+
-+    if (!buffersDone.empty())
++    while (!buffersDone.empty())
 +    {
-+        i = buffersDone.front();
++        int i = buffersDone.front();
++
 +        buffersDone.pop_front();
 +        qbuf(i);
 +    }
@@ -286,7 +310,7 @@ index c75ffc0..ffe1149 100644
  bool Video::needsResize()
  {
      int rc;
-@@ -185,7 +211,7 @@ bool Video::needsResize()
+@@ -186,7 +228,7 @@ bool Video::needsResize()
                  xyz::openbmc_project::Common::File::Open::PATH(path.c_str()));
          }
  
@@ -295,7 +319,7 @@ index c75ffc0..ffe1149 100644
          return true;
      }
  
-@@ -500,7 +526,7 @@ void Video::stop()
+@@ -513,7 +555,7 @@ void Video::stop()
          return;
      }
  
@@ -305,18 +329,19 @@ index c75ffc0..ffe1149 100644
      rc = ioctl(fd, VIDIOC_STREAMOFF, &type);
      if (rc)
 diff --git a/ikvm_video.hpp b/ikvm_video.hpp
-index 69ec79c..0246d25 100644
+index 0dbb702..353a1a1 100644
 --- a/ikvm_video.hpp
 +++ b/ikvm_video.hpp
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,8 @@
  #include <mutex>
  #include <string>
  #include <vector>
 +#include <deque>
++#include <linux/videodev2.h>
  
  namespace ikvm
  {
-@@ -36,8 +37,11 @@ class Video
+@@ -37,8 +39,11 @@ class Video
       * @return Pointer to the video frame data
       */
      char* getData();
@@ -328,13 +353,24 @@ index 69ec79c..0246d25 100644
      /*
       * @brief Gets whether or not the video frame needs to be resized
       *
-@@ -73,7 +77,28 @@ class Video
+@@ -47,6 +52,8 @@ class Video
+     bool needsResize();
+     /* @brief Performs the resize and re-allocates framebuffer */
+     void resize();
++    /* @brief Queue buffer back to driver */
++    void qbuf(int i);
+     /* @brief Starts streaming from the video device */
+     void start();
+     /* @brief Stops streaming from the video device */
+@@ -74,7 +81,41 @@ class Video
       */
      inline size_t getFrameSize() const
      {
 -        return buffers[lastFrameIndex].payload;
 +        if (buffersDone.empty())
++        {
 +            return 0;
++        }
 +        return buffers[buffersDone.front()].payload;
 +    }
 +    inline size_t getFrameSize(unsigned int i) const
@@ -349,16 +385,27 @@ index 69ec79c..0246d25 100644
 +    inline size_t getFrameCount() const
 +    {
 +        if (buffersDone.empty())
++        {
 +            return 0;
++        }
 +        return buffers[buffersDone.front()].sequence;
 +    }
 +    inline size_t getFrameCount(unsigned int i) const
 +    {
 +        return buffers[i].sequence;
++    }
++    /*
++     * @brief Gets the bounding box of a partial jpeg frame
++     *
++     * @return Value of the bounding box rectangle
++     */
++    inline v4l2_rect getBoundingBox(unsigned int i) const
++    {
++        return buffers[i].box;
      }
      /*
       * @brief Gets the height of the video frame
-@@ -138,8 +163,12 @@ class Video
+@@ -136,6 +177,8 @@ class Video
      static const int bytesPerPixel;
      /* @brief Number of components in a pixel (i.e. 3 for RGB pixel) */
      static const int samplesPerPixel;
@@ -366,20 +413,28 @@ index 69ec79c..0246d25 100644
 +    std::deque<int> buffersDone;
  
    private:
-+    void qbuf(int i);
-+
      /*
-      * @struct Buffer
-      * @brief Store the address and size of frame data from streaming
-@@ -159,6 +188,7 @@ class Video
+@@ -145,7 +188,9 @@ class Video
+      */
+     struct Buffer
+     {
+-        Buffer() : data(nullptr), queued(false), payload(0), size(0) {}
++        Buffer() : data(nullptr), queued(false), payload(0), size(0),
++            sequence(0), box{}
++        {}
+         ~Buffer() = default;
+         Buffer(const Buffer&) = default;
+         Buffer& operator=(const Buffer&) = default;
+@@ -156,6 +201,8 @@ class Video
          bool queued;
          size_t payload;
          size_t size;
-+        uint32_t sequence;
++        unsigned int sequence;
++        v4l2_rect box;
      };
  
      /*
-@@ -172,8 +202,6 @@ class Video
+@@ -169,8 +216,6 @@ class Video
      int fd;
      /* @brief Desired frame rate of video stream in frames per second */
      int frameRate;
@@ -389,5 +444,5 @@ index 69ec79c..0246d25 100644
      size_t height;
      /* @brief Width in pixels of the video frame */
 -- 
-2.25.1
+2.34.1
 

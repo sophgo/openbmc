@@ -1,3 +1,13 @@
+From 8483b30a15bc7b492a732962e138d03aff8bf9fa Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Fri, 29 Mar 2024 11:45:35 +0800
+Subject: [PATCH 4/4] 1. Updated bmcweb 2. Refactoring sophgo-fan-control with
+ C++
+
+---
+ yaml/xyz/openbmc_project/Sensor/Device.errors.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
+
 diff --git a/yaml/xyz/openbmc_project/Sensor/Device.errors.yaml b/yaml/xyz/openbmc_project/Sensor/Device.errors.yaml
 index c00e077..6547d0a 100644
 --- a/yaml/xyz/openbmc_project/Sensor/Device.errors.yaml
@@ -11,3 +21,6 @@ index c00e077..6547d0a 100644
 +- name: FanFault
 +  description: The speed value of fan during startup is 0.
 \ No newline at end of file
+-- 
+2.34.1
+
