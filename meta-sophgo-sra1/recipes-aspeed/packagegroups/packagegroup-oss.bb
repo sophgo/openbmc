@@ -26,11 +26,9 @@ RDEPENDS:${PN}-apps = " \
     i3c-tools \
     i2c-tools \
     xdma-test \
-    libpeci \
     dhrystone \
     nbd-client \
     iozone3 \
-    ncsi-netlink \
     hdparm \
     stressapptest \
     e2fsprogs-mke2fs \

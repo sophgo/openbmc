@@ -3,7 +3,7 @@ inherit obmc-phosphor-systemd
 SUMMARY = "At Scale Debug Service"
 DESCRIPTION = "At Scale Debug Service exposes remote JTAG target debug capabilities"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8929d33c051277ca2294fe0f5b062f38"
 
 
