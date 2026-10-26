@@ -1,18 +1,18 @@
-From f4eddacc871c6bb759e6e355a89ccaaa12c63396 Mon Sep 17 00:00:00 2001
+From 0e6fe7015ecabfafc93222c3fe04df1ede5d3cfc Mon Sep 17 00:00:00 2001
 From: Zhikui Ren <zhikui.ren@intel.com>
 Date: Tue, 8 Dec 2020 15:16:25 -0800
-Subject: [PATCH] update meson build for MCTP interfaces
+Subject: [PATCH 2/4] update meson build for MCTP interfaces
 
 Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
 ---
  gen/xyz/openbmc_project/MCTP/Base/meson.build | 13 ++++++
  .../MCTP/Binding/PCIe/meson.build             | 13 ++++++
  .../MCTP/Binding/SMBus/meson.build            | 13 ++++++
- .../openbmc_project/MCTP/Binding/meson.build  | 30 +++++++++++++
+ .../openbmc_project/MCTP/Binding/meson.build  | 28 +++++++++++++
  .../openbmc_project/MCTP/BusOwner/meson.build | 13 ++++++
  .../MCTP/SupportedMessageTypes/meson.build    | 13 ++++++
  gen/xyz/openbmc_project/MCTP/meson.build      | 42 +++++++++++++++++++
- 7 files changed, 137 insertions(+)
+ 7 files changed, 135 insertions(+)
  create mode 100644 gen/xyz/openbmc_project/MCTP/Base/meson.build
  create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
  create mode 100644 gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
@@ -22,7 +22,7 @@ Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
 
 diff --git a/gen/xyz/openbmc_project/MCTP/Base/meson.build b/gen/xyz/openbmc_project/MCTP/Base/meson.build
 new file mode 100644
-index 000000000000..c605b2d496ac
+index 0000000..c605b2d
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/Base/meson.build
 @@ -0,0 +1,13 @@
@@ -41,7 +41,7 @@ index 000000000000..c605b2d496ac
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
 new file mode 100644
-index 000000000000..4573a64f4099
+index 0000000..382342b
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/Binding/PCIe/meson.build
 @@ -0,0 +1,13 @@
@@ -60,7 +60,7 @@ index 000000000000..4573a64f4099
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
 new file mode 100644
-index 000000000000..bfb4d040a54c
+index 0000000..6192e5b
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/Binding/SMBus/meson.build
 @@ -0,0 +1,13 @@
@@ -79,7 +79,7 @@ index 000000000000..bfb4d040a54c
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/Binding/meson.build b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
 new file mode 100644
-index 000000000000..36a74ddac294
+index 0000000..1a05e9d
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/Binding/meson.build
 @@ -0,0 +1,28 @@
@@ -113,7 +113,7 @@ index 000000000000..36a74ddac294
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
 new file mode 100644
-index 000000000000..4b28bd6b34e7
+index 0000000..4b28bd6
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/BusOwner/meson.build
 @@ -0,0 +1,13 @@
@@ -132,7 +132,7 @@ index 000000000000..4b28bd6b34e7
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
 new file mode 100644
-index 000000000000..4fd46823ed17
+index 0000000..4fd4682
 --- /dev/null
 +++ b/gen/xyz/openbmc_project/MCTP/SupportedMessageTypes/meson.build
 @@ -0,0 +1,13 @@
@@ -150,7 +150,7 @@ index 000000000000..4fd46823ed17
 +    ],
 +)
 diff --git a/gen/xyz/openbmc_project/MCTP/meson.build b/gen/xyz/openbmc_project/MCTP/meson.build
-index b9598adf6fa7..6b6d00b833d2 100644
+index fc9ca6c..09102b5 100644
 --- a/gen/xyz/openbmc_project/MCTP/meson.build
 +++ b/gen/xyz/openbmc_project/MCTP/meson.build
 @@ -1,4 +1,33 @@
@@ -187,7 +187,7 @@ index b9598adf6fa7..6b6d00b833d2 100644
  subdir('Endpoint')
  generated_others += custom_target(
      'xyz/openbmc_project/MCTP/Endpoint__markdown'.underscorify(),
-@@ -13,3 +42,16 @@ generated_others += custom_target(
+@@ -14,3 +43,16 @@ generated_others += custom_target(
      ],
  )
  
@@ -205,5 +205,5 @@ index b9598adf6fa7..6b6d00b833d2 100644
 +    ],
 +)
 -- 
-2.17.1
+2.34.1
 
