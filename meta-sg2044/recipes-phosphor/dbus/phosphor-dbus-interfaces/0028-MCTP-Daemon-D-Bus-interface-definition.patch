@@ -1,7 +1,7 @@
-From b71be53feae971f950dca5a7d4870ab53cea0889 Mon Sep 17 00:00:00 2001
+From ccafe93566305842b2e7cf6c1ead7e07f146e47d Mon Sep 17 00:00:00 2001
 From: Jamin Lin <jamin_lin@aspeedtech.com>
 Date: Thu, 7 Jul 2022 16:49:30 +0800
-Subject: [PATCH] MCTP Daemon D-Bus interface definition.
+Subject: [PATCH 1/4] MCTP Daemon D-Bus interface definition.
 
 Patch from https://github.com/Intel-BMC/openbmc
 This interface definition was created on base of the MCTP design proposed in this document:
@@ -339,7 +339,7 @@ index 0000000..d46298e
 +      type: boolean
 +      description: Indicates Eid pool is managed by self
 diff --git a/yaml/xyz/openbmc_project/MCTP/Endpoint.interface.yaml b/yaml/xyz/openbmc_project/MCTP/Endpoint.interface.yaml
-index 8cb0f13..abb3ac9 100644
+index d867fa2..80c883c 100644
 --- a/yaml/xyz/openbmc_project/MCTP/Endpoint.interface.yaml
 +++ b/yaml/xyz/openbmc_project/MCTP/Endpoint.interface.yaml
 @@ -6,6 +6,11 @@ description: >
@@ -352,7 +352,7 @@ index 8cb0f13..abb3ac9 100644
 +          Endpoint / BusOwner / Bridge
 +
      - name: NetworkId
-       type: size
+       type: uint32
        description: >
 diff --git a/yaml/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml b/yaml/xyz/openbmc_project/MCTP/SupportedMessageTypes.interface.yaml
 new file mode 100644
@@ -397,5 +397,5 @@ index 0000000..fa447ee
 +      type: boolean
 +      description: Indicates support availability
 -- 
-2.25.1
+2.34.1
 
