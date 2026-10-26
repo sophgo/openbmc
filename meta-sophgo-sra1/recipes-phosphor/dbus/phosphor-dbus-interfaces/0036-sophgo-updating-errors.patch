@@ -1,0 +1,72 @@
+From fc7316e6447c04d0d4a2156698d77d5730b4c209 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Mon, 14 Sep 2026 09:27:59 +0800
+Subject: [PATCH] Add Software.Updating error interface for sophgo CPLD/BIOS
+ update
+
+---
+ .../openbmc_project/Software/Updating/meson.build | 14 ++++++++++++++
+ gen/xyz/openbmc_project/Software/meson.build      | 15 +++++++++++++++
+ .../openbmc_project/Software/Updating.errors.yaml |  6 ++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 gen/xyz/openbmc_project/Software/Updating/meson.build
+ create mode 100644 yaml/xyz/openbmc_project/Software/Updating.errors.yaml
+
+diff --git a/gen/xyz/openbmc_project/Software/Updating/meson.build b/gen/xyz/openbmc_project/Software/Updating/meson.build
+new file mode 100644
+index 0000000..aa22f1a
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Software/Updating/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/Software/Updating__cpp'.underscorify(),
++    input: [ '../../../../../yaml/xyz/openbmc_project/Software/Updating.errors.yaml',  ],
++    output: [ 'error.cpp', 'error.hpp',  ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../../yaml',
++        'xyz/openbmc_project/Software/Updating',
++    ],
++)
+diff --git a/gen/xyz/openbmc_project/Software/meson.build b/gen/xyz/openbmc_project/Software/meson.build
+index 04da7b7..70e2e97 100644
+--- a/gen/xyz/openbmc_project/Software/meson.build
++++ b/gen/xyz/openbmc_project/Software/meson.build
+@@ -194,3 +194,18 @@ generated_others += custom_target(
+     ],
+ )
+ 
++
++subdir('Updating')
++generated_others += custom_target(
++    'xyz/openbmc_project/Software/Updating__markdown'.underscorify(),
++    input: [ '../../../../yaml/xyz/openbmc_project/Software/Updating.errors.yaml',  ],
++    output: [ 'Updating.md' ],
++    depend_files: sdbusplusplus_depfiles,
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.current_source_dir() / '../../../../yaml',
++        'xyz/openbmc_project/Software/Updating',
++    ],
++)
+diff --git a/yaml/xyz/openbmc_project/Software/Updating.errors.yaml b/yaml/xyz/openbmc_project/Software/Updating.errors.yaml
+new file mode 100644
+index 0000000..e74e2e8
+--- /dev/null
++++ b/yaml/xyz/openbmc_project/Software/Updating.errors.yaml
+@@ -0,0 +1,6 @@
++- name: DoFlash
++  description: >
++      Shell script execution error for bios upgrading.
++- name: DoSvf
++  description: >
++      Shell script execution error for cpld upgrading.
+-- 
+2.34.1
+

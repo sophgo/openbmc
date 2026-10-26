@@ -1,50 +1,61 @@
+From fb18b06ad2e73cc831ff17b5ca295450c2a46957 Mon Sep 17 00:00:00 2001
+From: sunwenxiang <sunwenxiang133@gmail.com>
+Date: Fri, 11 Sep 2026 20:02:13 +0800
+Subject: [PATCH] ssifbridged: use 1-byte length field for SSIF messages
+
+sophgo host (ARM) uses standard SSIF over SMBus framing where the
+message length field is a single byte, not the 4-byte unsigned int
+framing used by the Intel-oriented upstream implementation. Adjust
+request parsing, response writing, timeout response, and verbose
+logging accordingly.
+---
+ ssifbridged.cpp | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
 diff --git a/ssifbridged.cpp b/ssifbridged.cpp
-index 9b74337..f41c87f 100644
+index fcba043..9a7eef1 100644
 --- a/ssifbridged.cpp
 +++ b/ssifbridged.cpp
-@@ -52,7 +52,7 @@ class SsifChannel
+@@ -60,7 +60,7 @@ class SsifChannel
    public:
-     static constexpr size_t ssifMessageSize = IPMI_SSIF_PAYLOAD_MAX +
+     static constexpr size_t ssifMessageSize = ipmiSsifPayloadMax +
                                                sizeof(unsigned int);
 -    size_t sizeofLenField = sizeof(unsigned int);
 +    size_t sizeofLenField = sizeof(unsigned char);
      static constexpr uint8_t netFnShift = 2;
      static constexpr uint8_t lunMask = (1 << netFnShift) - 1;
  
-@@ -144,6 +144,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
- 
-     auto rawIter = xferBuffer.cbegin();
-     auto rawEnd = rawIter + rlen;
-+    std::string rlenToLog = "rlen = " + std::to_string(rlen);
-     uint8_t netfn = rawIter[sizeofLenField] >> netFnShift;
-     uint8_t lun = rawIter[sizeofLenField] & lunMask;
-     uint8_t cmd = rawIter[sizeofLenField + 1];
-@@ -154,8 +155,8 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
+@@ -180,7 +180,7 @@ void rspTimerHandler(const boost::system::error_code& ec)
+                            std::to_string(ssifchannel->showNumOfReqNotRsp());
+     log<level::INFO>(msgToLog.c_str());
+     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+-    unsigned int* t = reinterpret_cast<unsigned int*>(rsp.data());
++    unsigned char* t = reinterpret_cast<unsigned char*>(rsp.data());
+     *t = 3;
+     rsp[ssifchannel->sizeofLenField] = ((prevReqCmd.netfn + 1)
+                                         << ssifchannel->netFnShift) |
+@@ -263,7 +263,7 @@ void SsifChannel::afterMethodCall(const boost::system::error_code& ec,
+     // write the response
+     auto rspIter = rsp.begin();
+     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+-    unsigned int* p = reinterpret_cast<unsigned int*>(&rspIter[0]);
++    unsigned char* p = reinterpret_cast<unsigned char*>(&rspIter[0]);
+     *p = payload.size() + 3;
+     rspIter[sizeofLenField] = (netfn << netFnShift) | (lun & lunMask);
+     rspIter[sizeofLenField + 1] = cmd;
+@@ -329,9 +329,10 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
  
      if (verbose)
      {
--        unsigned int lenRecv;
--        unsigned int *p = (unsigned int *) rawIter;
-+        unsigned char lenRecv;
-+        unsigned char *p = (unsigned char *) rawIter;
+-        unsigned int lenRecv = 0;
++        unsigned char lenRecv = 0;
+         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+-        const unsigned int* p = reinterpret_cast<const unsigned int*>(rawIter);
++        const unsigned char* p =
++            reinterpret_cast<const unsigned char*>(rawIter);
          lenRecv = p[0];
-         std::string msgToLog = "Read ssif request message with"
-                 " len=" + std::to_string(lenRecv) +
-@@ -197,7 +198,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
-                            sizeof(cc));
-                 /* if dbusTimeout, just return and do not send any response
-                  * to let host continue with other commands, response here
--                 * is potentionally make the response duplicated 
-+                 * is potentionally make the response duplicated
-                  * */
-                 return;
-             }
-@@ -218,7 +219,7 @@ void SsifChannel::processMessage(const boost::system::error_code& ecRd,
- 
-                 // write the response
-                 auto rspIter = rsp.begin();
--                unsigned int *p = (unsigned int *) &rspIter[0];
-+                unsigned char *p = (unsigned char *) &rspIter[0];
-                 *p = payload.size() + 3;
-                 rspIter[sizeofLenField] = (netfn << netFnShift) | (lun & lunMask);
-                 rspIter[sizeofLenField + 1] = cmd;
+         std::string msgToLog =
+             "Read ssif request message with"
+-- 
+2.34.1
+
