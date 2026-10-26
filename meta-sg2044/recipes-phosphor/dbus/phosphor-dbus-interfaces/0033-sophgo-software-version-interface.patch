@@ -1,11 +1,27 @@
+From 8a0013014df680d747ca9be1dd9f9791c56eeeb4 Mon Sep 17 00:00:00 2001
+From: zhaohui-yan <zhaohui.yan@sophgo.com>
+Date: Mon, 4 Mar 2024 11:20:06 +0800
+Subject: [PATCH 3/4] 1. Update fan speed control strategy web interface. 2.
+ Add
+
+---
+ yaml/xyz/openbmc_project/Software/Version.interface.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
 diff --git a/yaml/xyz/openbmc_project/Software/Version.interface.yaml b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
-index ee4d5ac..0979ef3 100644
+index 4d64227..d17f4ed 100644
 --- a/yaml/xyz/openbmc_project/Software/Version.interface.yaml
 +++ b/yaml/xyz/openbmc_project/Software/Version.interface.yaml
-@@ -42,3 +42,6 @@ enumerations:
+@@ -42,6 +42,9 @@ enumerations:
            - name: PSU
              description: >
                  The version is a version for a PSU.
 +          - name: Cpld
 +            description: >
 +                 The version is a version for Cpld.
+ 
+ associations:
+     - name: running
+-- 
+2.34.1
+
